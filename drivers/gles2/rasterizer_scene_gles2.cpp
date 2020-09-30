@@ -53,6 +53,8 @@
 #endif
 #endif
 
+/*static*/ CustomRenderBackgroundFunction RasterizerSceneGLES2::custom_render_background_function;
+
 static const GLenum _cube_side_enum[6] = {
 
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
@@ -3422,6 +3424,12 @@ void RasterizerSceneGLES2::render_scene(const Transform &p_cam_transform, const 
 			default: {
 			} break;
 		}
+	}
+
+	// Rogue
+	if (env && env->bg_mode == VS::ENV_BG_KEEP) {
+		if(custom_render_background_function)
+			custom_render_background_function(current_fb, viewport_x, viewport_y, viewport_width, viewport_height);
 	}
 
 	if (probe_interior) {

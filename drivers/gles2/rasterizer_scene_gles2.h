@@ -52,8 +52,13 @@
 
 */
 
+typedef void(*CustomRenderBackgroundFunction)(unsigned int fb, int vx, int vy, int vw, int vh);
+
+
 class RasterizerSceneGLES2 : public RasterizerScene {
 public:
+	static CustomRenderBackgroundFunction custom_render_background_function;
+
 	enum ShadowFilterMode {
 		SHADOW_FILTER_NEAREST,
 		SHADOW_FILTER_PCF5,
