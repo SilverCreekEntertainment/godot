@@ -1049,6 +1049,7 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 	ProjectSettings::get_singleton()->set_custom_property_info("display/window/size/height", PropertyInfo(Variant::INT, "display/window/size/height", PROPERTY_HINT_RANGE, "0,4320,or_greater")); // 8K resolution
 	GLOBAL_DEF("display/window/size/resizable", true);
 	GLOBAL_DEF("display/window/size/borderless", false);
+	GLOBAL_DEF("display/window/size/titlebarless", false);
 	GLOBAL_DEF("display/window/size/fullscreen", false);
 	GLOBAL_DEF("display/window/size/always_on_top", false);
 	GLOBAL_DEF("display/window/size/test_width", 0);
@@ -1075,6 +1076,7 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 
 		video_mode.resizable = GLOBAL_GET("display/window/size/resizable");
 		video_mode.borderless_window = GLOBAL_GET("display/window/size/borderless");
+		video_mode.titlebarless_window = GLOBAL_GET("display/window/size/titlebarless");
 		video_mode.fullscreen = GLOBAL_GET("display/window/size/fullscreen");
 		video_mode.always_on_top = GLOBAL_GET("display/window/size/always_on_top");
 	}
