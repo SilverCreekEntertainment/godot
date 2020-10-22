@@ -214,6 +214,7 @@ void OS_Windows::initialize_core() {
 	maximized = false;
 	minimized = false;
 	borderless = false;
+	titlebarless = false;
 
 	FileAccess::make_default<FileAccessWindows>(FileAccess::ACCESS_RESOURCES);
 	FileAccess::make_default<FileAccessWindows>(FileAccess::ACCESS_USERDATA);
@@ -1435,16 +1436,29 @@ Error OS_Windows::initialize(const VideoMode &p_desired, int p_video_driver, int
 	DWORD dwExStyle;
 	DWORD dwStyle;
 
-	if (video_mode.fullscreen || video_mode.borderless_window) {
+	if (video_mode.fullscreen || video_mode.borderless_window || video_mode.titlebarless_window) {
+
 		dwExStyle = WS_EX_APPWINDOW;
 		dwStyle = WS_POPUP;
 
+		// if we're not fullscreen or borderless, then readd the border and taskbar system menu items
+		if (!video_mode.fullscreen && !video_mode.borderless_window) {
+			dwStyle |= WS_THICKFRAME | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
+		}
+
 	} else {
+
 		dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 		dwStyle = WS_OVERLAPPEDWINDOW;
-		if (!video_mode.resizable) {
+		if (video_mode.resizable) {
+			dwStyle |= WS_THICKFRAME;
+		} else {
 			dwStyle &= ~WS_THICKFRAME;
 			dwStyle &= ~WS_MAXIMIZEBOX;
+		}
+
+		if (video_mode.titlebarless_window) {
+			dwStyle &= ~WS_CAPTION;
 		}
 	}
 
@@ -2304,9 +2318,32 @@ bool OS_Windows::get_borderless_window() {
 	return video_mode.borderless_window;
 }
 
+void OS_Windows::set_titlebarless_window(bool p_titlebarless) {
+	if (video_mode.titlebarless_window == p_titlebarless)
+		return;
+
+	video_mode.titlebarless_window = p_titlebarless;
+
+	_update_window_style();
+}
+
+bool OS_Windows::get_titlebarless_window() {
+	return video_mode.titlebarless_window;
+}
+
 void OS_Windows::_update_window_style(bool p_repaint, bool p_maximized) {
 	if (video_mode.fullscreen || video_mode.borderless_window) {
 		SetWindowLongPtr(hWnd, GWL_STYLE, WS_SYSMENU | WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE);
+	} else if (video_mode.titlebarless_window) {
+
+		DWORD dwStyle = WS_POPUP | WS_VISIBLE | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
+		if (video_mode.resizable) {
+			dwStyle |= WS_THICKFRAME;
+			if (p_maximized) {
+				dwStyle |= WS_MAXIMIZE;
+			}
+		}
+		SetWindowLongPtr(hWnd, GWL_STYLE, dwStyle);
 	} else {
 		if (video_mode.resizable) {
 			if (p_maximized) {
