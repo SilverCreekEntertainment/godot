@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -40,7 +40,7 @@
 #include <emscripten/html5.h>
 
 class OS_JavaScript : public OS_Unix {
-
+private:
 	VideoMode video_mode;
 	Vector2 windowed_size;
 	bool window_maximized;
@@ -53,10 +53,10 @@ class OS_JavaScript : public OS_Unix {
 	InputDefault *input;
 	Ref<InputEventKey> deferred_key_event;
 	CursorShape cursor_shape;
-	String cursors[CURSOR_MAX];
-	Map<CursorShape, Vector<Variant> > cursors_cache;
 	Point2 touches[32];
 
+	char canvas_id[256];
+	bool cursor_inside_canvas;
 	Point2i last_click_pos;
 	double last_click_ms;
 	int last_click_button_index;
@@ -71,9 +71,10 @@ class OS_JavaScript : public OS_Unix {
 
 	bool swap_ok_cancel;
 	bool idb_available;
-	int64_t sync_wait_time;
-	int64_t last_sync_check_time;
+	bool idb_needs_sync;
+	bool idb_is_syncing;
 
+	static Point2 compute_position_in_canvas(int x, int y);
 	static EM_BOOL fullscreen_change_callback(int p_event_type, const EmscriptenFullscreenChangeEvent *p_event, void *p_user_data);
 
 	static EM_BOOL keydown_callback(int p_event_type, const EmscriptenKeyboardEvent *p_event, void *p_user_data);
@@ -88,10 +89,16 @@ class OS_JavaScript : public OS_Unix {
 	static EM_BOOL touch_press_callback(int p_event_type, const EmscriptenTouchEvent *p_event, void *p_user_data);
 	static EM_BOOL touchmove_callback(int p_event_type, const EmscriptenTouchEvent *p_event, void *p_user_data);
 
-	static EM_BOOL gamepad_change_callback(int p_event_type, const EmscriptenGamepadEvent *p_event, void *p_user_data);
+	static void gamepad_callback(int p_index, int p_connected, const char *p_id, const char *p_guid);
 	void process_joypads();
 
 	static void file_access_close_callback(const String &p_file, int p_flags);
+
+	static void request_quit_callback();
+	static void drop_files_callback(char **p_filev, int p_filec);
+	static void send_notification_callback(int p_notification);
+	static void fs_sync_callback();
+	static void update_clipboard_callback(const char *p_text);
 
 protected:
 	void resume_audio();
@@ -109,8 +116,6 @@ protected:
 	virtual bool _check_internal_feature_support(const String &p_feature);
 
 public:
-	String canvas_id;
-	void finalize_async();
 	bool check_size_force_redraw();
 
 	// Override return type to make writing static callbacks less tedious.
@@ -179,10 +184,9 @@ public:
 	virtual int get_power_seconds_left();
 	virtual int get_power_percent_left();
 
-	void set_idb_available(bool p_idb_available);
 	virtual bool is_userfs_persistent() const;
-
-	OS_JavaScript(int p_argc, char *p_argv[]);
+	Error open_dynamic_library(const String p_path, void *&p_library_handle, bool p_also_set_library_path);
+	OS_JavaScript();
 };
 
 #endif

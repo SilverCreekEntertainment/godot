@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -32,6 +32,7 @@
 
 #include "joypad_linux.h"
 
+#include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <linux/input.h>
@@ -205,13 +206,24 @@ void JoypadLinux::monitor_joypads() {
 
 	while (!exit_udev) {
 		joy_mutex->lock();
-		for (int i = 0; i < 32; i++) {
+
+		DIR *input_directory;
+		input_directory = opendir("/dev/input");
+		if (input_directory) {
+			struct dirent *current;
 			char fname[64];
-			sprintf(fname, "/dev/input/event%d", i);
-			if (attached_devices.find(fname) == -1) {
-				open_joypad(fname);
+
+			while ((current = readdir(input_directory)) != NULL) {
+				if (strncmp(current->d_name, "event", 5) != 0) {
+					continue;
+				}
+				sprintf(fname, "/dev/input/%.*s", 16, current->d_name);
+				if (attached_devices.find(fname) == -1) {
+					open_joypad(fname);
+				}
 			}
 		}
+		closedir(input_directory);
 		joy_mutex->unlock();
 		usleep(1000000); // 1s
 	}
@@ -493,24 +505,28 @@ void JoypadLinux::process_joypads() {
 						switch (ev.code) {
 							case ABS_HAT0X:
 								if (ev.value != 0) {
-									if (ev.value < 0)
-										joy->dpad |= InputDefault::HAT_MASK_LEFT;
-									else
-										joy->dpad |= InputDefault::HAT_MASK_RIGHT;
-								} else
+									if (ev.value < 0) {
+										joy->dpad = (joy->dpad | InputDefault::HAT_MASK_LEFT) & ~InputDefault::HAT_MASK_RIGHT;
+									} else {
+										joy->dpad = (joy->dpad | InputDefault::HAT_MASK_RIGHT) & ~InputDefault::HAT_MASK_LEFT;
+									}
+								} else {
 									joy->dpad &= ~(InputDefault::HAT_MASK_LEFT | InputDefault::HAT_MASK_RIGHT);
+								}
 
 								input->joy_hat(i, joy->dpad);
 								break;
 
 							case ABS_HAT0Y:
 								if (ev.value != 0) {
-									if (ev.value < 0)
-										joy->dpad |= InputDefault::HAT_MASK_UP;
-									else
-										joy->dpad |= InputDefault::HAT_MASK_DOWN;
-								} else
+									if (ev.value < 0) {
+										joy->dpad = (joy->dpad | InputDefault::HAT_MASK_UP) & ~InputDefault::HAT_MASK_DOWN;
+									} else {
+										joy->dpad = (joy->dpad | InputDefault::HAT_MASK_DOWN) & ~InputDefault::HAT_MASK_UP;
+									}
+								} else {
 									joy->dpad &= ~(InputDefault::HAT_MASK_UP | InputDefault::HAT_MASK_DOWN);
+								}
 
 								input->joy_hat(i, joy->dpad);
 								break;

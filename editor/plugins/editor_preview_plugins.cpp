@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -834,7 +834,9 @@ bool EditorFontPreviewPlugin::handles(const String &p_type) const {
 
 Ref<Texture> EditorFontPreviewPlugin::generate_from_path(const String &p_path, const Size2 &p_size) const {
 
-	RES res = ResourceLoader::load(p_path);
+	Ref<ResourceInteractiveLoader> ril = ResourceLoader::load_interactive(p_path);
+	ril.ptr()->wait();
+	RES res = ril.ptr()->get_resource();
 	Ref<DynamicFont> sampled_font;
 	if (res->is_class("DynamicFont")) {
 		sampled_font = res->duplicate();

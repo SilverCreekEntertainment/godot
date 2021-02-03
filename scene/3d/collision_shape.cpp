@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -29,6 +29,7 @@
 /*************************************************************************/
 
 #include "collision_shape.h"
+
 #include "scene/resources/box_shape.h"
 #include "scene/resources/capsule_shape.h"
 #include "scene/resources/concave_polygon_shape.h"
@@ -82,7 +83,6 @@ void CollisionShape::_notification(int p_what) {
 				if (shape.is_valid()) {
 					parent->shape_owner_add_shape(owner_id, shape);
 				}
-				_update_in_shape_owner();
 			}
 		} break;
 		case NOTIFICATION_ENTER_TREE: {
@@ -115,27 +115,39 @@ void CollisionShape::resource_changed(RES res) {
 
 String CollisionShape::get_configuration_warning() const {
 
+	String warning = Spatial::get_configuration_warning();
+
 	if (!Object::cast_to<CollisionObject>(get_parent())) {
-		return TTR("CollisionShape only serves to provide a collision shape to a CollisionObject derived node. Please only use it as a child of Area, StaticBody, RigidBody, KinematicBody, etc. to give them a shape.");
+		if (warning != String()) {
+			warning += "\n\n";
+		}
+		warning += TTR("CollisionShape only serves to provide a collision shape to a CollisionObject derived node. Please only use it as a child of Area, StaticBody, RigidBody, KinematicBody, etc. to give them a shape.");
 	}
 
 	if (!shape.is_valid()) {
-		return TTR("A shape must be provided for CollisionShape to function. Please create a shape resource for it.");
-	}
-
-	if (shape->is_class("PlaneShape")) {
-		return TTR("Plane shapes don't work well and will be removed in future versions. Please don't use them.");
-	}
-
-	if (Object::cast_to<RigidBody>(get_parent())) {
-		if (Object::cast_to<ConcavePolygonShape>(*shape)) {
-			if (Object::cast_to<RigidBody>(get_parent())->get_mode() != RigidBody::MODE_STATIC) {
-				return TTR("ConcavePolygonShape doesn't support RigidBody in another mode than static.");
+		if (warning != String()) {
+			warning += "\n\n";
+		}
+		warning += TTR("A shape must be provided for CollisionShape to function. Please create a shape resource for it.");
+	} else {
+		if (shape->is_class("PlaneShape")) {
+			if (warning != String()) {
+				warning += "\n\n";
 			}
+			warning += TTR("Plane shapes don't work well and will be removed in future versions. Please don't use them.");
+		}
+
+		if (Object::cast_to<RigidBody>(get_parent()) &&
+				Object::cast_to<ConcavePolygonShape>(*shape) &&
+				Object::cast_to<RigidBody>(get_parent())->get_mode() != RigidBody::MODE_STATIC) {
+			if (warning != String()) {
+				warning += "\n\n";
+			}
+			warning += TTR("ConcavePolygonShape doesn't support RigidBody in another mode than static.");
 		}
 	}
 
-	return String();
+	return warning;
 }
 
 void CollisionShape::_bind_methods() {
@@ -157,7 +169,9 @@ void CollisionShape::_bind_methods() {
 }
 
 void CollisionShape::set_shape(const Ref<Shape> &p_shape) {
-
+	if (p_shape == shape) {
+		return;
+	}
 	if (!shape.is_null()) {
 		shape->unregister_owner(this);
 		shape->disconnect("changed", this, "_shape_changed");

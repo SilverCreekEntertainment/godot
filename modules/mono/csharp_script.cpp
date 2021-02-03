@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -345,14 +345,18 @@ Ref<Script> CSharpLanguage::get_template(const String &p_class_name, const Strin
 							 "//  }\n"
 							 "}\n";
 
-	String base_class_name = get_base_class_name(p_base_class_name, p_class_name);
+	// Replaces all spaces in p_class_name with underscores to prevent
+	// erronous C# Script templates from being generated when the object name
+	// has spaces in it.
+	String class_name_no_spaces = p_class_name.replace(" ", "_");
+	String base_class_name = get_base_class_name(p_base_class_name, class_name_no_spaces);
 	script_template = script_template.replace("%BASE%", base_class_name)
-							  .replace("%CLASS%", p_class_name);
+							  .replace("%CLASS%", class_name_no_spaces);
 
 	Ref<CSharpScript> script;
 	script.instance();
 	script->set_source_code(script_template);
-	script->set_name(p_class_name);
+	script->set_name(class_name_no_spaces);
 
 	return script;
 }
@@ -365,9 +369,10 @@ bool CSharpLanguage::is_using_templates() {
 void CSharpLanguage::make_template(const String &p_class_name, const String &p_base_class_name, Ref<Script> &p_script) {
 
 	String src = p_script->get_source_code();
-	String base_class_name = get_base_class_name(p_base_class_name, p_class_name);
+	String class_name_no_spaces = p_class_name.replace(" ", "_");
+	String base_class_name = get_base_class_name(p_base_class_name, class_name_no_spaces);
 	src = src.replace("%BASE%", base_class_name)
-				  .replace("%CLASS%", p_class_name)
+				  .replace("%CLASS%", class_name_no_spaces)
 				  .replace("%TS%", _get_indentation());
 	p_script->set_source_code(src);
 }
@@ -2608,14 +2613,14 @@ bool CSharpScript::_get_member_export(IMonoClassMember *p_member, bool p_inspect
 		if (!property->has_getter()) {
 #ifdef TOOLS_ENABLED
 			if (exported)
-				ERR_PRINTS("Read-only property cannot be exported: '" + MEMBER_FULL_QUALIFIED_NAME(p_member) + "'.");
+				ERR_PRINT("Cannot export a property without a getter: '" + MEMBER_FULL_QUALIFIED_NAME(p_member) + "'.");
 #endif
 			return false;
 		}
 		if (!property->has_setter()) {
 #ifdef TOOLS_ENABLED
 			if (exported)
-				ERR_PRINTS("Write-only property (without getter) cannot be exported: '" + MEMBER_FULL_QUALIFIED_NAME(p_member) + "'.");
+				ERR_PRINT("Cannot export a property without a setter: '" + MEMBER_FULL_QUALIFIED_NAME(p_member) + "'.");
 #endif
 			return false;
 		}
@@ -2691,7 +2696,7 @@ int CSharpScript::_try_get_member_export_hint(IMonoClassMember *p_member, Manage
 				name_only_hint_string += ",";
 			}
 
-			String enum_field_name = mono_field_get_name(field);
+			String enum_field_name = String::utf8(mono_field_get_name(field));
 			r_hint_string += enum_field_name;
 			name_only_hint_string += enum_field_name;
 
@@ -3356,9 +3361,9 @@ Error CSharpScript::load_source_code(const String &p_path) {
 
 	ERR_FAIL_COND_V_MSG(ferr != OK, ferr,
 			ferr == ERR_INVALID_DATA ?
-					"Script '" + p_path + "' contains invalid unicode (UTF-8), so it was not loaded."
+					  "Script '" + p_path + "' contains invalid unicode (UTF-8), so it was not loaded."
 										  " Please ensure that scripts are saved in valid UTF-8 unicode." :
-					"Failed to read file: '" + p_path + "'.");
+					  "Failed to read file: '" + p_path + "'.");
 
 #ifdef TOOLS_ENABLED
 	source_changed_cache = true;

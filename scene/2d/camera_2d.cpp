@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -78,6 +78,8 @@ void Camera2D::_update_process_mode() {
 }
 
 void Camera2D::set_zoom(const Vector2 &p_zoom) {
+	// Setting zoom to zero causes 'affine_invert' issues
+	ERR_FAIL_COND_MSG(Math::is_zero_approx(p_zoom.x) || Math::is_zero_approx(p_zoom.y), "Zoom level must be different from 0 (can be negative).");
 
 	zoom = p_zoom;
 	Point2 old_smoothed_camera_pos = smoothed_camera_pos;
@@ -200,10 +202,10 @@ Transform2D Camera2D::get_camera_transform() {
 	camera_screen_center = screen_rect.position + screen_rect.size * 0.5;
 
 	Transform2D xform;
+	xform.scale_basis(zoom);
 	if (rotating) {
 		xform.set_rotation(angle);
 	}
-	xform.scale_basis(zoom);
 	xform.set_origin(screen_rect.position /*.floor()*/);
 
 	/*

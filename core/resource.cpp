@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -155,8 +155,8 @@ Ref<Resource> Resource::duplicate_for_local_scene(Node *p_for_scene, Map<Ref<Res
 	List<PropertyInfo> plist;
 	get_property_list(&plist);
 
-	Resource *r = Object::cast_to<Resource>(ClassDB::instance(get_class()));
-	ERR_FAIL_COND_V(!r, Ref<Resource>());
+	Ref<Resource> r = Object::cast_to<Resource>(ClassDB::instance(get_class()));
+	ERR_FAIL_COND_V(r.is_null(), Ref<Resource>());
 
 	r->local_scene = p_for_scene;
 
@@ -186,9 +186,7 @@ Ref<Resource> Resource::duplicate_for_local_scene(Node *p_for_scene, Map<Ref<Res
 		r->set(E->get().name, p);
 	}
 
-	RES res = Ref<Resource>(r);
-
-	return res;
+	return r;
 }
 
 void Resource::configure_for_local_scene(Node *p_for_scene, Map<Ref<Resource>, Ref<Resource> > &remap_cache) {
@@ -224,8 +222,8 @@ Ref<Resource> Resource::duplicate(bool p_subresources) const {
 	List<PropertyInfo> plist;
 	get_property_list(&plist);
 
-	Resource *r = (Resource *)ClassDB::instance(get_class());
-	ERR_FAIL_COND_V(!r, Ref<Resource>());
+	Ref<Resource> r = (Resource *)ClassDB::instance(get_class());
+	ERR_FAIL_COND_V(r.is_null(), Ref<Resource>());
 
 	for (List<PropertyInfo>::Element *E = plist.front(); E; E = E->next()) {
 
@@ -247,7 +245,7 @@ Ref<Resource> Resource::duplicate(bool p_subresources) const {
 		}
 	}
 
-	return Ref<Resource>(r);
+	return r;
 }
 
 void Resource::_set_path(const String &p_path) {
@@ -418,6 +416,7 @@ void Resource::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_local_to_scene"), &Resource::is_local_to_scene);
 	ClassDB::bind_method(D_METHOD("get_local_scene"), &Resource::get_local_scene);
 	ClassDB::bind_method(D_METHOD("setup_local_to_scene"), &Resource::setup_local_to_scene);
+	ClassDB::bind_method(D_METHOD("emit_changed"), &Resource::emit_changed);
 
 	ClassDB::bind_method(D_METHOD("duplicate", "subresources"), &Resource::duplicate, DEFVAL(false));
 	ADD_SIGNAL(MethodInfo("changed"));

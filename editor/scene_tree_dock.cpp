@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -57,10 +57,7 @@ void SceneTreeDock::_nodes_drag_begin() {
 }
 
 void SceneTreeDock::_quick_open() {
-	Vector<String> files = quick_open->get_selected_files();
-	for (int i = 0; i < files.size(); i++) {
-		instance(files[i]);
-	}
+	instance_scenes(quick_open->get_selected_files(), scene_tree->get_selected());
 }
 
 void SceneTreeDock::_input(Ref<InputEvent> p_event) {
@@ -121,26 +118,9 @@ void SceneTreeDock::_unhandled_key_input(Ref<InputEvent> p_event) {
 }
 
 void SceneTreeDock::instance(const String &p_file) {
-
-	Node *parent = scene_tree->get_selected();
-
-	if (!parent) {
-		parent = edited_scene;
-	};
-
-	if (!edited_scene) {
-
-		current_option = -1;
-		accept->set_text(TTR("No parent to instance a child at."));
-		accept->popup_centered_minsize();
-		return;
-	};
-
-	ERR_FAIL_COND(!parent);
-
 	Vector<String> scenes;
 	scenes.push_back(p_file);
-	_perform_instance_scenes(scenes, parent, -1);
+	instance_scenes(scenes, scene_tree->get_selected());
 }
 
 void SceneTreeDock::instance_scenes(const Vector<String> &p_files, Node *p_parent) {
@@ -152,8 +132,11 @@ void SceneTreeDock::instance_scenes(const Vector<String> &p_files, Node *p_paren
 	}
 
 	if (!parent || !edited_scene) {
-
-		accept->set_text(TTR("No parent to instance the scenes at."));
+		if (p_files.size() == 1) {
+			accept->set_text(TTR("No parent to instance a child at."));
+		} else {
+			accept->set_text(TTR("No parent to instance the scenes at."));
+		}
 		accept->popup_centered_minsize();
 		return;
 	};
@@ -235,6 +218,7 @@ void SceneTreeDock::_perform_instance_scenes(const Vector<String> &p_files, Node
 	}
 
 	editor_data->get_undo_redo().commit_action();
+	editor->push_item(instances[instances.size() - 1]);
 }
 
 void SceneTreeDock::_replace_with_branch_scene(const String &p_file, Node *base) {
@@ -371,7 +355,7 @@ void SceneTreeDock::_tool_selected(int p_tool, bool p_confirm_override) {
 				if (preferred_types.empty()) {
 					preferred_types.push_back("Control");
 					preferred_types.push_back("Node2D");
-					preferred_types.push_back("Node3D");
+					preferred_types.push_back("Spatial");
 				}
 
 				for (int i = 0; i < preferred_types.size(); i++) {
@@ -1163,7 +1147,7 @@ void SceneTreeDock::_notification(int p_what) {
 			button_create_script->set_icon(get_icon("ScriptCreate", "EditorIcons"));
 			button_detach_script->set_icon(get_icon("ScriptRemove", "EditorIcons"));
 			button_2d->set_icon(get_icon("Node2D", "EditorIcons"));
-			button_3d->set_icon(get_icon("Node3D", "EditorIcons"));
+			button_3d->set_icon(get_icon("Spatial", "EditorIcons"));
 			button_ui->set_icon(get_icon("Control", "EditorIcons"));
 			button_custom->set_icon(get_icon("Add", "EditorIcons"));
 
@@ -1279,10 +1263,6 @@ void SceneTreeDock::_fill_path_renames(Vector<StringName> base_path, Vector<Stri
 }
 
 void SceneTreeDock::fill_path_renames(Node *p_node, Node *p_new_parent, List<Pair<NodePath, NodePath> > *p_renames) {
-
-	if (!bool(EDITOR_DEF("editors/animation/autorename_animation_tracks", true)))
-		return;
-
 	Vector<StringName> base_path;
 	Node *n = p_node->get_parent();
 	while (n) {
@@ -1329,35 +1309,50 @@ void SceneTreeDock::perform_node_renames(Node *p_base, List<Pair<NodePath, NodeP
 
 			List<PropertyInfo> properties;
 			si->get_property_list(&properties);
+			NodePath root_path = p_base->get_path();
 
 			for (List<PropertyInfo>::Element *E = properties.front(); E; E = E->next()) {
 
 				String propertyname = E->get().name;
 				Variant p = p_base->get(propertyname);
 				if (p.get_type() == Variant::NODE_PATH) {
+					NodePath root_path_new = root_path;
+					for (List<Pair<NodePath, NodePath> >::Element *F = p_renames->front(); F; F = F->next()) {
+						if (root_path == F->get().first) {
+							root_path_new = F->get().second;
+							break;
+						}
+					}
 
 					// Goes through all paths to check if its matching
 					for (List<Pair<NodePath, NodePath> >::Element *F = p_renames->front(); F; F = F->next()) {
-
-						NodePath root_path = p_base->get_path();
-
 						NodePath rel_path_old = root_path.rel_path_to(F->get().first);
-
-						NodePath rel_path_new = F->get().second;
-
-						// if not empty, get new relative path
-						if (F->get().second != NodePath()) {
-							rel_path_new = root_path.rel_path_to(F->get().second);
-						}
 
 						// if old path detected, then it needs to be replaced with the new one
 						if (p == rel_path_old) {
+							NodePath rel_path_new = F->get().second;
+
+							// if not empty, get new relative path
+							if (!rel_path_new.is_empty()) {
+								rel_path_new = root_path_new.rel_path_to(F->get().second);
+							}
 
 							editor_data->get_undo_redo().add_do_property(p_base, propertyname, rel_path_new);
 							editor_data->get_undo_redo().add_undo_property(p_base, propertyname, rel_path_old);
 
 							p_base->set(propertyname, rel_path_new);
 							break;
+						}
+
+						// update the node itself if it has a valid node path and has not been deleted
+						if (root_path == F->get().first && p != NodePath() && F->get().second != NodePath()) {
+							NodePath abs_path = NodePath(String(root_path).plus_file(p)).simplified();
+							NodePath rel_path_new = F->get().second.rel_path_to(abs_path);
+
+							editor_data->get_undo_redo().add_do_property(p_base, propertyname, rel_path_new);
+							editor_data->get_undo_redo().add_undo_property(p_base, propertyname, p);
+
+							p_base->set(propertyname, rel_path_new);
 						}
 					}
 				}
@@ -1956,7 +1951,7 @@ Node *SceneTreeDock::_get_selection_group_tail(Node *p_node, List<Node *> p_list
 }
 
 void SceneTreeDock::_do_create(Node *p_parent) {
-	Object *c = create_dialog->instance_selected();
+	Variant c = create_dialog->instance_selected();
 
 	ERR_FAIL_COND(!c);
 	Node *child = Object::cast_to<Node>(c);
@@ -2034,7 +2029,7 @@ void SceneTreeDock::_create() {
 			Node *n = E->get();
 			ERR_FAIL_COND(!n);
 
-			Object *c = create_dialog->instance_selected();
+			Variant c = create_dialog->instance_selected();
 
 			ERR_FAIL_COND(!c);
 			Node *newnode = Object::cast_to<Node>(c);
@@ -2113,8 +2108,12 @@ void SceneTreeDock::replace_node(Node *p_node, Node *p_by_node, bool p_keep_prop
 				continue;
 
 			if (E->get().name == "__meta__") {
-				if (Object::cast_to<CanvasItem>(newnode)) {
-					Dictionary metadata = n->get(E->get().name);
+				Dictionary metadata = n->get(E->get().name);
+				if (metadata.has("_editor_description_")) {
+					newnode->set_meta("_editor_description_", metadata["_editor_description_"]);
+				}
+
+				if (Object::cast_to<CanvasItem>(newnode) || Object::cast_to<Spatial>(newnode)) {
 					if (metadata.has("_edit_group_") && metadata["_edit_group_"]) {
 						newnode->set_meta("_edit_group_", true);
 					}
@@ -2167,7 +2166,6 @@ void SceneTreeDock::replace_node(Node *p_node, Node *p_by_node, bool p_keep_prop
 	if (n == edited_scene) {
 		edited_scene = newnode;
 		editor->set_edited_scene(newnode);
-		newnode->set_editable_instances(n->get_editable_instances());
 	}
 
 	//small hack to make collisionshapes and other kind of nodes to work
@@ -2872,8 +2870,8 @@ SceneTreeDock::SceneTreeDock(EditorNode *p_editor, Node *p_scene_root, EditorSel
 	HBoxContainer *filter_hbc = memnew(HBoxContainer);
 	filter_hbc->add_constant_override("separate", 0);
 
-	ED_SHORTCUT("scene_tree/rename", TTR("Rename"));
-	ED_SHORTCUT("scene_tree/batch_rename", TTR("Batch Rename"), KEY_MASK_CMD | KEY_F2);
+	ED_SHORTCUT("scene_tree/rename", TTR("Rename"), KEY_F2);
+	ED_SHORTCUT("scene_tree/batch_rename", TTR("Batch Rename"), KEY_MASK_SHIFT | KEY_F2);
 	ED_SHORTCUT("scene_tree/add_child_node", TTR("Add Child Node"), KEY_MASK_CMD | KEY_A);
 	ED_SHORTCUT("scene_tree/instance_scene", TTR("Instance Child Scene"));
 	ED_SHORTCUT("scene_tree/expand_collapse_all", TTR("Expand/Collapse All"));

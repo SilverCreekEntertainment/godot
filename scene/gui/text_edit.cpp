@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -885,6 +885,7 @@ void TextEdit::_notification(int p_what) {
 			}
 
 			Point2 cursor_pos;
+			bool is_cursor_visible = false;
 			int cursor_insert_offset_y = 0;
 
 			// Get the highlighted words.
@@ -1492,6 +1493,7 @@ void TextEdit::_notification(int p_what) {
 
 					if (cursor.column == (last_wrap_column + j) && cursor.line == line && cursor_wrap_index == line_wrap_index && (char_ofs + char_margin) >= xmargin_beg) {
 
+						is_cursor_visible = true;
 						cursor_pos = Point2i(char_ofs + char_margin + ofs_x, ofs_y);
 						cursor_pos.y += (get_row_height() - cache.font->get_height()) / 2;
 
@@ -1552,65 +1554,84 @@ void TextEdit::_notification(int p_what) {
 			}
 
 			bool completion_below = false;
-			if (completion_active && completion_options.size() > 0) {
-				// Code completion box.
-				Ref<StyleBox> csb = get_stylebox("completion");
-				int maxlines = get_constant("completion_lines");
-				int cmax_width = get_constant("completion_max_width") * cache.font->get_char_size('x').x;
-				int scrollw = get_constant("completion_scroll_width");
-				Color scrollc = get_color("completion_scroll_color");
+			if (completion_active && is_cursor_visible && completion_options.size() > 0) {
+				// Completion panel
 
+				const Ref<StyleBox> csb = get_stylebox("completion");
+				const int maxlines = get_constant("completion_lines");
+				const int cmax_width = get_constant("completion_max_width") * cache.font->get_char_size('x').x;
+				const Color scrollc = get_color("completion_scroll_color");
+
+				const int row_height = get_row_height();
 				const int completion_options_size = completion_options.size();
-				int lines = MIN(completion_options_size, maxlines);
-				int w = 0;
-				int h = lines * get_row_height();
-				int nofs = cache.font->get_string_size(completion_base).width;
+				const int row_count = MIN(completion_options_size, maxlines);
+				const int completion_rows_height = row_count * row_height;
+				const int completion_base_width = cache.font->get_string_size(completion_base).width;
 
+				int scroll_rectangle_width = get_constant("completion_scroll_width");
+				int width = 0;
+
+				// Compute max width of the panel based on the longest completion option
 				if (completion_options_size < 50) {
 					for (int i = 0; i < completion_options_size; i++) {
-						int w2 = MIN(cache.font->get_string_size(completion_options[i].display).x, cmax_width);
-						if (w2 > w)
-							w = w2;
+						int line_width = MIN(cache.font->get_string_size(completion_options[i].display).x, cmax_width);
+						if (line_width > width) {
+							width = line_width;
+						}
 					}
 				} else {
-					w = cmax_width;
+					width = cmax_width;
 				}
 
 				// Add space for completion icons.
 				const int icon_hsep = get_constant("hseparation", "ItemList");
-				Size2 icon_area_size(get_row_height(), get_row_height());
-				w += icon_area_size.width + icon_hsep;
+				const Size2 icon_area_size(row_height, row_height);
+				const int icon_area_width = icon_area_size.width + icon_hsep;
+				width += icon_area_size.width + icon_hsep;
 
-				int th = h + csb->get_minimum_size().y;
+				const int line_from = CLAMP(completion_index - row_count / 2, 0, completion_options_size - row_count);
 
-				if (cursor_pos.y + get_row_height() + th > get_size().height) {
-					completion_rect.position.y = cursor_pos.y - th - (cache.line_spacing / 2.0f) - cursor_insert_offset_y;
+				for (int i = 0; i < row_count; i++) {
+					int l = line_from + i;
+					ERR_CONTINUE(l < 0 || l >= completion_options_size);
+					if (completion_options[l].default_value.get_type() == Variant::COLOR) {
+						width += icon_area_size.width;
+						break;
+					}
+				}
+
+				// Position completion panel
+				completion_rect.size.width = width + 2;
+				completion_rect.size.height = completion_rows_height;
+
+				if (completion_options_size <= maxlines) {
+					scroll_rectangle_width = 0;
+				}
+
+				const Point2 csb_offset = csb->get_offset();
+				const int total_height = completion_rect.size.height + csb->get_minimum_size().y;
+				const int ajdusted_cursor_y = cursor_pos.y - cursor_insert_offset_y - (get_row_height() - cache.font->get_height()) / 2;
+
+				completion_rect.position.x = cursor_pos.x - completion_base_width - icon_area_width - csb_offset.x;
+
+				if (ajdusted_cursor_y + row_height + total_height > get_size().height) {
+					// Completion panel above the cursor line
+					completion_rect.position.y = ajdusted_cursor_y - total_height;
 				} else {
-					completion_rect.position.y = cursor_pos.y + cache.font->get_height() + (cache.line_spacing / 2.0f) + csb->get_offset().y - cursor_insert_offset_y;
+					// Completion panel below the cursor line
+					completion_rect.position.y = ajdusted_cursor_y + row_height;
 					completion_below = true;
 				}
 
-				if (cursor_pos.x - nofs + w + scrollw > get_size().width) {
-					completion_rect.position.x = get_size().width - w - scrollw;
-				} else {
-					completion_rect.position.x = cursor_pos.x - nofs;
-				}
-
-				completion_rect.size.width = w + 2;
-				completion_rect.size.height = h;
-				if (completion_options_size <= maxlines)
-					scrollw = 0;
-
-				draw_style_box(csb, Rect2(completion_rect.position - csb->get_offset(), completion_rect.size + csb->get_minimum_size() + Size2(scrollw, 0)));
+				draw_style_box(csb, Rect2(completion_rect.position - csb_offset, completion_rect.size + csb->get_minimum_size() + Size2(scroll_rectangle_width, 0)));
 
 				if (cache.completion_background_color.a > 0.01) {
-					VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(completion_rect.position, completion_rect.size + Size2(scrollw, 0)), cache.completion_background_color);
+					VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(completion_rect.position, completion_rect.size + Size2(scroll_rectangle_width, 0)), cache.completion_background_color);
 				}
-				int line_from = CLAMP(completion_index - lines / 2, 0, completion_options_size - lines);
 				VisualServer::get_singleton()->canvas_item_add_rect(ci, Rect2(Point2(completion_rect.position.x, completion_rect.position.y + (completion_index - line_from) * get_row_height()), Size2(completion_rect.size.width, get_row_height())), cache.completion_selected_color);
-				draw_rect(Rect2(completion_rect.position + Vector2(icon_area_size.x + icon_hsep, 0), Size2(MIN(nofs, completion_rect.size.width - (icon_area_size.x + icon_hsep)), completion_rect.size.height)), cache.completion_existing_color);
+				draw_rect(Rect2(completion_rect.position + Vector2(icon_area_size.x + icon_hsep, 0), Size2(MIN(completion_base_width, completion_rect.size.width - (icon_area_size.x + icon_hsep)), completion_rect.size.height)), cache.completion_existing_color);
 
-				for (int i = 0; i < lines; i++) {
+				for (int i = 0; i < row_count; i++) {
 
 					int l = line_from + i;
 					ERR_CONTINUE(l < 0 || l >= completion_options_size);
@@ -1635,14 +1656,19 @@ void TextEdit::_notification(int p_what) {
 					}
 
 					title_pos.x = icon_area.position.x + icon_area.size.width + icon_hsep;
+
+					if (completion_options[l].default_value.get_type() == Variant::COLOR) {
+						draw_rect(Rect2(Point2(completion_rect.position.x + completion_rect.size.width - icon_area_size.x, icon_area.position.y), icon_area_size), (Color)completion_options[l].default_value);
+					}
+
 					draw_string(cache.font, title_pos, completion_options[l].display, text_color, completion_rect.size.width - (icon_area_size.x + icon_hsep));
 				}
 
-				if (scrollw) {
+				if (scroll_rectangle_width) {
 					// Draw a small scroll rectangle to show a position in the options.
 					float r = (float)maxlines / completion_options_size;
 					float o = (float)line_from / completion_options_size;
-					draw_rect(Rect2(completion_rect.position.x + completion_rect.size.width, completion_rect.position.y + o * completion_rect.size.y, scrollw, completion_rect.size.y * r), scrollc);
+					draw_rect(Rect2(completion_rect.position.x + completion_rect.size.width, completion_rect.position.y + o * completion_rect.size.y, scroll_rectangle_width, completion_rect.size.y * r), scrollc);
 				}
 
 				completion_line_ofs = line_from;
@@ -1650,7 +1676,7 @@ void TextEdit::_notification(int p_what) {
 
 			// Check to see if the hint should be drawn.
 			bool show_hint = false;
-			if (completion_hint != "") {
+			if (is_cursor_visible && completion_hint != "") {
 				if (completion_active) {
 					if (completion_below && !callhint_below) {
 						show_hint = true;
@@ -1691,7 +1717,7 @@ void TextEdit::_notification(int p_what) {
 					completion_hint_offset = cursor_pos.x - offset;
 				}
 
-				Point2 hint_ofs = Vector2(completion_hint_offset, cursor_pos.y) + callhint_offset;
+				Point2 hint_ofs = Vector2(completion_hint_offset, cursor_pos.y - cursor_insert_offset_y - (get_row_height() - cache.font->get_height()) / 2) + callhint_offset;
 
 				if (callhint_below) {
 					hint_ofs.y += get_row_height() + sb->get_offset().y;
@@ -1740,8 +1766,24 @@ void TextEdit::_notification(int p_what) {
 			Point2 cursor_pos = Point2(cursor_get_column(), cursor_get_line()) * get_row_height();
 			OS::get_singleton()->set_ime_position(get_global_position() + cursor_pos);
 
-			if (OS::get_singleton()->has_virtual_keyboard() && virtual_keyboard_enabled)
-				OS::get_singleton()->show_virtual_keyboard(get_text(), get_global_rect(), true);
+			if (OS::get_singleton()->has_virtual_keyboard() && virtual_keyboard_enabled) {
+				int cursor_start = -1;
+				int cursor_end = -1;
+
+				if (!selection.active) {
+					String full_text = _base_get_text(0, 0, cursor.line, cursor.column);
+
+					cursor_start = full_text.length();
+				} else {
+					String pre_text = _base_get_text(0, 0, selection.from_line, selection.from_column);
+					String post_text = _base_get_text(selection.from_line, selection.from_column, selection.to_line, selection.to_column);
+
+					cursor_start = pre_text.length();
+					cursor_end = cursor_start + post_text.length();
+				}
+
+				OS::get_singleton()->show_virtual_keyboard(get_text(), get_global_rect(), true, -1, cursor_start, cursor_end);
+			}
 		} break;
 		case NOTIFICATION_FOCUS_EXIT: {
 
@@ -3735,7 +3777,7 @@ void TextEdit::_gui_input(const Ref<InputEvent> &p_gui_input) {
 			return;
 		}
 
-		if (!scancode_handled && (!k->get_command() || (k->get_command() && k->get_alt()))) { // For German keyboards.
+		if (!scancode_handled && !k->get_command()) { // For German keyboards.
 
 			if (k->get_unicode() >= 32) {
 
@@ -6745,7 +6787,7 @@ void TextEdit::set_tooltip_request_func(Object *p_obj, const StringName &p_funct
 }
 
 void TextEdit::set_line(int line, String new_text) {
-	if (line < 0 || line > text.size())
+	if (line < 0 || line >= text.size())
 		return;
 	_remove_text(line, 0, line, text[line].length());
 	_insert_text(line, 0, new_text);
@@ -7054,6 +7096,12 @@ void TextEdit::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_virtual_keyboard_enabled"), &TextEdit::is_virtual_keyboard_enabled);
 	ClassDB::bind_method(D_METHOD("set_selecting_enabled", "enable"), &TextEdit::set_selecting_enabled);
 	ClassDB::bind_method(D_METHOD("is_selecting_enabled"), &TextEdit::is_selecting_enabled);
+	ClassDB::bind_method(D_METHOD("is_line_set_as_safe", "line"), &TextEdit::is_line_set_as_safe);
+	ClassDB::bind_method(D_METHOD("set_line_as_safe", "line", "safe"), &TextEdit::set_line_as_safe);
+	ClassDB::bind_method(D_METHOD("is_line_set_as_bookmark", "line"), &TextEdit::is_line_set_as_bookmark);
+	ClassDB::bind_method(D_METHOD("set_line_as_bookmark", "line", "bookmark"), &TextEdit::set_line_as_bookmark);
+	ClassDB::bind_method(D_METHOD("set_line_as_breakpoint", "line", "breakpoint"), &TextEdit::set_line_as_breakpoint);
+	ClassDB::bind_method(D_METHOD("is_line_set_as_breakpoint", "line"), &TextEdit::is_line_set_as_breakpoint);
 
 	ClassDB::bind_method(D_METHOD("cut"), &TextEdit::cut);
 	ClassDB::bind_method(D_METHOD("copy"), &TextEdit::copy);

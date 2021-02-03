@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -141,6 +141,10 @@ void ScriptDebuggerRemote::debug(ScriptLanguage *p_script, bool p_can_continue, 
 		return;
 
 	ERR_FAIL_COND_MSG(!tcp_client->is_connected_to_host(), "Script Debugger failed to connect, but being used anyway.");
+
+	if (allow_focus_steal_pid) {
+		OS::get_singleton()->enable_for_stealing_focus(allow_focus_steal_pid);
+	}
 
 	packet_peer_stream->put_var("debug_enter");
 	packet_peer_stream->put_var(2);
@@ -1231,6 +1235,10 @@ void ScriptDebuggerRemote::set_skip_breakpoints(bool p_skip_breakpoints) {
 	skip_breakpoints = p_skip_breakpoints;
 }
 
+void ScriptDebuggerRemote::set_allow_focus_steal_pid(OS::ProcessID p_pid) {
+	allow_focus_steal_pid = p_pid;
+}
+
 ScriptDebuggerRemote::ResourceUsageFunc ScriptDebuggerRemote::resource_usage_func = NULL;
 
 ScriptDebuggerRemote::ScriptDebuggerRemote() :
@@ -1258,6 +1266,7 @@ ScriptDebuggerRemote::ScriptDebuggerRemote() :
 		warn_count(0),
 		last_msec(0),
 		msec_count(0),
+		allow_focus_steal_pid(0),
 		locking(false),
 		poll_every(0),
 		scene_tree(NULL) {

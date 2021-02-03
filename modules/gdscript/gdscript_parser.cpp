@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -2862,7 +2862,6 @@ void GDScriptParser::_parse_block(BlockNode *p_block, bool p_static) {
 					return;
 				}
 				StringName n = tokenizer->get_token_literal();
-				tokenizer->advance();
 				if (current_function) {
 					for (int i = 0; i < current_function->arguments.size(); i++) {
 						if (n == current_function->arguments[i]) {
@@ -2879,6 +2878,7 @@ void GDScriptParser::_parse_block(BlockNode *p_block, bool p_static) {
 					}
 					check_block = check_block->parent_block;
 				}
+				tokenizer->advance();
 
 				//must know when the local variable is declared
 				LocalVarNode *lv = alloc_node<LocalVarNode>();
@@ -4109,6 +4109,7 @@ void GDScriptParser::_parse_class(ClassNode *p_class) {
 				//arguments
 			} break;
 			case GDScriptTokenizer::TK_PR_SIGNAL: {
+				_mark_line_as_safe(tokenizer->get_token_line());
 				tokenizer->advance();
 
 				if (!tokenizer->is_token_literal()) {
@@ -4629,6 +4630,7 @@ void GDScriptParser::_parse_class(ClassNode *p_class) {
 						if (subexpr->type != Node::TYPE_CONSTANT) {
 							current_export = PropertyInfo();
 							_set_error("Expected a constant expression.");
+							return;
 						}
 
 						Variant constant = static_cast<ConstantNode *>(subexpr)->value;

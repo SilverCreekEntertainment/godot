@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -99,7 +99,7 @@ public class GodotView extends GLSurfaceView {
 	public boolean onTouchEvent(MotionEvent event) {
 		super.onTouchEvent(event);
 		this.detector.onTouchEvent(event);
-		return godot.gotTouchEvent(event);
+		return inputHandler.onTouchEvent(event);
 	}
 
 	@Override
@@ -158,15 +158,15 @@ public class GodotView extends GLSurfaceView {
 
 				if (GLUtils.use_32) {
 					setEGLConfigChooser(translucent ?
-												new RegularFallbackConfigChooser(8, 8, 8, 8, 24, stencil,
+												  new RegularFallbackConfigChooser(8, 8, 8, 8, 24, stencil,
 														new RegularConfigChooser(8, 8, 8, 8, 16, stencil)) :
-												new RegularFallbackConfigChooser(8, 8, 8, 8, 24, stencil,
+												  new RegularFallbackConfigChooser(8, 8, 8, 8, 24, stencil,
 														new RegularConfigChooser(5, 6, 5, 0, 16, stencil)));
 
 				} else {
 					setEGLConfigChooser(translucent ?
-												new RegularConfigChooser(8, 8, 8, 8, 16, stencil) :
-												new RegularConfigChooser(5, 6, 5, 0, 16, stencil));
+												  new RegularConfigChooser(8, 8, 8, 8, 16, stencil) :
+												  new RegularConfigChooser(5, 6, 5, 0, 16, stencil));
 				}
 				break;
 		}
@@ -177,6 +177,10 @@ public class GodotView extends GLSurfaceView {
 
 	public void onBackPressed() {
 		godot.onBackPressed();
+	}
+
+	public GodotInputHandler getInputHandler() {
+		return inputHandler;
 	}
 
 	@Override

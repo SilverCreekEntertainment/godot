@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -142,7 +142,6 @@ protected:
 
 	virtual void set_cmdline(const char *p_execpath, const List<String> &p_args);
 
-	void _ensure_user_data_dir();
 	virtual bool _check_internal_feature_support(const String &p_feature) = 0;
 
 public:
@@ -176,6 +175,7 @@ public:
 	virtual Point2 get_mouse_position() const = 0;
 	virtual int get_mouse_button_state() const = 0;
 	virtual void set_window_title(const String &p_title) = 0;
+	virtual void set_window_mouse_passthrough(const PoolVector2Array &p_region){};
 
 	virtual void set_clipboard(const String &p_text);
 	virtual String get_clipboard() const;
@@ -239,6 +239,22 @@ public:
 	virtual void request_attention() {}
 	virtual void center_window();
 
+	// Returns internal pointers and handles.
+	// While exposed to GDScript this is mostly to give GDNative plugins access to this information.
+	// Note that whether a valid handle is returned depends on whether it applies to the given
+	// platform and often to the chosen render driver.
+	// NULL will be returned if a handle is not available.
+
+	enum HandleType {
+		APPLICATION_HANDLE, // HINSTANCE, NSApplication*, UIApplication*, JNIEnv* ...
+		DISPLAY_HANDLE, // X11::Display* ...
+		WINDOW_HANDLE, // HWND, X11::Window*, NSWindow*, UIWindow*, Android activity ...
+		WINDOW_VIEW, // HDC, NSView*, UIView*, Android surface ...
+		OPENGL_CONTEXT, // HGLRC, X11::GLXContext, NSOpenGLContext*, EGLContext* ...
+	};
+
+	virtual void *get_native_handle(int p_handle_type) { return NULL; };
+
 	// Returns window area free of hardware controls and other obstacles.
 	// The application should use this to determine where to place UI elements.
 	//
@@ -292,6 +308,8 @@ public:
 	virtual String get_name() const = 0;
 	virtual List<String> get_cmdline_args() const { return _cmdline; }
 	virtual String get_model_name() const;
+
+	void ensure_user_data_dir();
 
 	virtual MainLoop *get_main_loop() const = 0;
 
@@ -461,7 +479,7 @@ public:
 	};
 
 	virtual void set_screen_orientation(ScreenOrientation p_orientation);
-	ScreenOrientation get_screen_orientation() const;
+	virtual ScreenOrientation get_screen_orientation() const;
 
 	virtual void enable_for_stealing_focus(ProcessID pid) {}
 	virtual void move_window_to_foreground() {}

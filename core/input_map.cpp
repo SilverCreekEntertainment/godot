@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -30,6 +30,7 @@
 
 #include "input_map.h"
 
+#include "core/os/input.h"
 #include "core/os/keyboard.h"
 #include "core/project_settings.h"
 
@@ -153,8 +154,12 @@ void InputMap::action_erase_event(const StringName &p_action, const Ref<InputEve
 	ERR_FAIL_COND_MSG(!input_map.has(p_action), "Request for nonexistent InputMap action '" + String(p_action) + "'.");
 
 	List<Ref<InputEvent> >::Element *E = _find_event(input_map[p_action], p_event);
-	if (E)
+	if (E) {
 		input_map[p_action].inputs.erase(E);
+		if (Input::get_singleton()->is_action_pressed(p_action)) {
+			Input::get_singleton()->action_release(p_action);
+		}
+	}
 }
 
 void InputMap::action_erase_events(const StringName &p_action) {

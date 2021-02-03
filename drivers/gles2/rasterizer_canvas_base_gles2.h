@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -31,13 +31,14 @@
 #ifndef RASTERIZERCANVASBASEGLES2_H
 #define RASTERIZERCANVASBASEGLES2_H
 
-#include "rasterizer_array_gles2.h"
+#include "drivers/gles_common/rasterizer_array.h"
 #include "rasterizer_storage_gles2.h"
 #include "servers/visual/rasterizer.h"
 
 #include "shaders/canvas.glsl.gen.h"
 #include "shaders/lens_distorted.glsl.gen.h"
 
+#include "drivers/gles_common/rasterizer_storage_common.h"
 #include "shaders/canvas_shadow.glsl.gen.h"
 
 class RasterizerCanvasBaseGLES2 : public RasterizerCanvas {
@@ -77,7 +78,11 @@ public:
 		LensDistortedShaderGLES2 lens_shader;
 
 		bool using_texture_rect;
+
 		bool using_light_angle;
+		bool using_modulate;
+		bool using_large_vertex;
+
 		bool using_ninepatch;
 		bool using_skeleton;
 
@@ -102,7 +107,8 @@ public:
 
 	RasterizerStorageGLES2 *storage;
 
-	bool use_nvidia_rect_workaround;
+	// allow user to choose api usage
+	GLenum _buffer_upload_usage_flag;
 
 	void _set_uniforms();
 
@@ -131,7 +137,7 @@ public:
 	virtual void canvas_debug_viewport_shadows(Light *p_lights_with_shadow);
 
 	RasterizerStorageGLES2::Texture *_bind_canvas_texture(const RID &p_texture, const RID &p_normal_map);
-	void _set_texture_rect_mode(bool p_texture_rect, bool p_light_angle = false);
+	void _set_texture_rect_mode(bool p_texture_rect, bool p_light_angle = false, bool p_modulate = false, bool p_large_vertex = false);
 
 	void initialize();
 	void finalize();

@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -43,6 +43,55 @@ const String godot_project_name_xml_string = R"(<?xml version="1.0" encoding="ut
 	<string name="godot_project_name_string">%s</string>
 </resources>
 )";
+
+OS::ScreenOrientation _get_screen_orientation() {
+	String orientation_settings = ProjectSettings::get_singleton()->get("display/window/handheld/orientation");
+	OS::ScreenOrientation screen_orientation;
+	if (orientation_settings == "portrait")
+		screen_orientation = OS::SCREEN_PORTRAIT;
+	else if (orientation_settings == "reverse_landscape")
+		screen_orientation = OS::SCREEN_REVERSE_LANDSCAPE;
+	else if (orientation_settings == "reverse_portrait")
+		screen_orientation = OS::SCREEN_REVERSE_PORTRAIT;
+	else if (orientation_settings == "sensor_landscape")
+		screen_orientation = OS::SCREEN_SENSOR_LANDSCAPE;
+	else if (orientation_settings == "sensor_portrait")
+		screen_orientation = OS::SCREEN_SENSOR_PORTRAIT;
+	else if (orientation_settings == "sensor")
+		screen_orientation = OS::SCREEN_SENSOR;
+	else
+		screen_orientation = OS::SCREEN_LANDSCAPE;
+
+	return screen_orientation;
+}
+
+int _get_android_orientation_value(OS::ScreenOrientation screen_orientation) {
+	switch (screen_orientation) {
+		case OS::SCREEN_PORTRAIT: return 1;
+		case OS::SCREEN_REVERSE_LANDSCAPE: return 8;
+		case OS::SCREEN_REVERSE_PORTRAIT: return 9;
+		case OS::SCREEN_SENSOR_LANDSCAPE: return 11;
+		case OS::SCREEN_SENSOR_PORTRAIT: return 12;
+		case OS::SCREEN_SENSOR: return 13;
+		case OS::SCREEN_LANDSCAPE:
+		default:
+			return 0;
+	}
+}
+
+String _get_android_orientation_label(OS::ScreenOrientation screen_orientation) {
+	switch (screen_orientation) {
+		case OS::SCREEN_PORTRAIT: return "portrait";
+		case OS::SCREEN_REVERSE_LANDSCAPE: return "reverseLandscape";
+		case OS::SCREEN_REVERSE_PORTRAIT: return "reversePortrait";
+		case OS::SCREEN_SENSOR_LANDSCAPE: return "userLandscape";
+		case OS::SCREEN_SENSOR_PORTRAIT: return "userPortrait";
+		case OS::SCREEN_SENSOR: return "fullUser";
+		case OS::SCREEN_LANDSCAPE:
+		default:
+			return "landscape";
+	}
+}
 
 // Utility method used to create a directory.
 Error create_directory(const String &p_dir) {
@@ -209,7 +258,7 @@ String _get_plugins_tag(const String &plugins_names) {
 
 String _get_activity_tag(const Ref<EditorExportPreset> &p_preset) {
 	bool uses_xr = (int)(p_preset->get("xr_features/xr_mode")) == 1;
-	String orientation = (int)(p_preset->get("screen/orientation")) == 1 ? "portrait" : "landscape";
+	String orientation = _get_android_orientation_label(_get_screen_orientation());
 	String manifest_activity_text = vformat(
 			"        <activity android:name=\"com.godot.game.GodotApp\" "
 			"tools:replace=\"android:screenOrientation\" "
@@ -230,7 +279,7 @@ String _get_application_tag(const Ref<EditorExportPreset> &p_preset, const Strin
 	String manifest_application_text =
 			"    <application android:label=\"@string/godot_project_name_string\"\n"
 			"        android:allowBackup=\"false\" tools:ignore=\"GoogleAppIndexingWarning\"\n"
-			"        android:icon=\"@mipmap/icon\">)\n\n"
+			"        android:icon=\"@mipmap/icon\">\n\n"
 			"        <meta-data tools:node=\"remove\" android:name=\"xr_mode_metadata_name\" />\n";
 
 	manifest_application_text += _get_plugins_tag(plugins_names);

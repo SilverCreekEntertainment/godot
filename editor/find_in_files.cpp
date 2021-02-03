@@ -5,8 +5,8 @@
 /*                           GODOT ENGINE                                */
 /*                      https://godotengine.org                          */
 /*************************************************************************/
-/* Copyright (c) 2007-2020 Juan Linietsky, Ariel Manzur.                 */
-/* Copyright (c) 2014-2020 Godot Engine contributors (cf. AUTHORS.md).   */
+/* Copyright (c) 2007-2021 Juan Linietsky, Ariel Manzur.                 */
+/* Copyright (c) 2014-2021 Godot Engine contributors (cf. AUTHORS.md).   */
 /*                                                                       */
 /* Permission is hereby granted, free of charge, to any person obtaining */
 /* a copy of this software and associated documentation files (the       */
@@ -732,8 +732,19 @@ void FindInFilesPanel::_on_item_edited() {
 }
 
 void FindInFilesPanel::_on_finished() {
+	String results_text;
+	int result_count = _result_items.size();
+	int file_count = _file_items.size();
 
-	_status_label->set_text(TTR("Search complete"));
+	if (result_count == 1 && file_count == 1) {
+		results_text = vformat(TTR("%d match in %d file."), result_count, file_count);
+	} else if (result_count != 1 && file_count == 1) {
+		results_text = vformat(TTR("%d matches in %d file."), result_count, file_count);
+	} else {
+		results_text = vformat(TTR("%d matches in %d files."), result_count, file_count);
+	}
+
+	_status_label->set_text(results_text);
 	update_replace_buttons();
 	set_progress_visible(false);
 	_refresh_button->show();
