@@ -55,6 +55,7 @@ void ColorPicker::_notification(int p_what) {
 			btn_pick->set_icon(get_icon("screen_picker", "ColorPicker"));
 			bt_add_preset->set_icon(get_icon("add_preset"));
 
+			_update_controls();
 			_update_color();
 
 #ifdef TOOLS_ENABLED
@@ -170,10 +171,13 @@ void ColorPicker::_value_changed(double) {
 		return;
 
 	if (hsv_mode_enabled) {
-		color.set_hsv(scroll[0]->get_value() / 360.0,
-				scroll[1]->get_value() / 100.0,
-				scroll[2]->get_value() / 100.0,
-				scroll[3]->get_value() / 255.0);
+		h = scroll[0]->get_value() / 360.0;
+		s = scroll[1]->get_value() / 100.0;
+		v = scroll[2]->get_value() / 100.0;
+		color.set_hsv(h, s, v, scroll[3]->get_value() / 255.0);
+
+		last_hsv = color;
+
 	} else {
 		for (int i = 0; i < 4; i++) {
 			color.components[i] = scroll[i]->get_value() / (raw_mode_enabled ? 1.0 : 255.0);
@@ -578,6 +582,8 @@ void ColorPicker::_preset_input(const Ref<InputEvent> &p_event) {
 }
 
 void ColorPicker::_screen_input(const Ref<InputEvent> &p_event) {
+	if (!is_inside_tree())
+		return;
 
 	Ref<InputEventMouseButton> bev = p_event;
 	if (bev.is_valid() && bev->get_button_index() == BUTTON_LEFT && !bev->is_pressed()) {
@@ -608,6 +614,9 @@ void ColorPicker::_add_preset_pressed() {
 }
 
 void ColorPicker::_screen_pick_pressed() {
+	if (!is_inside_tree())
+		return;
+
 	Viewport *r = get_tree()->get_root();
 	if (!screen) {
 		screen = memnew(Control);

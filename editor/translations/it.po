@@ -52,14 +52,15 @@
 # Anonymous <noreply@weblate.org>, 2020.
 # riccardo boffelli <riccardo.boffelli.96@gmail.com>, 2020.
 # Lorenzo Asolan <brixiumx@gmail.com>, 2020.
-# Lorenzo Cerqua <lorenzocerqua@tutanota.com>, 2020.
+# Lorenzo Cerqua <lorenzocerqua@tutanota.com>, 2020, 2021.
 # Federico Manzella <ferdiu.manzella@gmail.com>, 2020.
 # Ziv D <wizdavid@gmail.com>, 2020.
+# Riteo Siuga <lorenzocerqua@tutanota.com>, 2021.
 msgid ""
 msgstr ""
 "Project-Id-Version: Godot Engine editor\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2021-01-22 10:21+0000\n"
+"PO-Revision-Date: 2021-02-21 10:50+0000\n"
 "Last-Translator: Micila Micillotto <micillotto@gmail.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/godot-engine/"
 "godot/it/>\n"
@@ -68,7 +69,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.5-dev\n"
+"X-Generator: Weblate 4.5\n"
 
 #: core/math/expression.cpp modules/gdscript/gdscript_functions.cpp
 #: modules/visual_script/visual_script_builtin_funcs.cpp
@@ -473,15 +474,15 @@ msgstr "Non è possibile aggiungere una nuova traccia senza un nodo radice"
 
 #: editor/animation_track_editor.cpp
 msgid "Invalid track for Bezier (no suitable sub-properties)"
-msgstr "Traccia non valida per la curva Bézier (nessuna sottoproprietà adatta)"
+msgstr "Traccia non valida per Bezier (nessuna sotto-proprietà valida)"
 
 #: editor/animation_track_editor.cpp
 msgid "Add Bezier Track"
-msgstr "Aggiungi traccia Bézier"
+msgstr "Aggiungi una traccia di curve di Bézier"
 
 #: editor/animation_track_editor.cpp
 msgid "Track path is invalid, so can't add a key."
-msgstr "Il tracciato non è valido, non è possibile aggiungere una chiave."
+msgstr "La traccia non è valida, quindi è impossibile aggiungere una chiave."
 
 #: editor/animation_track_editor.cpp
 msgid "Track is not of type Spatial, can't insert key"
@@ -489,21 +490,21 @@ msgstr "La traccia non è di tipo Spatial, impossibile aggiungere la chiave"
 
 #: editor/animation_track_editor.cpp
 msgid "Add Transform Track Key"
-msgstr "Aggiungi chiave traccia Transform"
+msgstr "Aggiungi una chiave a una traccia di trasformazioni"
 
 #: editor/animation_track_editor.cpp
 msgid "Add Track Key"
-msgstr "Aggiungi chiave traccia"
+msgstr "Aggiungi una chiave a una traccia"
 
 #: editor/animation_track_editor.cpp
 msgid "Track path is invalid, so can't add a method key."
 msgstr ""
-"Il tracciato non è valido, non è possibile aggiungere una chiave di chiamata "
-"di funzione."
+"La traccia non è valida, quindi, non è stato possibile aggiungere una chiave "
+"chiamata metodo."
 
 #: editor/animation_track_editor.cpp
 msgid "Add Method Track Key"
-msgstr "Aggiungi chiave alla traccia metodo"
+msgstr "Aggiungi una chiave a una traccia di chiamate di metodi"
 
 #: editor/animation_track_editor.cpp
 msgid "Method not found in object: "
@@ -511,7 +512,7 @@ msgstr "Metodo non trovato nell'oggetto: "
 
 #: editor/animation_track_editor.cpp
 msgid "Anim Move Keys"
-msgstr "Sposta chiavi animazione"
+msgstr "Sposta delle chiavi d'animazione"
 
 #: editor/animation_track_editor.cpp
 msgid "Clipboard is empty"
@@ -519,18 +520,18 @@ msgstr "Gli appunti sono vuoti"
 
 #: editor/animation_track_editor.cpp
 msgid "Paste Tracks"
-msgstr "Incolla tracce"
+msgstr "Incolla delle tracce"
 
 #: editor/animation_track_editor.cpp
 msgid "Anim Scale Keys"
-msgstr "Scala chiavi animazione"
+msgstr "Scala delle chiavi d'animazione"
 
 #: editor/animation_track_editor.cpp
 msgid ""
 "This option does not work for Bezier editing, as it's only a single track."
 msgstr ""
-"Questa opzione non funziona per modificare curve di Bézier, dato che si "
-"tratta di una traccia singola."
+"Questa opzione non funziona per modificare delle curve di Bézier, dato che "
+"si tratta di una singola traccia."
 
 #: editor/animation_track_editor.cpp
 msgid ""
@@ -544,14 +545,14 @@ msgid ""
 "Alternatively, use an import preset that imports animations to separate "
 "files."
 msgstr ""
-"Questa animazione appartiene a una scena importata, eventuali modifiche alle "
-"tracce importate non saranno salvate.\n"
+"Questa animazione appartiene ad una scena importata, quindi i cambiamenti "
+"alle tracce importate non saranno salvate.\n"
 "\n"
-"Per abilitare la possibilità di aggiungere ulteriori tracce, vai alle "
-"impostazioni di importazione della scena e imposta\n"
-"\"Animation > Storage\" su \"Files\", abilita \"Animation > Keep Custom "
-"Tracks\", e infine reimporta la scena.\n"
-"Altrimenti, usa un preset di importazione che importa le animazioni in file "
+"Per abilitare l'aggiunta di tracce personalizzate, naviga alle impostazioni "
+"d'importazione della scena ed imposta\n"
+"\"Animation > Storage\" a \"Files\", abilita \"Animation > Keep Custom Tracks"
+"\", e poi re-importa.\n"
+"In alternativa, usa un preset d'importo che importa le animazioni da file "
 "separati."
 
 #: editor/animation_track_editor.cpp
@@ -568,11 +569,11 @@ msgstr "Mostra solo le tracce dei nodi selezionati nell'albero."
 
 #: editor/animation_track_editor.cpp
 msgid "Group tracks by node or display them as plain list."
-msgstr "Raggruppa le tracce per nodo o mostra una lista semplice."
+msgstr "Raggruppa le tracce per nodo o le visualizza in una lista semplice."
 
 #: editor/animation_track_editor.cpp
 msgid "Snap:"
-msgstr "Snap:"
+msgstr "Scatto:"
 
 #: editor/animation_track_editor.cpp
 msgid "Animation step value."
@@ -599,27 +600,27 @@ msgstr "Modifica"
 
 #: editor/animation_track_editor.cpp
 msgid "Animation properties."
-msgstr "Proprietà animazione."
+msgstr "Proprietà dell'animazione."
 
 #: editor/animation_track_editor.cpp
 msgid "Copy Tracks"
-msgstr "Copia tracce"
+msgstr "Copia le tracce"
 
 #: editor/animation_track_editor.cpp
 msgid "Scale Selection"
-msgstr "Scala selezione"
+msgstr "Scala la selezione"
 
 #: editor/animation_track_editor.cpp
 msgid "Scale From Cursor"
-msgstr "Scala da cursore"
+msgstr "Scala a partire dal cursore"
 
 #: editor/animation_track_editor.cpp modules/gridmap/grid_map_editor_plugin.cpp
 msgid "Duplicate Selection"
-msgstr "Duplica selezione"
+msgstr "Duplica la selezione"
 
 #: editor/animation_track_editor.cpp
 msgid "Duplicate Transposed"
-msgstr "Duplica trasposto"
+msgstr "Duplica Trasposto"
 
 #: editor/animation_track_editor.cpp
 msgid "Delete Selection"
@@ -627,19 +628,19 @@ msgstr "Elimina la selezione"
 
 #: editor/animation_track_editor.cpp
 msgid "Go to Next Step"
-msgstr "Va' al passo successivo"
+msgstr "Vai allo Step Successivo"
 
 #: editor/animation_track_editor.cpp
 msgid "Go to Previous Step"
-msgstr "Va' al passo precedente"
+msgstr "Vai allo Step Precedente"
 
 #: editor/animation_track_editor.cpp
 msgid "Optimize Animation"
-msgstr "Ottimizza animazione"
+msgstr "Ottimizza l'animazione"
 
 #: editor/animation_track_editor.cpp
 msgid "Clean-Up Animation"
-msgstr "Pulisci animazione"
+msgstr "Pulisci l'animazione"
 
 #: editor/animation_track_editor.cpp
 msgid "Pick the node that will be animated:"
@@ -647,7 +648,7 @@ msgstr "Seleziona il nodo che verrà animato:"
 
 #: editor/animation_track_editor.cpp
 msgid "Use Bezier Curves"
-msgstr "Usa curve di Bézier"
+msgstr "Usa le curve di Bézier"
 
 #: editor/animation_track_editor.cpp
 msgid "Anim. Optimizer"
@@ -655,15 +656,15 @@ msgstr "Ottimizzatore anim."
 
 #: editor/animation_track_editor.cpp
 msgid "Max. Linear Error:"
-msgstr "Max. errore lineare:"
+msgstr "Max errore lineare:"
 
 #: editor/animation_track_editor.cpp
 msgid "Max. Angular Error:"
-msgstr "Max. errore angolare:"
+msgstr "Max errore angolare:"
 
 #: editor/animation_track_editor.cpp
 msgid "Max Optimizable Angle:"
-msgstr "Max. angolo ottimizzabile:"
+msgstr "Max angolo ottimizzabile:"
 
 #: editor/animation_track_editor.cpp
 msgid "Optimize"
@@ -671,11 +672,11 @@ msgstr "Ottimizza"
 
 #: editor/animation_track_editor.cpp
 msgid "Remove invalid keys"
-msgstr "Rimuovi chiavi non valide"
+msgstr "Rimuovi le chiavi non valide"
 
 #: editor/animation_track_editor.cpp
 msgid "Remove unresolved and empty tracks"
-msgstr "Rimuovi tracce irrisolte e vuote"
+msgstr "Rimuovi le tracce irrisolte e vuote"
 
 #: editor/animation_track_editor.cpp
 msgid "Clean-up all animations"
@@ -683,7 +684,7 @@ msgstr "Pulisci tutte le animazioni"
 
 #: editor/animation_track_editor.cpp
 msgid "Clean-Up Animation(s) (NO UNDO!)"
-msgstr "Pulisci animazione(i) (NON ANNULLABILE!)"
+msgstr "Pulisci le animazioni (NON ANNULLABILE!)"
 
 #: editor/animation_track_editor.cpp
 msgid "Clean-Up"
@@ -702,37 +703,37 @@ msgstr "Seleziona le tracce da copiare"
 #: editor/plugins/animation_player_editor_plugin.cpp
 #: editor/plugins/script_text_editor.cpp
 #: editor/plugins/sprite_frames_editor_plugin.cpp editor/property_editor.cpp
-#: scene/gui/line_edit.cpp scene/gui/text_edit.cpp
+#: editor/scene_tree_dock.cpp scene/gui/line_edit.cpp scene/gui/text_edit.cpp
 msgid "Copy"
 msgstr "Copia"
 
 #: editor/animation_track_editor.cpp
 msgid "Select All/None"
-msgstr "Seleziona Tutto/Nulla"
+msgstr "Seleziona tutto/nulla"
 
 #: editor/animation_track_editor_plugins.cpp
 msgid "Add Audio Track Clip"
-msgstr "Aggiungi traccia clip audio"
+msgstr "Aggiungi audio in una traccia di riproduzione audio"
 
 #: editor/animation_track_editor_plugins.cpp
 msgid "Change Audio Track Clip Start Offset"
-msgstr "Cambia Offset di Inizio della Clip della Traccia Audio"
+msgstr "Cambia Offset Inizio Clip Traccia Audio"
 
 #: editor/animation_track_editor_plugins.cpp
 msgid "Change Audio Track Clip End Offset"
-msgstr "Cambia offset di fine della clip della traccia audio"
+msgstr "Cambia Offset Fine Clip Traccia Audio"
 
 #: editor/array_property_edit.cpp
 msgid "Resize Array"
-msgstr "Ridimensiona array"
+msgstr "Ridimensiona lista"
 
 #: editor/array_property_edit.cpp
 msgid "Change Array Value Type"
-msgstr "Cambia tipo del valore dell'array"
+msgstr "Cambia il tipo del valore della lista"
 
 #: editor/array_property_edit.cpp
 msgid "Change Array Value"
-msgstr "Cambia valore array"
+msgstr "Cambia il valore della lista"
 
 #: editor/code_editor.cpp
 msgid "Go to Line"
@@ -740,7 +741,7 @@ msgstr "Vai alla linea"
 
 #: editor/code_editor.cpp
 msgid "Line Number:"
-msgstr "Numero linea:"
+msgstr "Numero della linea:"
 
 #: editor/code_editor.cpp
 msgid "%d replaced."
@@ -752,11 +753,11 @@ msgstr "%d corrispondenza."
 
 #: editor/code_editor.cpp editor/editor_help.cpp
 msgid "%d matches."
-msgstr "%d corrispondenza/e."
+msgstr "%d corrispondenze."
 
 #: editor/code_editor.cpp editor/find_in_files.cpp
 msgid "Match Case"
-msgstr "Distingui maiuscole"
+msgstr "Distingui le maiuscole"
 
 #: editor/code_editor.cpp editor/find_in_files.cpp
 msgid "Whole Words"
@@ -772,7 +773,7 @@ msgstr "Rimpiazza tutti"
 
 #: editor/code_editor.cpp
 msgid "Selection Only"
-msgstr "Solo selezione"
+msgstr "Solo nella selezione"
 
 #: editor/code_editor.cpp editor/plugins/script_text_editor.cpp
 #: editor/plugins/text_editor.cpp
@@ -781,7 +782,7 @@ msgstr "Standard"
 
 #: editor/code_editor.cpp editor/plugins/script_editor_plugin.cpp
 msgid "Toggle Scripts Panel"
-msgstr "Commuta pannello degli script"
+msgstr "Toggle Pannello Script"
 
 #: editor/code_editor.cpp editor/plugins/canvas_item_editor_plugin.cpp
 #: editor/plugins/texture_region_editor_plugin.cpp
@@ -797,15 +798,15 @@ msgstr "Rimpicciolisci"
 
 #: editor/code_editor.cpp
 msgid "Reset Zoom"
-msgstr "Resetta ingrandimento"
+msgstr "Reimposta ingrandimento"
 
 #: editor/code_editor.cpp
 msgid "Warnings"
-msgstr "Avvertenze"
+msgstr "Avvisi"
 
 #: editor/code_editor.cpp
 msgid "Line and column numbers."
-msgstr "Numeri di riga e colonna."
+msgstr "Numeri di riga e di colonna."
 
 #: editor/connections_dialog.cpp
 msgid "Method in target node must be specified."
@@ -813,7 +814,7 @@ msgstr "Il metodo del nodo designato deve essere specificato."
 
 #: editor/connections_dialog.cpp
 msgid "Method name must be a valid identifier."
-msgstr "Il nome del metodo dev'essere un identificatore valido."
+msgstr "Il nome del metodo deve essere un identificatore valido."
 
 #: editor/connections_dialog.cpp
 msgid ""
@@ -2592,7 +2593,8 @@ msgstr ""
 "configurazione fallita."
 
 #: editor/editor_node.cpp
-msgid "Unable to find script field for addon plugin at: 'res://addons/%s'."
+#, fuzzy
+msgid "Unable to find script field for addon plugin at: '%s'."
 msgstr ""
 "Impossibile trovare il campo dello script per il componente aggiuntivo in: "
 "'res://addons/%s'."
@@ -3031,14 +3033,6 @@ msgid "Help"
 msgstr "Aiuto"
 
 #: editor/editor_node.cpp editor/plugins/script_editor_plugin.cpp
-#: editor/plugins/script_text_editor.cpp
-#: editor/plugins/shader_editor_plugin.cpp editor/plugins/text_editor.cpp
-#: editor/plugins/visual_shader_editor_plugin.cpp editor/project_manager.cpp
-#: editor/project_settings_editor.cpp editor/settings_config_dialog.cpp
-msgid "Search"
-msgstr "Cerca"
-
-#: editor/editor_node.cpp editor/plugins/script_editor_plugin.cpp
 #: editor/plugins/shader_editor_plugin.cpp
 msgid "Online Docs"
 msgstr "Documentazione online"
@@ -3204,6 +3198,24 @@ msgstr "Unisci con esistente"
 #: editor/editor_node.cpp
 msgid "Open & Run a Script"
 msgstr "Apri ed esegui uno script"
+
+#: editor/editor_node.cpp
+msgid ""
+"The following files are newer on disk.\n"
+"What action should be taken?"
+msgstr ""
+"I seguenti file sono più recenti sul disco.\n"
+"Quale azione dovrebbe essere presa?"
+
+#: editor/editor_node.cpp editor/plugins/script_editor_plugin.cpp
+#: editor/plugins/shader_editor_plugin.cpp
+msgid "Reload"
+msgstr "Ricarica"
+
+#: editor/editor_node.cpp editor/plugins/script_editor_plugin.cpp
+#: editor/plugins/shader_editor_plugin.cpp
+msgid "Resave"
+msgstr "Risalva"
 
 #: editor/editor_node.cpp
 msgid "New Inherited"
@@ -3416,7 +3428,7 @@ msgstr "Rendi Unico"
 #: editor/plugins/script_text_editor.cpp
 #: editor/plugins/sprite_frames_editor_plugin.cpp
 #: editor/plugins/tile_map_editor_plugin.cpp editor/property_editor.cpp
-#: scene/gui/line_edit.cpp scene/gui/text_edit.cpp
+#: editor/scene_tree_dock.cpp scene/gui/line_edit.cpp scene/gui/text_edit.cpp
 msgid "Paste"
 msgstr "Incolla"
 
@@ -5095,7 +5107,8 @@ msgid "Got:"
 msgstr "Ottenuto:"
 
 #: editor/plugins/asset_library_editor_plugin.cpp
-msgid "Failed sha256 hash check"
+#, fuzzy
+msgid "Failed SHA-256 hash check"
 msgstr "Check hash sha256 fallito"
 
 #: editor/plugins/asset_library_editor_plugin.cpp
@@ -7039,6 +7052,14 @@ msgstr "Chiudi la documentazione"
 msgid "Run"
 msgstr "Esegui"
 
+#: editor/plugins/script_editor_plugin.cpp
+#: editor/plugins/script_text_editor.cpp
+#: editor/plugins/shader_editor_plugin.cpp editor/plugins/text_editor.cpp
+#: editor/plugins/visual_shader_editor_plugin.cpp editor/project_manager.cpp
+#: editor/project_settings_editor.cpp editor/settings_config_dialog.cpp
+msgid "Search"
+msgstr "Cerca"
+
 #: editor/plugins/script_editor_plugin.cpp editor/script_editor_debugger.cpp
 msgid "Step Into"
 msgstr "Passo dentro all'istruzione"
@@ -7091,16 +7112,6 @@ msgid ""
 msgstr ""
 "I file seguenti sono più recenti su disco.\n"
 "Che azione deve essere intrapresa?:"
-
-#: editor/plugins/script_editor_plugin.cpp
-#: editor/plugins/shader_editor_plugin.cpp
-msgid "Reload"
-msgstr "Ricarica"
-
-#: editor/plugins/script_editor_plugin.cpp
-#: editor/plugins/shader_editor_plugin.cpp
-msgid "Resave"
-msgstr "Risalva"
 
 #: editor/plugins/script_editor_plugin.cpp editor/script_editor_debugger.cpp
 msgid "Debugger"
@@ -7197,8 +7208,8 @@ msgstr "Punti di interruzione"
 msgid "Go To"
 msgstr "Vai a"
 
-#: editor/plugins/script_text_editor.cpp scene/gui/line_edit.cpp
-#: scene/gui/text_edit.cpp
+#: editor/plugins/script_text_editor.cpp editor/scene_tree_dock.cpp
+#: scene/gui/line_edit.cpp scene/gui/text_edit.cpp
 msgid "Cut"
 msgstr "Taglia"
 
@@ -7419,6 +7430,10 @@ msgstr "Inclinazione"
 #: editor/plugins/spatial_editor_plugin.cpp
 msgid "Yaw"
 msgstr "Imbardata"
+
+#: editor/plugins/spatial_editor_plugin.cpp
+msgid "Size"
+msgstr "Dimensione"
 
 #: editor/plugins/spatial_editor_plugin.cpp
 msgid "Objects Drawn"
@@ -10121,6 +10136,10 @@ msgid "Projects"
 msgstr "Progetti"
 
 #: editor/project_manager.cpp
+msgid "Loading, please wait..."
+msgstr "Caricamento, per favore attendere..."
+
+#: editor/project_manager.cpp
 msgid "Last Modified"
 msgstr "Ultima Modifica"
 
@@ -10741,6 +10760,16 @@ msgid "Instance Child Scene"
 msgstr "Istanzia Scena Figlia"
 
 #: editor/scene_tree_dock.cpp
+#, fuzzy
+msgid "Can't paste root node into the same scene."
+msgstr "Impossibile operare su nodi da scena esterna!"
+
+#: editor/scene_tree_dock.cpp
+#, fuzzy
+msgid "Paste Node(s)"
+msgstr "Incolla nodi"
+
+#: editor/scene_tree_dock.cpp
 msgid "Detach Script"
 msgstr "Rimuovi Script"
 
@@ -10865,6 +10894,11 @@ msgstr "Impossibile operare su nodi da cui la scena corrente eredita!"
 #: editor/scene_tree_dock.cpp
 msgid "Attach Script"
 msgstr "Allega Script"
+
+#: editor/scene_tree_dock.cpp
+#, fuzzy
+msgid "Cut Node(s)"
+msgstr "Taglia nodi"
 
 #: editor/scene_tree_dock.cpp
 msgid "Remove Node(s)"

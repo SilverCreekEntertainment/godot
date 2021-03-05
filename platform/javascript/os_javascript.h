@@ -42,7 +42,6 @@
 class OS_JavaScript : public OS_Unix {
 private:
 	VideoMode video_mode;
-	Vector2 windowed_size;
 	bool window_maximized;
 	bool entering_fullscreen;
 	bool just_exited_fullscreen;
@@ -134,6 +133,9 @@ public:
 	virtual void set_window_fullscreen(bool p_enabled);
 	virtual bool is_window_fullscreen() const;
 	virtual Size2 get_screen_size(int p_screen = -1) const;
+	virtual int get_screen_dpi(int p_screen = -1) const;
+	virtual float get_screen_scale(int p_screen = -1) const;
+	virtual float get_screen_max_scale() const;
 
 	virtual Point2 get_mouse_position() const;
 	virtual int get_mouse_button_state() const;
@@ -165,6 +167,7 @@ public:
 	virtual Error execute(const String &p_path, const List<String> &p_arguments, bool p_blocking = true, ProcessID *r_child_id = NULL, String *r_pipe = NULL, int *r_exitcode = NULL, bool read_stderr = false, Mutex *p_pipe_mutex = NULL);
 	virtual Error kill(const ProcessID &p_pid);
 	virtual int get_process_id() const;
+	int get_processor_count() const;
 
 	virtual void alert(const String &p_alert, const String &p_title = "ALERT!");
 	virtual void set_window_title(const String &p_title);

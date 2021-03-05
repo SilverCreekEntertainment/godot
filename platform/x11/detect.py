@@ -70,9 +70,10 @@ def get_opts():
         BoolVariable("use_asan", "Use LLVM/GCC compiler address sanitizer (ASAN))", False),
         BoolVariable("use_lsan", "Use LLVM/GCC compiler leak sanitizer (LSAN))", False),
         BoolVariable("use_tsan", "Use LLVM/GCC compiler thread sanitizer (TSAN))", False),
+        BoolVariable("use_msan", "Use LLVM/GCC compiler memory sanitizer (MSAN))", False),
         BoolVariable("pulseaudio", "Detect and use PulseAudio", True),
         BoolVariable("udev", "Use udev for gamepad connection callbacks", True),
-        EnumVariable("debug_symbols", "Add debugging symbols to release/release_debug builds", "yes", ("yes", "no")),
+        BoolVariable("debug_symbols", "Add debugging symbols to release/release_debug builds", True),
         BoolVariable("separate_debug_symbols", "Create a separate file containing debugging symbols", False),
         BoolVariable("touch", "Enable touch events", True),
         BoolVariable("execinfo", "Use libexecinfo on systems where glibc is not available", False),
@@ -87,25 +88,23 @@ def configure(env):
     ## Build type
 
     if env["target"] == "release":
-        if env["debug_symbols"] != "full":
-            if env["optimize"] == "speed":  # optimize for speed (default)
-                env.Prepend(CCFLAGS=["-O3"])
-            else:  # optimize for size
-                env.Prepend(CCFLAGS=["-Os"])
+        if env["optimize"] == "speed":  # optimize for speed (default)
+            env.Prepend(CCFLAGS=["-O3"])
+        else:  # optimize for size
+            env.Prepend(CCFLAGS=["-Os"])
 
-        if env["debug_symbols"] == "yes":
+        if env["debug_symbols"]:
             env.Prepend(CCFLAGS=["-g2"])
 
     elif env["target"] == "release_debug":
-        if env["debug_symbols"] != "full":
-            if env["optimize"] == "speed":  # optimize for speed (default)
-                env.Prepend(CCFLAGS=["-O2"])
-            else:  # optimize for size
-                env.Prepend(CCFLAGS=["-Os"])
+        if env["optimize"] == "speed":  # optimize for speed (default)
+            env.Prepend(CCFLAGS=["-O2"])
+        else:  # optimize for size
+            env.Prepend(CCFLAGS=["-Os"])
 
         env.Prepend(CPPDEFINES=["DEBUG_ENABLED"])
 
-        if env["debug_symbols"] == "yes":
+        if env["debug_symbols"]:
             env.Prepend(CCFLAGS=["-g2"])
 
     elif env["target"] == "debug":
@@ -142,7 +141,7 @@ def configure(env):
             print("Using LLD with GCC is not supported yet, try compiling with 'use_llvm=yes'.")
             sys.exit(255)
 
-    if env["use_ubsan"] or env["use_asan"] or env["use_lsan"] or env["use_tsan"]:
+    if env["use_ubsan"] or env["use_asan"] or env["use_lsan"] or env["use_tsan"] or env["use_msan"]:
         env.extra_suffix += "s"
 
         if env["use_ubsan"]:
@@ -173,6 +172,10 @@ def configure(env):
         if env["use_tsan"]:
             env.Append(CCFLAGS=["-fsanitize=thread"])
             env.Append(LINKFLAGS=["-fsanitize=thread"])
+
+        if env["use_msan"]:
+            env.Append(CCFLAGS=["-fsanitize=memory"])
+            env.Append(LINKFLAGS=["-fsanitize=memory"])
 
     if env["use_lto"]:
         if not env["use_llvm"] and env.GetOption("num_jobs") > 1:
@@ -311,9 +314,8 @@ def configure(env):
 
     if os.system("pkg-config --exists alsa") == 0:  # 0 means found
         print("Enabling ALSA")
+        env["alsa"] = True
         env.Append(CPPDEFINES=["ALSA_ENABLED", "ALSAMIDI_ENABLED"])
-        # Don't parse --cflags, we don't need to add /usr/include/alsa to include path
-        env.ParseConfig("pkg-config alsa --libs")
     else:
         print("ALSA libraries not found, disabling driver")
 
@@ -321,20 +323,20 @@ def configure(env):
         if os.system("pkg-config --exists libpulse") == 0:  # 0 means found
             print("Enabling PulseAudio")
             env.Append(CPPDEFINES=["PULSEAUDIO_ENABLED"])
-            env.ParseConfig("pkg-config --cflags --libs libpulse")
+            env.ParseConfig("pkg-config --cflags libpulse")
         else:
             print("PulseAudio development libraries not found, disabling driver")
 
     if platform.system() == "Linux":
         env.Append(CPPDEFINES=["JOYDEV_ENABLED"])
-
         if env["udev"]:
             if os.system("pkg-config --exists libudev") == 0:  # 0 means found
                 print("Enabling udev support")
                 env.Append(CPPDEFINES=["UDEV_ENABLED"])
-                env.ParseConfig("pkg-config libudev --cflags --libs")
             else:
                 print("libudev development libraries not found, disabling udev support")
+    else:
+        env["udev"] = False  # Linux specific
 
     # Linkflags below this line should typically stay the last ones
     if not env["builtin_zlib"]:
@@ -384,3 +386,9 @@ def configure(env):
         # That doesn't make any sense but it's likely a Ubuntu bug?
         if is64 or env["bits"] == "64":
             env.Append(LINKFLAGS=["-static-libgcc", "-static-libstdc++"])
+        if env["use_llvm"]:
+            env["LINKCOM"] = env["LINKCOM"] + " -l:libatomic.a"
+
+    else:
+        if env["use_llvm"]:
+            env.Append(LIBS=["atomic"])

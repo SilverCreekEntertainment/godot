@@ -31,6 +31,7 @@
 #ifndef EDITOR_NODE_H
 #define EDITOR_NODE_H
 
+#include "core/safe_refcount.h"
 #include "editor/editor_data.h"
 #include "editor/editor_folding.h"
 #include "editor/editor_run.h"
@@ -106,10 +107,10 @@ public:
 		String path;
 		List<String> args;
 		String output;
-		Thread *execute_output_thread;
-		Mutex *execute_output_mutex;
+		Thread execute_output_thread;
+		Mutex execute_output_mutex;
 		int exitcode;
-		volatile bool done;
+		SafeFlag done;
 	};
 
 private:
@@ -427,6 +428,9 @@ private:
 	Label *version_label;
 	ToolButton *bottom_panel_raise;
 
+	Tree *disk_changed_list;
+	ConfirmationDialog *disk_changed;
+
 	void _bottom_panel_raise_toggled(bool);
 
 	EditorInterface *editor_interface;
@@ -640,10 +644,16 @@ private:
 	static void _resource_loaded(RES p_resource, const String &p_path);
 
 	void _resources_changed(const PoolVector<String> &p_resources);
+	void _scan_external_changes();
+	void _reload_modified_scenes();
+	void _reload_project_settings();
+	void _resave_scenes(String p_str);
 
 	void _feature_profile_changed();
 	bool _is_class_editor_disabled_by_feature_profile(const StringName &p_class);
 	Ref<ImageTexture> _load_custom_class_icon(const String &p_path) const;
+
+	static String _to_absolute_plugin_path(const String &p_path);
 
 protected:
 	void _notification(int p_what);
@@ -697,7 +707,7 @@ public:
 	void add_control_to_dock(DockSlot p_slot, Control *p_control);
 	void remove_control_from_dock(Control *p_control);
 
-	void set_addon_plugin_enabled(const String &p_addon, bool p_enabled, bool p_config_changed = false);
+	void set_addon_plugin_enabled(String p_addon, bool p_enabled, bool p_config_changed = false);
 	bool is_addon_plugin_enabled(const String &p_addon) const;
 
 	void edit_node(Node *p_node);
@@ -740,7 +750,7 @@ public:
 	void fix_dependencies(const String &p_for_file);
 	void clear_scene() { _cleanup_scene(); }
 	int new_scene();
-	Error load_scene(const String &p_scene, bool p_ignore_broken_deps = false, bool p_set_inherited = false, bool p_clear_errors = true, bool p_force_open_imported = false);
+	Error load_scene(const String &p_scene, bool p_ignore_broken_deps = false, bool p_set_inherited = false, bool p_clear_errors = true, bool p_force_open_imported = false, bool p_silent_change_tab = false);
 	Error load_resource(const String &p_resource, bool p_ignore_broken_deps = false);
 
 	bool is_scene_open(const String &p_path);

@@ -51,6 +51,7 @@
 #include "viewport.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 void SceneTreeTimer::_bind_methods() {
 
@@ -478,6 +479,9 @@ bool SceneTree::iteration(float p_time) {
 	emit_signal("physics_frame");
 
 	_notify_group_pause("physics_process_internal", Node::NOTIFICATION_INTERNAL_PHYSICS_PROCESS);
+	if (GLOBAL_GET("physics/common/enable_pause_aware_picking")) {
+		call_group_flags(GROUP_CALL_REALTIME, "_viewports", "_process_picking", true);
+	}
 	_notify_group_pause("physics_process", Node::NOTIFICATION_PHYSICS_PROCESS);
 	_flush_ugc();
 	MessageQueue::get_singleton()->flush(); //small little hack
@@ -635,6 +639,9 @@ void SceneTree::quit(int p_exit_code) {
 		// Override the exit code if a positive argument is given (the default is `-1`).
 		// This is a shorthand for calling `set_exit_code()` on the OS singleton then quitting.
 		OS::get_singleton()->set_exit_code(p_exit_code);
+	} else if (!OS::get_singleton()->is_custom_exit_code()) {
+		// Must customize exit code, otherwise it will default to a non-zero value
+		OS::get_singleton()->set_exit_code(EXIT_SUCCESS);
 	}
 
 	_quit = true;
@@ -2029,12 +2036,14 @@ SceneTree::SceneTree() {
 	debug_collisions_hint = false;
 	debug_navigation_hint = false;
 #endif
-	debug_collisions_color = GLOBAL_DEF("debug/shapes/collision/shape_color", Color(0.0, 0.6, 0.7, 0.5));
+	debug_collisions_color = GLOBAL_DEF("debug/shapes/collision/shape_color", Color(0.0, 0.6, 0.7, 0.42));
 	debug_collision_contact_color = GLOBAL_DEF("debug/shapes/collision/contact_color", Color(1.0, 0.2, 0.1, 0.8));
 	debug_navigation_color = GLOBAL_DEF("debug/shapes/navigation/geometry_color", Color(0.1, 1.0, 0.7, 0.4));
 	debug_navigation_disabled_color = GLOBAL_DEF("debug/shapes/navigation/disabled_geometry_color", Color(1.0, 0.7, 0.1, 0.4));
 	collision_debug_contacts = GLOBAL_DEF("debug/shapes/collision/max_contacts_displayed", 10000);
 	ProjectSettings::get_singleton()->set_custom_property_info("debug/shapes/collision/max_contacts_displayed", PropertyInfo(Variant::INT, "debug/shapes/collision/max_contacts_displayed", PROPERTY_HINT_RANGE, "0,20000,1")); // No negative
+
+	GLOBAL_DEF("debug/shapes/collision/draw_2d_outlines", true);
 
 	tree_version = 1;
 	physics_process_time = 1;

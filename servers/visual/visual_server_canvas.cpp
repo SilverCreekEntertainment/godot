@@ -100,7 +100,7 @@ void VisualServerCanvas::_render_canvas_item(Item *p_canvas_item, const Transfor
 	Rect2 rect = ci->get_rect();
 	Transform2D xform = ci->xform;
 	if (snap_2d_transforms) {
-		xform.elements[2] = xform.elements[2].floor();
+		xform.elements[2] = xform.elements[2].round();
 	}
 	xform = p_transform * xform;
 
@@ -128,6 +128,8 @@ void VisualServerCanvas::_render_canvas_item(Item *p_canvas_item, const Transfor
 		} else {
 			ci->final_clip_rect = global_rect;
 		}
+		ci->final_clip_rect.position = ci->final_clip_rect.position.round();
+		ci->final_clip_rect.size = ci->final_clip_rect.size.round();
 		ci->final_clip_owner = ci;
 
 	} else {

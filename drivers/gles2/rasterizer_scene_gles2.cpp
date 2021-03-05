@@ -126,6 +126,12 @@ void RasterizerSceneGLES2::shadow_atlas_set_size(RID p_atlas, int p_size) {
 		glGenFramebuffers(1, &shadow_atlas->fbo);
 		glBindFramebuffer(GL_FRAMEBUFFER, shadow_atlas->fbo);
 
+		if (shadow_atlas->size > storage->config.max_viewport_dimensions[0] || shadow_atlas->size > storage->config.max_viewport_dimensions[1]) {
+			WARN_PRINTS("Cannot set shadow atlas size larger than maximum hardware supported size of (" + itos(storage->config.max_viewport_dimensions[0]) + ", " + itos(storage->config.max_viewport_dimensions[1]) + "). Setting size to maximum.");
+			shadow_atlas->size = MIN(shadow_atlas->size, storage->config.max_viewport_dimensions[0]);
+			shadow_atlas->size = MIN(shadow_atlas->size, storage->config.max_viewport_dimensions[1]);
+		}
+
 		// create a depth texture
 		glActiveTexture(GL_TEXTURE0);
 
@@ -542,6 +548,13 @@ bool RasterizerSceneGLES2::reflection_probe_instance_begin_render(RID p_instance
 
 		//update cubemap if resolution changed
 		int size = rpi->probe_ptr->resolution;
+
+		if (size > storage->config.max_viewport_dimensions[0] || size > storage->config.max_viewport_dimensions[1]) {
+			WARN_PRINT_ONCE("Cannot set reflection probe resolution larger than maximum hardware supported size of (" + itos(storage->config.max_viewport_dimensions[0]) + ", " + itos(storage->config.max_viewport_dimensions[1]) + "). Setting size to maximum.");
+			size = MIN(size, storage->config.max_viewport_dimensions[0]);
+			size = MIN(size, storage->config.max_viewport_dimensions[1]);
+		}
+
 		rpi->current_resolution = size;
 
 		GLenum internal_format = GL_RGB;
@@ -887,6 +900,10 @@ RID RasterizerSceneGLES2::light_instance_create(RID p_light) {
 	light_instance->light_ptr = storage->light_owner.getornull(p_light);
 
 	light_instance->light_index = 0xFFFF;
+
+	// an ever increasing counter for each light added,
+	// used for sorting lights for a consistent render
+	light_instance->light_counter = _light_counter++;
 
 	if (!light_instance->light_ptr) {
 		memdelete(light_instance);
@@ -3274,6 +3291,30 @@ void RasterizerSceneGLES2::render_scene(const Transform &p_cam_transform, const 
 			index++;
 		}
 
+		// for fog transmission, we want some kind of consistent ordering of lights
+		// add any more conditions here in which we need consistent light ordering
+		// (perhaps we always should have it, but don't know yet)
+		if (env && env->fog_transmit_enabled) {
+
+			struct _LightSort {
+
+				bool operator()(LightInstance *A, LightInstance *B) const {
+					return A->light_counter > B->light_counter;
+				}
+			};
+
+			int num_lights_to_sort = render_light_instance_count - render_directional_lights;
+
+			if (num_lights_to_sort) {
+				SortArray<LightInstance *, _LightSort> sorter;
+				sorter.sort(&render_light_instances[render_directional_lights], num_lights_to_sort);
+				// rejig indices
+				for (int i = render_directional_lights; i < render_light_instance_count; i++) {
+					render_light_instances[i]->light_index = i;
+				}
+			}
+		}
+
 	} else {
 		render_light_instances = NULL;
 		render_directional_lights = 0;
@@ -4019,6 +4060,12 @@ void RasterizerSceneGLES2::initialize() {
 		directional_shadow.light_count = 0;
 		directional_shadow.size = next_power_of_2(GLOBAL_GET("rendering/quality/directional_shadow/size"));
 
+		if (directional_shadow.size > storage->config.max_viewport_dimensions[0] || directional_shadow.size > storage->config.max_viewport_dimensions[1]) {
+			WARN_PRINTS("Cannot set directional shadow size larger than maximum hardware supported size of (" + itos(storage->config.max_viewport_dimensions[0]) + ", " + itos(storage->config.max_viewport_dimensions[1]) + "). Setting size to maximum.");
+			directional_shadow.size = MIN(directional_shadow.size, storage->config.max_viewport_dimensions[0]);
+			directional_shadow.size = MIN(directional_shadow.size, storage->config.max_viewport_dimensions[1]);
+		}
+
 		glGenFramebuffers(1, &directional_shadow.fbo);
 		glBindFramebuffer(GL_FRAMEBUFFER, directional_shadow.fbo);
 
@@ -4075,4 +4122,5 @@ void RasterizerSceneGLES2::finalize() {
 }
 
 RasterizerSceneGLES2::RasterizerSceneGLES2() {
+	_light_counter = 0;
 }

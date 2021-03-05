@@ -1,5 +1,5 @@
 /*************************************************************************/
-/*  mutex_windows.h                                                      */
+/*  import_defaults_editor.h                                             */
 /*************************************************************************/
 /*                       This file is part of:                           */
 /*                           GODOT ENGINE                                */
@@ -28,36 +28,45 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
-#ifndef MUTEX_WINDOWS_H
-#define MUTEX_WINDOWS_H
+#ifndef IMPORT_DEFAULTS_EDITOR_H
+#define IMPORT_DEFAULTS_EDITOR_H
 
-#ifdef WINDOWS_ENABLED
+#include "core/undo_redo.h"
+#include "editor/editor_data.h"
+#include "editor/editor_plugin_settings.h"
+#include "editor/editor_sectioned_inspector.h"
+#include "editor_autoload_settings.h"
+#include "scene/gui/center_container.h"
+#include "scene/gui/option_button.h"
 
-#include "core/os/mutex.h"
+class ImportDefaultsEditorSettings;
 
-#include <windows.h>
+class ImportDefaultsEditor : public VBoxContainer {
+	GDCLASS(ImportDefaultsEditor, VBoxContainer)
 
-class MutexWindows : public Mutex {
+	OptionButton *importers;
+	Button *save_defaults;
+	Button *reset_defaults;
 
-#ifdef WINDOWS_USE_MUTEX
-	HANDLE mutex;
-#else
-	CRITICAL_SECTION mutex;
-#endif
+	EditorInspector *inspector;
 
-	static Mutex *create_func_windows(bool p_recursive);
+	ImportDefaultsEditorSettings *settings;
+
+	void _update_importer();
+	void _importer_selected(int p_index);
+
+	void _reset();
+	void _save();
+
+protected:
+	void _notification(int p_what);
+	static void _bind_methods();
 
 public:
-	virtual void lock();
-	virtual void unlock();
-	virtual Error try_lock();
+	void clear();
 
-	static void make_default();
-
-	MutexWindows();
-	~MutexWindows();
+	ImportDefaultsEditor();
+	~ImportDefaultsEditor();
 };
 
-#endif
-
-#endif
+#endif // IMPORT_DEFAULTS_EDITOR_H

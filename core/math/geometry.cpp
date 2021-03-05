@@ -877,6 +877,7 @@ PoolVector<Plane> Geometry::build_box_planes(const Vector3 &p_extents) {
 }
 
 PoolVector<Plane> Geometry::build_cylinder_planes(real_t p_radius, real_t p_height, int p_sides, Vector3::Axis p_axis) {
+	ERR_FAIL_INDEX_V(p_axis, 3, PoolVector<Plane>());
 
 	PoolVector<Plane> planes;
 
@@ -899,6 +900,7 @@ PoolVector<Plane> Geometry::build_cylinder_planes(real_t p_radius, real_t p_heig
 }
 
 PoolVector<Plane> Geometry::build_sphere_planes(real_t p_radius, int p_lats, int p_lons, Vector3::Axis p_axis) {
+	ERR_FAIL_INDEX_V(p_axis, 3, PoolVector<Plane>());
 
 	PoolVector<Plane> planes;
 
@@ -932,6 +934,7 @@ PoolVector<Plane> Geometry::build_sphere_planes(real_t p_radius, int p_lats, int
 }
 
 PoolVector<Plane> Geometry::build_capsule_planes(real_t p_radius, real_t p_height, int p_sides, int p_lats, Vector3::Axis p_axis) {
+	ERR_FAIL_INDEX_V(p_axis, 3, PoolVector<Plane>());
 
 	PoolVector<Plane> planes;
 
@@ -989,6 +992,10 @@ void Geometry::make_atlas(const Vector<Size2i> &p_rects, Vector<Point2i> &r_resu
 	// 256x8192 atlas (won't work anywhere).
 
 	ERR_FAIL_COND(p_rects.size() == 0);
+	for (int i = 0; i < p_rects.size(); i++) {
+		ERR_FAIL_COND(p_rects[i].width <= 0);
+		ERR_FAIL_COND(p_rects[i].height <= 0);
+	}
 
 	Vector<_AtlasWorkRect> wrects;
 	wrects.resize(p_rects.size());

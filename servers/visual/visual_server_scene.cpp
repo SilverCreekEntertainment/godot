@@ -132,6 +132,10 @@ void VisualServerScene::SpatialPartitioningScene_BVH::deactivate(SpatialPartitio
 	_bvh.deactivate(p_handle - 1);
 }
 
+void VisualServerScene::SpatialPartitioningScene_BVH::force_collision_check(SpatialPartitionID p_handle) {
+	_bvh.force_collision_check(p_handle - 1);
+}
+
 void VisualServerScene::SpatialPartitioningScene_BVH::update() {
 	_bvh.update();
 }
@@ -782,7 +786,13 @@ void VisualServerScene::instance_set_visible(RID p_instance, bool p_visible) {
 
 	// give the opportunity for the spatial paritioning scene to use a special implementation of visibility
 	// for efficiency (supported in BVH but not octree)
-	if (instance->spatial_partition_id) {
+
+	// slightly bug prone optimization here - we want to avoid doing a collision check twice
+	// once when activating, and once when calling set_pairable. We do this by deferring the collision check.
+	// However, in some cases (notably meshes), set_pairable never gets called. So we want to catch this case
+	// and force a collision check (see later in this function).
+	// This is only done in two stages to maintain compatibility with the octree.
+	if (instance->spatial_partition_id && instance->scenario) {
 		if (p_visible) {
 			instance->scenario->sps->activate(instance->spatial_partition_id, instance->transformed_aabb);
 		} else {
@@ -828,6 +838,11 @@ void VisualServerScene::instance_set_visible(RID p_instance, bool p_visible) {
 
 		} break;
 		default: {
+			// if we haven't called set_pairable, we STILL need to do a collision check
+			// for activated items because we deferred it earlier in the call to activate.
+			if (instance->spatial_partition_id && instance->scenario && p_visible) {
+				instance->scenario->sps->force_collision_check(instance->spatial_partition_id);
+			}
 		}
 	}
 }
@@ -840,12 +855,14 @@ void VisualServerScene::instance_set_use_lightmap(RID p_instance, RID p_lightmap
 	Instance *instance = instance_owner.get(p_instance);
 	ERR_FAIL_COND(!instance);
 
+	instance->lightmap = RID();
+	instance->lightmap_slice = -1;
+	instance->lightmap_uv_rect = Rect2(0, 0, 1, 1);
+	instance->baked_light = false;
+
 	if (instance->lightmap_capture) {
 		InstanceLightmapCaptureData *lightmap_capture = static_cast<InstanceLightmapCaptureData *>(((Instance *)instance->lightmap_capture)->base_data);
 		lightmap_capture->users.erase(instance);
-		instance->lightmap = RID();
-		instance->lightmap_slice = -1;
-		instance->lightmap_uv_rect = Rect2(0, 0, 1, 1);
 		instance->lightmap_capture = NULL;
 	}
 
@@ -860,6 +877,7 @@ void VisualServerScene::instance_set_use_lightmap(RID p_instance, RID p_lightmap
 		instance->lightmap = p_lightmap;
 		instance->lightmap_slice = p_lightmap_slice;
 		instance->lightmap_uv_rect = p_lightmap_uv_rect;
+		instance->baked_light = true;
 	}
 }
 
@@ -2696,20 +2714,20 @@ void VisualServerScene::_gi_probe_bake_thread() {
 
 	while (true) {
 
-		probe_bake_sem->wait();
+		probe_bake_sem.wait();
 		if (probe_bake_thread_exit) {
 			break;
 		}
 
 		Instance *to_bake = NULL;
 
-		probe_bake_mutex->lock();
+		probe_bake_mutex.lock();
 
 		if (!probe_bake_list.empty()) {
 			to_bake = probe_bake_list.front()->get();
 			probe_bake_list.pop_front();
 		}
-		probe_bake_mutex->unlock();
+		probe_bake_mutex.unlock();
 
 		if (!to_bake)
 			continue;
@@ -3248,15 +3266,9 @@ void VisualServerScene::_bake_gi_probe(Instance *p_gi_probe) {
 	}
 
 	//send back to main thread to update un little chunks
-	if (probe_bake_mutex) {
-		probe_bake_mutex->lock();
-	}
-
+	probe_bake_mutex.lock();
 	probe_data->dynamic.updating_stage = GI_UPDATE_STAGE_UPLOADING;
-
-	if (probe_bake_mutex) {
-		probe_bake_mutex->unlock();
-	}
+	probe_bake_mutex.unlock();
 }
 
 bool VisualServerScene::_check_gi_probe(Instance *p_gi_probe) {
@@ -3397,11 +3409,11 @@ void VisualServerScene::render_probes() {
 					if (_check_gi_probe(instance_probe) || force_lighting) { //send to lighting thread
 
 #ifndef NO_THREADS
-						probe_bake_mutex->lock();
+						probe_bake_mutex.lock();
 						probe->dynamic.updating_stage = GI_UPDATE_STAGE_LIGHTING;
 						probe_bake_list.push_back(instance_probe);
-						probe_bake_mutex->unlock();
-						probe_bake_sem->post();
+						probe_bake_mutex.unlock();
+						probe_bake_sem.post();
 
 #else
 
@@ -3673,12 +3685,8 @@ VisualServerScene *VisualServerScene::singleton = NULL;
 
 VisualServerScene::VisualServerScene() {
 
-#ifndef NO_THREADS
-	probe_bake_sem = Semaphore::create();
-	probe_bake_mutex = Mutex::create();
-	probe_bake_thread = Thread::create(_gi_probe_bake_threads, this);
+	probe_bake_thread.start(_gi_probe_bake_threads, this);
 	probe_bake_thread_exit = false;
-#endif
 
 	render_pass = 1;
 	singleton = this;
@@ -3687,13 +3695,7 @@ VisualServerScene::VisualServerScene() {
 
 VisualServerScene::~VisualServerScene() {
 
-#ifndef NO_THREADS
 	probe_bake_thread_exit = true;
-	probe_bake_sem->post();
-	Thread::wait_to_finish(probe_bake_thread);
-	memdelete(probe_bake_thread);
-	memdelete(probe_bake_sem);
-	memdelete(probe_bake_mutex);
-
-#endif
+	probe_bake_sem.post();
+	probe_bake_thread.wait_to_finish();
 }

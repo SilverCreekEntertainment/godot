@@ -307,7 +307,7 @@ private:
 		Point2 drag_accum;
 		bool drag_attempted;
 		Variant drag_data;
-		Control *drag_preview;
+		ObjectID drag_preview_id;
 		float tooltip_timer;
 		float tooltip_delay;
 		List<Control *> modal_stack;
@@ -369,6 +369,7 @@ private:
 
 	void _gui_force_drag(Control *p_base, const Variant &p_data, Control *p_control);
 	void _gui_set_drag_preview(Control *p_base, Control *p_control);
+	Control *_gui_get_drag_preview();
 
 	bool _gui_is_modal_on_top(const Control *p_control);
 	List<Control *>::Element *_gui_show_modal(Control *p_control);
@@ -406,7 +407,7 @@ private:
 	void _canvas_layer_remove(CanvasLayer *p_canvas_layer);
 
 	void _drop_mouse_focus();
-	void _drop_physics_mouseover();
+	void _drop_physics_mouseover(bool p_paused_only = false);
 
 	void _update_canvas_items(Node *p_node);
 
@@ -414,6 +415,7 @@ private:
 
 protected:
 	void _notification(int p_what);
+	void _process_picking(bool p_ignore_paused);
 	static void _bind_methods();
 	virtual void _validate_property(PropertyInfo &property) const;
 

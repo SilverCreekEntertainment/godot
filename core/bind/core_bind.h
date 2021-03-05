@@ -40,6 +40,7 @@
 #include "core/os/os.h"
 #include "core/os/semaphore.h"
 #include "core/os/thread.h"
+#include "core/safe_refcount.h"
 
 class _ResourceLoader : public Object {
 	GDCLASS(_ResourceLoader, Object);
@@ -252,6 +253,7 @@ public:
 
 	bool has_environment(const String &p_var) const;
 	String get_environment(const String &p_var) const;
+	bool set_environment(const String &p_var, const String &p_value) const;
 
 	String get_name() const;
 	Vector<String> get_cmdline_args();
@@ -310,8 +312,8 @@ public:
 	uint64_t get_static_memory_peak_usage() const;
 	uint64_t get_dynamic_memory_usage() const;
 
-	void delay_usec(uint32_t p_usec) const;
-	void delay_msec(uint32_t p_msec) const;
+	void delay_usec(int p_usec) const;
+	void delay_msec(int p_msec) const;
 	uint32_t get_ticks_msec() const;
 	uint64_t get_ticks_usec() const;
 	uint32_t get_splash_tick_msec() const;
@@ -510,6 +512,7 @@ public:
 	Error open_compressed(const String &p_path, ModeFlags p_mode_flags, CompressionMode p_compress_mode = COMPRESSION_FASTLZ);
 
 	Error open(const String &p_path, ModeFlags p_mode_flags); // open a file.
+	void flush(); // Flush a file (write its buffer to disk).
 	void close(); // Close a file.
 	bool is_open() const; // True when file is open.
 
@@ -654,7 +657,7 @@ public:
 class _Mutex : public Reference {
 
 	GDCLASS(_Mutex, Reference);
-	Mutex *mutex;
+	Mutex mutex;
 
 	static void _bind_methods();
 
@@ -662,24 +665,18 @@ public:
 	void lock();
 	Error try_lock();
 	void unlock();
-
-	_Mutex();
-	~_Mutex();
 };
 
 class _Semaphore : public Reference {
 
 	GDCLASS(_Semaphore, Reference);
-	Semaphore *semaphore;
+	Semaphore semaphore;
 
 	static void _bind_methods();
 
 public:
 	Error wait();
 	Error post();
-
-	_Semaphore();
-	~_Semaphore();
 };
 
 class _Thread : public Reference {
@@ -689,10 +686,10 @@ class _Thread : public Reference {
 protected:
 	Variant ret;
 	Variant userdata;
-	volatile bool active;
+	SafeFlag active;
 	Object *target_instance;
 	StringName target_method;
-	Thread *thread;
+	Thread thread;
 	static void _bind_methods();
 	static void _start_func(void *ud);
 

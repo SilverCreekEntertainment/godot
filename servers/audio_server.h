@@ -204,7 +204,7 @@ private:
 				last_mix_with_audio = 0;
 				used = false;
 				active = false;
-				peak_volume = AudioFrame(0, 0);
+				peak_volume = AudioFrame(AUDIO_MIN_PEAK_DB, AUDIO_MIN_PEAK_DB);
 			}
 		};
 
@@ -238,7 +238,7 @@ private:
 	size_t audio_data_total_mem;
 	size_t audio_data_max_mem;
 
-	Mutex *audio_data_lock;
+	Mutex audio_data_lock;
 
 	void init_channels_and_buffers();
 

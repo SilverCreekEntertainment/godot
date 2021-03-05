@@ -147,7 +147,16 @@ void BakedLightmapData::clear_users() {
 	users.clear();
 }
 
+void BakedLightmapData::clear_data() {
+	clear_users();
+	if (baked_light.is_valid()) {
+		VS::get_singleton()->free(baked_light);
+	}
+	baked_light = VS::get_singleton()->lightmap_capture_create();
+}
+
 void BakedLightmapData::_set_user_data(const Array &p_data) {
+	ERR_FAIL_COND(p_data.size() <= 0);
 
 	// Detect old lightmapper format
 	if (p_data.size() % 3 == 0) {
@@ -226,6 +235,7 @@ void BakedLightmapData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_user_path", "user_idx"), &BakedLightmapData::get_user_path);
 	ClassDB::bind_method(D_METHOD("get_user_lightmap", "user_idx"), &BakedLightmapData::get_user_lightmap);
 	ClassDB::bind_method(D_METHOD("clear_users"), &BakedLightmapData::clear_users);
+	ClassDB::bind_method(D_METHOD("clear_data"), &BakedLightmapData::clear_data);
 
 	ADD_PROPERTY(PropertyInfo(Variant::AABB, "bounds", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NOEDITOR), "set_bounds", "get_bounds");
 	ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM, "cell_space_transform", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NOEDITOR), "set_cell_space_transform", "get_cell_space_transform");
@@ -317,6 +327,9 @@ Size2i BakedLightmap::_compute_lightmap_size(const MeshesFound &p_mesh) {
 }
 
 void BakedLightmap::_find_meshes_and_lights(Node *p_at_node, Vector<MeshesFound> &meshes, Vector<LightsFound> &lights) {
+
+	AABB bounds = AABB(-extents, extents * 2.0);
+
 	MeshInstance *mi = Object::cast_to<MeshInstance>(p_at_node);
 	if (mi && mi->get_flag(GeometryInstance::FLAG_USE_BAKED_LIGHT) && mi->is_visible_in_tree()) {
 		Ref<Mesh> mesh = mi->get_mesh();
@@ -339,27 +352,34 @@ void BakedLightmap::_find_meshes_and_lights(Node *p_at_node, Vector<MeshesFound>
 			}
 
 			if (surfaces_found && all_have_uv2_and_normal) {
-				MeshesFound mf;
-				mf.cast_shadows = mi->get_cast_shadows_setting() != GeometryInstance::SHADOW_CASTING_SETTING_OFF;
-				mf.generate_lightmap = mi->get_generate_lightmap();
-				mf.xform = get_global_transform().affine_inverse() * mi->get_global_transform();
-				mf.node_path = get_path_to(mi);
-				mf.subindex = -1;
-				mf.mesh = mesh;
 
-				static const int lightmap_scale[4] = { 1, 2, 4, 8 }; //GeometryInstance3D::LIGHTMAP_SCALE_MAX = { 1, 2, 4, 8 };
-				mf.lightmap_scale = lightmap_scale[mi->get_lightmap_scale()];
+				Transform mesh_xform = get_global_transform().affine_inverse() * mi->get_global_transform();
 
-				Ref<Material> all_override = mi->get_material_override();
-				for (int i = 0; i < mesh->get_surface_count(); i++) {
-					if (all_override.is_valid()) {
-						mf.overrides.push_back(all_override);
-					} else {
-						mf.overrides.push_back(mi->get_surface_material(i));
+				AABB aabb = mesh_xform.xform(mesh->get_aabb());
+
+				if (bounds.intersects(aabb)) {
+					MeshesFound mf;
+					mf.cast_shadows = mi->get_cast_shadows_setting() != GeometryInstance::SHADOW_CASTING_SETTING_OFF;
+					mf.generate_lightmap = mi->get_generate_lightmap();
+					mf.xform = mesh_xform;
+					mf.node_path = get_path_to(mi);
+					mf.subindex = -1;
+					mf.mesh = mesh;
+
+					static const int lightmap_scale[4] = { 1, 2, 4, 8 }; //GeometryInstance3D::LIGHTMAP_SCALE_MAX = { 1, 2, 4, 8 };
+					mf.lightmap_scale = lightmap_scale[mi->get_lightmap_scale()];
+
+					Ref<Material> all_override = mi->get_material_override();
+					for (int i = 0; i < mesh->get_surface_count(); i++) {
+						if (all_override.is_valid()) {
+							mf.overrides.push_back(all_override);
+						} else {
+							mf.overrides.push_back(mi->get_surface_material(i));
+						}
 					}
-				}
 
-				meshes.push_back(mf);
+					meshes.push_back(mf);
+				}
 			}
 		}
 	}
@@ -383,10 +403,16 @@ void BakedLightmap::_find_meshes_and_lights(Node *p_at_node, Vector<MeshesFound>
 					continue;
 				}
 
-				MeshesFound mf;
+				Transform mesh_xform = xf * bmeshes[i + 1];
 
-				Transform mesh_xf = bmeshes[i + 1];
-				mf.xform = xf * mesh_xf;
+				AABB aabb = mesh_xform.xform(mesh->get_aabb());
+
+				if (!bounds.intersects(aabb)) {
+					continue;
+				}
+
+				MeshesFound mf;
+				mf.xform = mesh_xform;
 				mf.node_path = get_path_to(s);
 				mf.subindex = i / 2;
 				mf.lightmap_scale = 1;
@@ -488,6 +514,55 @@ void BakedLightmap::_get_material_images(const MeshesFound &p_found_mesh, Lightm
 			r_emission_textures.push_back(emission_texture);
 		}
 		r_mesh_data.emission.push_back(emission);
+	}
+}
+
+void BakedLightmap::_save_image(String &r_base_path, Ref<Image> r_img, bool p_use_srgb) {
+	if (use_hdr) {
+		r_base_path += ".exr";
+	} else {
+		r_base_path += ".png";
+	}
+
+	String relative_path = r_base_path;
+	if (relative_path.begins_with("res://")) {
+		relative_path = relative_path.substr(6, relative_path.length());
+	}
+
+	bool hdr_grayscale = use_hdr && !use_color;
+
+	if (p_use_srgb || hdr_grayscale) {
+		r_img->lock();
+		for (int i = 0; i < r_img->get_height(); i++) {
+			for (int j = 0; j < r_img->get_width(); j++) {
+				Color c = r_img->get_pixel(j, i);
+
+				if (hdr_grayscale) {
+					c = Color(c.get_v(), 0.0f, 0.0f);
+				}
+
+				if (p_use_srgb) {
+					c = c.to_srgb();
+				}
+
+				r_img->set_pixel(j, i, c);
+			}
+		}
+		r_img->unlock();
+	}
+
+	if (!use_color) {
+		if (use_hdr) {
+			r_img->convert(Image::FORMAT_RH);
+		} else {
+			r_img->convert(Image::FORMAT_L8);
+		}
+	}
+
+	if (use_hdr) {
+		r_img->save_exr(relative_path, !use_color);
+	} else {
+		r_img->save_png(relative_path);
 	}
 }
 
@@ -770,7 +845,7 @@ BakedLightmap::BakeError BakedLightmap::bake(Node *p_from_node, String p_data_sa
 	if (get_light_data().is_valid()) {
 		data = get_light_data();
 		set_light_data(Ref<BakedLightmapData>()); //clear
-		data->clear_users();
+		data->clear_data();
 	} else {
 		data.instance();
 	}
@@ -868,6 +943,8 @@ BakedLightmap::BakeError BakedLightmap::bake(Node *p_from_node, String p_data_sa
 		images.push_back(lightmapper->get_bake_texture(i));
 	}
 
+	bool use_srgb = use_color && !use_hdr;
+
 	if (gen_atlas) {
 
 		Ref<Image> large_image;
@@ -881,13 +958,7 @@ BakedLightmap::BakeError BakedLightmap::bake(Node *p_from_node, String p_data_sa
 		String base_path = p_data_save_path.get_basename();
 
 		if (ResourceLoader::import) {
-
-			base_path += ".exr";
-			String relative_path = base_path;
-			if (relative_path.begins_with("res://")) {
-				relative_path = relative_path.substr(6, relative_path.length());
-			}
-			large_image->save_exr(relative_path, false);
+			_save_image(base_path, large_image, use_srgb);
 
 			Ref<ConfigFile> config;
 			config.instance();
@@ -903,7 +974,7 @@ BakedLightmap::BakeError BakedLightmap::bake(Node *p_from_node, String p_data_sa
 			config->set_value("params", "flags/repeat", false);
 			config->set_value("params", "flags/filter", true);
 			config->set_value("params", "flags/mipmaps", false);
-			config->set_value("params", "flags/srgb", false);
+			config->set_value("params", "flags/srgb", use_srgb);
 			config->set_value("params", "slices/horizontal", 1);
 			config->set_value("params", "slices/vertical", images.size());
 			config->save(base_path + ".import");
@@ -962,12 +1033,7 @@ BakedLightmap::BakeError BakedLightmap::bake(Node *p_from_node, String p_data_sa
 
 			if (ResourceLoader::import) {
 
-				base_path += ".exr";
-				String relative_path = base_path;
-				if (relative_path.begins_with("res://")) {
-					relative_path = relative_path.substr(6, relative_path.length());
-				}
-				images[i]->save_exr(relative_path, false);
+				_save_image(base_path, images[i], use_srgb);
 
 				Ref<ConfigFile> config;
 				config.instance();
@@ -983,7 +1049,7 @@ BakedLightmap::BakeError BakedLightmap::bake(Node *p_from_node, String p_data_sa
 				config->set_value("params", "flags/repeat", false);
 				config->set_value("params", "flags/filter", true);
 				config->set_value("params", "flags/mipmaps", false);
-				config->set_value("params", "flags/srgb", false);
+				config->set_value("params", "flags/srgb", use_srgb);
 
 				config->save(base_path + ".import");
 
@@ -1284,6 +1350,26 @@ bool BakedLightmap::is_using_denoiser() const {
 	return use_denoiser;
 }
 
+void BakedLightmap::set_use_hdr(bool p_enable) {
+
+	use_hdr = p_enable;
+}
+
+bool BakedLightmap::is_using_hdr() const {
+
+	return use_hdr;
+}
+
+void BakedLightmap::set_use_color(bool p_enable) {
+
+	use_color = p_enable;
+}
+
+bool BakedLightmap::is_using_color() const {
+
+	return use_color;
+}
+
 void BakedLightmap::set_environment_mode(EnvironmentMode p_mode) {
 	environment_mode = p_mode;
 	_change_notify();
@@ -1403,6 +1489,12 @@ void BakedLightmap::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_use_denoiser", "use_denoiser"), &BakedLightmap::set_use_denoiser);
 	ClassDB::bind_method(D_METHOD("is_using_denoiser"), &BakedLightmap::is_using_denoiser);
 
+	ClassDB::bind_method(D_METHOD("set_use_hdr", "use_denoiser"), &BakedLightmap::set_use_hdr);
+	ClassDB::bind_method(D_METHOD("is_using_hdr"), &BakedLightmap::is_using_hdr);
+
+	ClassDB::bind_method(D_METHOD("set_use_color", "use_denoiser"), &BakedLightmap::set_use_color);
+	ClassDB::bind_method(D_METHOD("is_using_color"), &BakedLightmap::is_using_color);
+
 	ClassDB::bind_method(D_METHOD("set_generate_atlas", "enabled"), &BakedLightmap::set_generate_atlas);
 	ClassDB::bind_method(D_METHOD("is_generate_atlas_enabled"), &BakedLightmap::is_generate_atlas_enabled);
 
@@ -1438,6 +1530,8 @@ void BakedLightmap::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "quality", PROPERTY_HINT_ENUM, "Low,Medium,High,Ultra"), "set_bake_quality", "get_bake_quality");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "bounces", PROPERTY_HINT_RANGE, "0,16,1"), "set_bounces", "get_bounces");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "use_denoiser"), "set_use_denoiser", "is_using_denoiser");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "use_hdr"), "set_use_hdr", "is_using_hdr");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "use_color"), "set_use_color", "is_using_color");
 	ADD_PROPERTY(PropertyInfo(Variant::REAL, "bias", PROPERTY_HINT_RANGE, "0.00001,0.1,0.00001,or_greater"), "set_bias", "get_bias");
 	ADD_PROPERTY(PropertyInfo(Variant::REAL, "default_texels_per_unit", PROPERTY_HINT_RANGE, "0.0,64.0,0.01,or_greater"), "set_default_texels_per_unit", "get_default_texels_per_unit");
 
@@ -1503,6 +1597,8 @@ BakedLightmap::BakedLightmap() {
 	environment_custom_energy = 1.0;
 
 	use_denoiser = true;
+	use_hdr = true;
+	use_color = true;
 	bias = 0.005;
 
 	generate_atlas = true;

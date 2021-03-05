@@ -1063,6 +1063,10 @@ void RasterizerCanvasBaseGLES2::initialize() {
 
 	state.canvas_shader.init();
 
+	state.using_light_angle = false;
+	state.using_large_vertex = false;
+	state.using_modulate = false;
+
 	_set_texture_rect_mode(true);
 	state.canvas_shader.set_conditional(CanvasShaderGLES2::USE_RGBA_SHADOWS, storage->config.use_rgba_2d_shadows);
 
@@ -1070,7 +1074,7 @@ void RasterizerCanvasBaseGLES2::initialize() {
 
 	state.lens_shader.init();
 
-	state.canvas_shader.set_conditional(CanvasShaderGLES2::USE_PIXEL_SNAP, GLOBAL_DEF("rendering/quality/2d/use_pixel_snap", false));
+	state.canvas_shader.set_conditional(CanvasShaderGLES2::USE_PIXEL_SNAP, GLOBAL_DEF("rendering/2d/snapping/use_gpu_pixel_snap", false));
 
 	state.using_light = NULL;
 	state.using_transparent_rt = false;

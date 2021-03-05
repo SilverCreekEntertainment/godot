@@ -556,6 +556,11 @@ String _OS::get_environment(const String &p_var) const {
 	return OS::get_singleton()->get_environment(p_var);
 }
 
+bool _OS::set_environment(const String &p_var, const String &p_value) const {
+
+	return OS::get_singleton()->set_environment(p_var, p_value);
+}
+
 String _OS::get_name() const {
 
 	return OS::get_singleton()->get_name();
@@ -950,13 +955,19 @@ uint64_t _OS::get_system_time_msecs() const {
 	return OS::get_singleton()->get_system_time_msecs();
 }
 
-void _OS::delay_usec(uint32_t p_usec) const {
-
+/** This method uses a signed argument for better error reporting as it's used from the scripting API. */
+void _OS::delay_usec(int p_usec) const {
+	ERR_FAIL_COND_MSG(
+			p_usec < 0,
+			vformat("Can't sleep for %d microseconds. The delay provided must be greater than or equal to 0 microseconds.", p_usec));
 	OS::get_singleton()->delay_usec(p_usec);
 }
 
-void _OS::delay_msec(uint32_t p_msec) const {
-
+/** This method uses a signed argument for better error reporting as it's used from the scripting API. */
+void _OS::delay_msec(int p_msec) const {
+	ERR_FAIL_COND_MSG(
+			p_msec < 0,
+			vformat("Can't sleep for %d milliseconds. The delay provided must be greater than or equal to 0 milliseconds.", p_msec));
 	OS::get_singleton()->delay_usec(int64_t(p_msec) * 1000);
 }
 
@@ -1347,8 +1358,9 @@ void _OS::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("shell_open", "uri"), &_OS::shell_open);
 	ClassDB::bind_method(D_METHOD("get_process_id"), &_OS::get_process_id);
 
-	ClassDB::bind_method(D_METHOD("get_environment", "environment"), &_OS::get_environment);
-	ClassDB::bind_method(D_METHOD("has_environment", "environment"), &_OS::has_environment);
+	ClassDB::bind_method(D_METHOD("get_environment", "variable"), &_OS::get_environment);
+	ClassDB::bind_method(D_METHOD("set_environment", "variable", "value"), &_OS::set_environment);
+	ClassDB::bind_method(D_METHOD("has_environment", "variable"), &_OS::has_environment);
 
 	ClassDB::bind_method(D_METHOD("get_name"), &_OS::get_name);
 	ClassDB::bind_method(D_METHOD("get_cmdline_args"), &_OS::get_cmdline_args);
@@ -2005,6 +2017,11 @@ Error _File::open(const String &p_path, ModeFlags p_mode_flags) {
 	return err;
 }
 
+void _File::flush() {
+	ERR_FAIL_COND_MSG(!f, "File must be opened before flushing.");
+	f->flush();
+}
+
 void _File::close() {
 
 	if (f)
@@ -2321,6 +2338,7 @@ void _File::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("open_compressed", "path", "mode_flags", "compression_mode"), &_File::open_compressed, DEFVAL(0));
 
 	ClassDB::bind_method(D_METHOD("open", "path", "flags"), &_File::open);
+	ClassDB::bind_method(D_METHOD("flush"), &_File::flush);
 	ClassDB::bind_method(D_METHOD("close"), &_File::close);
 	ClassDB::bind_method(D_METHOD("get_path"), &_File::get_path);
 	ClassDB::bind_method(D_METHOD("get_path_absolute"), &_File::get_path_absolute);
@@ -2696,12 +2714,14 @@ void _Marshalls::_bind_methods() {
 
 Error _Semaphore::wait() {
 
-	return semaphore->wait();
+	semaphore.wait();
+	return OK; // Can't fail anymore; keep compat
 }
 
 Error _Semaphore::post() {
 
-	return semaphore->post();
+	semaphore.post();
+	return OK; // Can't fail anymore; keep compat
 }
 
 void _Semaphore::_bind_methods() {
@@ -2710,31 +2730,21 @@ void _Semaphore::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("post"), &_Semaphore::post);
 }
 
-_Semaphore::_Semaphore() {
-
-	semaphore = Semaphore::create();
-}
-
-_Semaphore::~_Semaphore() {
-
-	memdelete(semaphore);
-}
-
 ///////////////
 
 void _Mutex::lock() {
 
-	mutex->lock();
+	mutex.lock();
 }
 
 Error _Mutex::try_lock() {
 
-	return mutex->try_lock();
+	return mutex.try_lock();
 }
 
 void _Mutex::unlock() {
 
-	mutex->unlock();
+	mutex.unlock();
 }
 
 void _Mutex::_bind_methods() {
@@ -2742,16 +2752,6 @@ void _Mutex::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("lock"), &_Mutex::lock);
 	ClassDB::bind_method(D_METHOD("try_lock"), &_Mutex::try_lock);
 	ClassDB::bind_method(D_METHOD("unlock"), &_Mutex::unlock);
-}
-
-_Mutex::_Mutex() {
-
-	mutex = Mutex::create();
-}
-
-_Mutex::~_Mutex() {
-
-	memdelete(mutex);
 }
 
 ///////////////
@@ -2797,7 +2797,7 @@ void _Thread::_start_func(void *ud) {
 
 Error _Thread::start(Object *p_instance, const StringName &p_method, const Variant &p_userdata, Priority p_priority) {
 
-	ERR_FAIL_COND_V_MSG(active, ERR_ALREADY_IN_USE, "Thread already started.");
+	ERR_FAIL_COND_V_MSG(active.is_set(), ERR_ALREADY_IN_USE, "Thread already started.");
 	ERR_FAIL_COND_V(!p_instance, ERR_INVALID_PARAMETER);
 	ERR_FAIL_COND_V(p_method == StringName(), ERR_INVALID_PARAMETER);
 	ERR_FAIL_INDEX_V(p_priority, PRIORITY_MAX, ERR_INVALID_PARAMETER);
@@ -2806,49 +2806,35 @@ Error _Thread::start(Object *p_instance, const StringName &p_method, const Varia
 	target_method = p_method;
 	target_instance = p_instance;
 	userdata = p_userdata;
-	active = true;
+	active.set();
 
 	Ref<_Thread> *ud = memnew(Ref<_Thread>(this));
 
 	Thread::Settings s;
 	s.priority = (Thread::Priority)p_priority;
-	thread = Thread::create(_start_func, ud, s);
-	if (!thread) {
-		active = false;
-		target_method = StringName();
-		target_instance = NULL;
-		userdata = Variant();
-		return ERR_CANT_CREATE;
-	}
+	thread.start(_start_func, ud, s);
 
 	return OK;
 }
 
 String _Thread::get_id() const {
 
-	if (!thread)
-		return String();
-
-	return itos(thread->get_id());
+	return itos(thread.get_id());
 }
 
 bool _Thread::is_active() const {
 
-	return active;
+	return active.is_set();
 }
 Variant _Thread::wait_to_finish() {
 
-	ERR_FAIL_COND_V_MSG(!thread, Variant(), "Thread must exist to wait for its completion.");
-	ERR_FAIL_COND_V_MSG(!active, Variant(), "Thread must be active to wait for its completion.");
-	Thread::wait_to_finish(thread);
+	ERR_FAIL_COND_V_MSG(!active.is_set(), Variant(), "Thread must be active to wait for its completion.");
+	thread.wait_to_finish();
 	Variant r = ret;
-	active = false;
 	target_method = StringName();
 	target_instance = NULL;
 	userdata = Variant();
-	if (thread)
-		memdelete(thread);
-	thread = NULL;
+	active.clear();
 
 	return r;
 }
@@ -2866,14 +2852,12 @@ void _Thread::_bind_methods() {
 }
 _Thread::_Thread() {
 
-	active = false;
-	thread = NULL;
 	target_instance = NULL;
 }
 
 _Thread::~_Thread() {
 
-	ERR_FAIL_COND_MSG(active, "Reference to a Thread object was lost while the thread is still running...");
+	ERR_FAIL_COND_MSG(active.is_set(), "Reference to a Thread object was lost while the thread is still running...");
 }
 
 /////////////////////////////////////

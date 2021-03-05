@@ -110,12 +110,14 @@
 # Lucas Dantas <lucas.lucantas38@gmail.com>, 2021.
 # Carlos Bonifacio <carlosboni.sa@gmail.com>, 2021.
 # Lucas Castro <castroclucas@gmail.com>, 2021.
+# Ricardo Zamarrenho Carvalho Correa <ricardozcc17@gmail.com>, 2021.
+# Diego dos Reis Macedo <diego_dragon97@hotmail.com>, 2021.
 msgid ""
 msgstr ""
 "Project-Id-Version: Godot Engine editor\n"
 "POT-Creation-Date: 2016-05-30\n"
-"PO-Revision-Date: 2021-01-26 03:28+0000\n"
-"Last-Translator: Lucas Castro <castroclucas@gmail.com>\n"
+"PO-Revision-Date: 2021-02-15 10:51+0000\n"
+"Last-Translator: Carlos Bonifacio <carlosboni.sa@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) <https://hosted.weblate.org/projects/"
 "godot-engine/godot/pt_BR/>\n"
 "Language: pt_BR\n"
@@ -751,7 +753,7 @@ msgstr "Selecionar Trilhas para Copiar"
 #: editor/plugins/animation_player_editor_plugin.cpp
 #: editor/plugins/script_text_editor.cpp
 #: editor/plugins/sprite_frames_editor_plugin.cpp editor/property_editor.cpp
-#: scene/gui/line_edit.cpp scene/gui/text_edit.cpp
+#: editor/scene_tree_dock.cpp scene/gui/line_edit.cpp scene/gui/text_edit.cpp
 msgid "Copy"
 msgstr "Copiar"
 
@@ -2633,7 +2635,8 @@ msgstr ""
 "falhou."
 
 #: editor/editor_node.cpp
-msgid "Unable to find script field for addon plugin at: 'res://addons/%s'."
+#, fuzzy
+msgid "Unable to find script field for addon plugin at: '%s'."
 msgstr ""
 "Não foi possível encontrar o campo de script para o plugin em: 'res://addons/"
 "%s'."
@@ -3068,14 +3071,6 @@ msgid "Help"
 msgstr "Ajuda"
 
 #: editor/editor_node.cpp editor/plugins/script_editor_plugin.cpp
-#: editor/plugins/script_text_editor.cpp
-#: editor/plugins/shader_editor_plugin.cpp editor/plugins/text_editor.cpp
-#: editor/plugins/visual_shader_editor_plugin.cpp editor/project_manager.cpp
-#: editor/project_settings_editor.cpp editor/settings_config_dialog.cpp
-msgid "Search"
-msgstr "Pesquisar"
-
-#: editor/editor_node.cpp editor/plugins/script_editor_plugin.cpp
 #: editor/plugins/shader_editor_plugin.cpp
 msgid "Online Docs"
 msgstr "Documentação Online"
@@ -3239,6 +3234,25 @@ msgstr "Fundir Com Existente"
 #: editor/editor_node.cpp
 msgid "Open & Run a Script"
 msgstr "Abrir e Rodar um Script"
+
+#: editor/editor_node.cpp
+#, fuzzy
+msgid ""
+"The following files are newer on disk.\n"
+"What action should be taken?"
+msgstr ""
+"Os seguintes arquivos são mais recentes no disco.\n"
+"Que ação deve ser tomada?:"
+
+#: editor/editor_node.cpp editor/plugins/script_editor_plugin.cpp
+#: editor/plugins/shader_editor_plugin.cpp
+msgid "Reload"
+msgstr "Recarregar"
+
+#: editor/editor_node.cpp editor/plugins/script_editor_plugin.cpp
+#: editor/plugins/shader_editor_plugin.cpp
+msgid "Resave"
+msgstr "Salve novamente"
 
 #: editor/editor_node.cpp
 msgid "New Inherited"
@@ -3452,7 +3466,7 @@ msgstr "Tornar Único"
 #: editor/plugins/script_text_editor.cpp
 #: editor/plugins/sprite_frames_editor_plugin.cpp
 #: editor/plugins/tile_map_editor_plugin.cpp editor/property_editor.cpp
-#: scene/gui/line_edit.cpp scene/gui/text_edit.cpp
+#: editor/scene_tree_dock.cpp scene/gui/line_edit.cpp scene/gui/text_edit.cpp
 msgid "Paste"
 msgstr "Colar"
 
@@ -5131,7 +5145,8 @@ msgid "Got:"
 msgstr "Obtido:"
 
 #: editor/plugins/asset_library_editor_plugin.cpp
-msgid "Failed sha256 hash check"
+#, fuzzy
+msgid "Failed SHA-256 hash check"
 msgstr "Falha na verificação da hash sha256"
 
 #: editor/plugins/asset_library_editor_plugin.cpp
@@ -7063,6 +7078,14 @@ msgstr "Fechar Docs"
 msgid "Run"
 msgstr "Rodar"
 
+#: editor/plugins/script_editor_plugin.cpp
+#: editor/plugins/script_text_editor.cpp
+#: editor/plugins/shader_editor_plugin.cpp editor/plugins/text_editor.cpp
+#: editor/plugins/visual_shader_editor_plugin.cpp editor/project_manager.cpp
+#: editor/project_settings_editor.cpp editor/settings_config_dialog.cpp
+msgid "Search"
+msgstr "Pesquisar"
+
 #: editor/plugins/script_editor_plugin.cpp editor/script_editor_debugger.cpp
 msgid "Step Into"
 msgstr "Passo para dentro"
@@ -7115,16 +7138,6 @@ msgid ""
 msgstr ""
 "Os seguintes arquivos são mais recentes no disco.\n"
 "Que ação deve ser tomada?:"
-
-#: editor/plugins/script_editor_plugin.cpp
-#: editor/plugins/shader_editor_plugin.cpp
-msgid "Reload"
-msgstr "Recarregar"
-
-#: editor/plugins/script_editor_plugin.cpp
-#: editor/plugins/shader_editor_plugin.cpp
-msgid "Resave"
-msgstr "Salve novamente"
 
 #: editor/plugins/script_editor_plugin.cpp editor/script_editor_debugger.cpp
 msgid "Debugger"
@@ -7219,8 +7232,8 @@ msgstr "Breakpoints"
 msgid "Go To"
 msgstr "Ir Para"
 
-#: editor/plugins/script_text_editor.cpp scene/gui/line_edit.cpp
-#: scene/gui/text_edit.cpp
+#: editor/plugins/script_text_editor.cpp editor/scene_tree_dock.cpp
+#: scene/gui/line_edit.cpp scene/gui/text_edit.cpp
 msgid "Cut"
 msgstr "Recortar"
 
@@ -7441,6 +7454,11 @@ msgstr "Tom"
 #: editor/plugins/spatial_editor_plugin.cpp
 msgid "Yaw"
 msgstr "Guinada"
+
+#: editor/plugins/spatial_editor_plugin.cpp
+#, fuzzy
+msgid "Size"
+msgstr "Tamanho: "
 
 #: editor/plugins/spatial_editor_plugin.cpp
 msgid "Objects Drawn"
@@ -10126,6 +10144,11 @@ msgid "Projects"
 msgstr "Projetos"
 
 #: editor/project_manager.cpp
+#, fuzzy
+msgid "Loading, please wait..."
+msgstr "Reconectando, por favor aguarde."
+
+#: editor/project_manager.cpp
 msgid "Last Modified"
 msgstr "Ultima Modificação"
 
@@ -10745,6 +10768,16 @@ msgid "Instance Child Scene"
 msgstr "Instânciar Cena Filha"
 
 #: editor/scene_tree_dock.cpp
+#, fuzzy
+msgid "Can't paste root node into the same scene."
+msgstr "Não é possível operar em nós de uma cena externa!"
+
+#: editor/scene_tree_dock.cpp
+#, fuzzy
+msgid "Paste Node(s)"
+msgstr "Colar Nodes"
+
+#: editor/scene_tree_dock.cpp
 msgid "Detach Script"
 msgstr "Remover Script"
 
@@ -10869,6 +10902,11 @@ msgstr "Não é possível operar em nós que a cena atual herda!"
 #: editor/scene_tree_dock.cpp
 msgid "Attach Script"
 msgstr "Adicionar Script"
+
+#: editor/scene_tree_dock.cpp
+#, fuzzy
+msgid "Cut Node(s)"
+msgstr "Recortar Nós"
 
 #: editor/scene_tree_dock.cpp
 msgid "Remove Node(s)"
@@ -11680,7 +11718,7 @@ msgstr "Atribua um recurso MeshLibrary a este GridMap para usar seus meshes."
 
 #: modules/lightmapper_cpu/lightmapper_cpu.cpp
 msgid "Begin Bake"
-msgstr ""
+msgstr "Iniciar pré-cálculo"
 
 #: modules/lightmapper_cpu/lightmapper_cpu.cpp
 msgid "Preparing data structures"
@@ -11695,19 +11733,18 @@ msgid "Direct lighting"
 msgstr "Direct lightning"
 
 #: modules/lightmapper_cpu/lightmapper_cpu.cpp
-#, fuzzy
 msgid "Indirect lighting"
-msgstr "Recuar Direita"
+msgstr "Iluminação indireta"
 
 #: modules/lightmapper_cpu/lightmapper_cpu.cpp
 #, fuzzy
 msgid "Post processing"
-msgstr "Pós-Processamento"
+msgstr "Pós-processamento"
 
 #: modules/lightmapper_cpu/lightmapper_cpu.cpp
 #, fuzzy
 msgid "Plotting lightmaps"
-msgstr "Planejando Luzes:"
+msgstr "Traçando mapas de luz"
 
 #: modules/mono/csharp_script.cpp
 msgid "Class name can't be a reserved keyword"
@@ -12249,18 +12286,12 @@ msgstr ""
 "exportação."
 
 #: platform/android/export/export.cpp
-#, fuzzy
 msgid "A valid Android SDK path is required in Editor Settings."
-msgstr ""
-"Caminho do Android SDK inválido para o build personalizado em Configurações "
-"do Editor."
+msgstr "Um caminho Android SDK é necessário nas Configurações do Editor."
 
 #: platform/android/export/export.cpp
-#, fuzzy
 msgid "Invalid Android SDK path in Editor Settings."
-msgstr ""
-"Caminho do Android SDK inválido para o build personalizado em Configurações "
-"do Editor."
+msgstr "Caminho do Android SDK está inválido para Configurações do Editor."
 
 #: platform/android/export/export.cpp
 msgid "Missing 'platform-tools' directory!"
@@ -12272,16 +12303,14 @@ msgstr ""
 "Não foi possível encontrar o comando adb nas ferramentas do Android SDK."
 
 #: platform/android/export/export.cpp
-#, fuzzy
 msgid "Please check in the Android SDK directory specified in Editor Settings."
 msgstr ""
-"Caminho do Android SDK inválido para o build personalizado em Configurações "
+"Por favor, verifique o caminho do Android SDK especificado nas Configurações "
 "do Editor."
 
 #: platform/android/export/export.cpp
-#, fuzzy
 msgid "Missing 'build-tools' directory!"
-msgstr "Diretório 'ferramentas-da-plataforma' ausente!"
+msgstr "Diretório 'ferramentas-da-plataforma' está faltando !"
 
 #: platform/android/export/export.cpp
 msgid "Unable to find Android SDK build-tools' apksigner command."
@@ -12765,19 +12794,17 @@ msgid "Preparing geometry (%d/%d)"
 msgstr "Analisando Geometria..."
 
 #: scene/3d/baked_lightmap.cpp
-#, fuzzy
 msgid "Preparing environment"
-msgstr "Visualizar Ambiente"
+msgstr "Preparando ambiente"
 
 #: scene/3d/baked_lightmap.cpp
-#, fuzzy
 msgid "Generating capture"
-msgstr "Generando Lightmaps"
+msgstr "Gerando captura"
 
 #: scene/3d/baked_lightmap.cpp
 #, fuzzy
 msgid "Saving lightmaps"
-msgstr "Generando Lightmaps"
+msgstr "Salvando mapas  de luz"
 
 #: scene/3d/baked_lightmap.cpp
 msgid "Done"
@@ -13123,9 +13150,8 @@ msgid "Must use a valid extension."
 msgstr "Deve usar uma extensão válida."
 
 #: scene/gui/graph_edit.cpp
-#, fuzzy
 msgid "Enable grid minimap."
-msgstr "Ativar Snap"
+msgstr "Ativar minimapa de grade."
 
 #: scene/gui/popup.cpp
 msgid ""

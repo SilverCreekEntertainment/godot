@@ -3191,6 +3191,9 @@ void Tree::item_selected(int p_column, TreeItem *p_item) {
 		//emit_signal("multi_selected",p_item,p_column,true); - NO this is for TreeItem::select
 
 		selected_col = p_column;
+		if (!selected_item) {
+			selected_item = p_item;
+		}
 	} else {
 
 		select_single_item(p_item, root, p_column);
@@ -3199,6 +3202,13 @@ void Tree::item_selected(int p_column, TreeItem *p_item) {
 }
 
 void Tree::item_deselected(int p_column, TreeItem *p_item) {
+	if (selected_item == p_item) {
+		selected_item = nullptr;
+
+		if (selected_col == p_column) {
+			selected_col = -1;
+		}
+	}
 
 	if (select_mode == SELECT_MULTI || select_mode == SELECT_SINGLE) {
 		p_item->cells.write[p_column].selected = false;
@@ -4003,6 +4013,7 @@ void Tree::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("get_edited"), &Tree::get_edited);
 	ClassDB::bind_method(D_METHOD("get_edited_column"), &Tree::get_edited_column);
+	ClassDB::bind_method(D_METHOD("edit_selected"), &Tree::edit_selected);
 	ClassDB::bind_method(D_METHOD("get_custom_popup_rect"), &Tree::get_custom_popup_rect);
 	ClassDB::bind_method(D_METHOD("get_item_area_rect", "item", "column"), &Tree::_get_item_rect, DEFVAL(-1));
 	ClassDB::bind_method(D_METHOD("get_item_at_position", "position"), &Tree::get_item_at_position);
@@ -4017,6 +4028,7 @@ void Tree::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_column_title", "column", "title"), &Tree::set_column_title);
 	ClassDB::bind_method(D_METHOD("get_column_title", "column"), &Tree::get_column_title);
 	ClassDB::bind_method(D_METHOD("get_scroll"), &Tree::get_scroll);
+	ClassDB::bind_method(D_METHOD("scroll_to_item", "item"), &Tree::_scroll_to_item);
 
 	ClassDB::bind_method(D_METHOD("set_hide_folding", "hide"), &Tree::set_hide_folding);
 	ClassDB::bind_method(D_METHOD("is_folding_hidden"), &Tree::is_folding_hidden);

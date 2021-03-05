@@ -346,13 +346,15 @@ void Main::print_help(const char *p_binary) {
  */
 
 Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_phase) {
+#if defined(DEBUG_ENABLED) && !defined(NO_THREADS)
+	check_lockless_atomics();
+#endif
+
 	RID_OwnerBase::init_rid();
 
 	OS::get_singleton()->initialize_core();
 
 	engine = memnew(Engine);
-
-	ClassDB::init();
 
 	MAIN_PRINT("Main: Initialize CORE");
 
@@ -360,8 +362,6 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 	register_core_driver_types();
 
 	MAIN_PRINT("Main: Initialize Globals");
-
-	Thread::_main_thread_id = Thread::get_caller_id();
 
 	globals = memnew(ProjectSettings);
 	input_map = memnew(InputMap);
@@ -978,6 +978,11 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 	}
 #endif
 
+	// Only flush stdout in debug builds by default, as spamming `print()` will
+	// decrease performance if this is enabled.
+	GLOBAL_DEF_RST("application/run/flush_stdout_on_print", false);
+	GLOBAL_DEF_RST("application/run/flush_stdout_on_print.debug", true);
+
 	GLOBAL_DEF("logging/file_logging/enable_file_logging", false);
 	// Only file logging by default on desktop platforms as logs can't be
 	// accessed easily on mobile/Web platforms (if at all).
@@ -1024,6 +1029,8 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 	if (quiet_stdout)
 		_print_line_enabled = false;
 
+	Logger::set_flush_stdout_on_print(ProjectSettings::get_singleton()->get("application/run/flush_stdout_on_print"));
+
 	OS::get_singleton()->set_cmdline(execpath, main_args);
 
 	GLOBAL_DEF("rendering/quality/driver/driver_name", "GLES3");
@@ -1035,7 +1042,7 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 	GLOBAL_DEF("rendering/quality/driver/fallback_to_gles2", false);
 
 	// Assigning here, to be sure that it appears in docs
-	GLOBAL_DEF("rendering/quality/2d/use_nvidia_rect_flicker_workaround", false);
+	GLOBAL_DEF("rendering/2d/options/use_nvidia_rect_flicker_workaround", false);
 
 	GLOBAL_DEF("display/window/size/width", 1024);
 	ProjectSettings::get_singleton()->set_custom_property_info("display/window/size/width", PropertyInfo(Variant::INT, "display/window/size/width", PROPERTY_HINT_RANGE, "0,7680,or_greater")); // 8K resolution
@@ -1121,9 +1128,9 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 		OS::get_singleton()->_allow_layered = false;
 	}
 
-	Engine::get_singleton()->_pixel_snap = GLOBAL_DEF("rendering/quality/2d/use_pixel_snap", false);
-	Engine::get_singleton()->_snap_2d_transforms = GLOBAL_DEF("rendering/quality/2d/use_transform_snap", false);
-	Engine::get_singleton()->_snap_2d_viewports = GLOBAL_DEF("rendering/quality/2d/use_camera_snap", false);
+	Engine::get_singleton()->_gpu_pixel_snap = GLOBAL_DEF("rendering/2d/snapping/use_gpu_pixel_snap", false);
+	Engine::get_singleton()->_snap_2d_transforms = GLOBAL_DEF("rendering/2d/snapping/use_transform_snap", false);
+	Engine::get_singleton()->_snap_2d_viewports = GLOBAL_DEF("rendering/2d/snapping/use_camera_snap", false);
 	OS::get_singleton()->_keep_screen_on = GLOBAL_DEF("display/window/energy_saving/keep_screen_on", true);
 	if (rtm == -1) {
 		rtm = GLOBAL_DEF("rendering/threads/thread_model", OS::RENDER_THREAD_SAFE);
@@ -1196,6 +1203,7 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 	Engine::get_singleton()->set_physics_jitter_fix(GLOBAL_DEF("physics/common/physics_jitter_fix", 0.5));
 	Engine::get_singleton()->set_target_fps(GLOBAL_DEF("debug/settings/fps/force_fps", 0));
 	ProjectSettings::get_singleton()->set_custom_property_info("debug/settings/fps/force_fps", PropertyInfo(Variant::INT, "debug/settings/fps/force_fps", PROPERTY_HINT_RANGE, "0,120,1,or_greater"));
+	GLOBAL_DEF("physics/common/enable_pause_aware_picking", false);
 
 	GLOBAL_DEF("debug/settings/stdout/print_fps", false);
 	GLOBAL_DEF("debug/settings/stdout/verbose_stdout", false);
@@ -1273,9 +1281,11 @@ Error Main::setup2(Thread::ID p_main_tid_override) {
 	// Print engine name and version
 	print_line(String(VERSION_NAME) + " v" + get_full_version_string() + " - " + String(VERSION_WEBSITE));
 
+#if !defined(NO_THREADS)
 	if (p_main_tid_override) {
-		Thread::_main_thread_id = p_main_tid_override;
+		Thread::main_thread_id = p_main_tid_override;
 	}
+#endif
 
 	Error err = OS::get_singleton()->initialize(video_mode, video_driver_idx, audio_driver_idx);
 	if (err != OK) {
@@ -1303,7 +1313,7 @@ Error Main::setup2(Thread::ID p_main_tid_override) {
 
 	MAIN_PRINT("Main: Setup Logo");
 
-#ifdef JAVASCRIPT_ENABLED
+#if defined(JAVASCRIPT_ENABLED) || defined(ANDROID_ENABLED)
 	bool show_logo = false;
 #else
 	bool show_logo = true;
@@ -1325,7 +1335,7 @@ Error Main::setup2(Thread::ID p_main_tid_override) {
 
 	register_server_types();
 
-	MAIN_PRINT("Main: Load Remaps");
+	MAIN_PRINT("Main: Load Boot Image");
 
 	Color clear = GLOBAL_DEF("rendering/environment/default_clear_color", Color(0.3, 0.3, 0.3));
 	VisualServer::get_singleton()->set_default_clear_color(clear);
@@ -1376,7 +1386,6 @@ Error Main::setup2(Thread::ID p_main_tid_override) {
 
 	MAIN_PRINT("Main: DCC");
 	VisualServer::get_singleton()->set_default_clear_color(GLOBAL_DEF("rendering/environment/default_clear_color", Color(0.3, 0.3, 0.3)));
-	MAIN_PRINT("Main: END");
 
 	GLOBAL_DEF("application/config/icon", String());
 	ProjectSettings::get_singleton()->set_custom_property_info("application/config/icon",
@@ -1401,7 +1410,16 @@ Error Main::setup2(Thread::ID p_main_tid_override) {
 		id->set_emulate_mouse_from_touch(bool(GLOBAL_DEF("input_devices/pointing/emulate_mouse_from_touch", true)));
 	}
 
-	MAIN_PRINT("Main: Load Remaps");
+	MAIN_PRINT("Main: Load Translations and Remaps");
+
+	translation_server->setup(); //register translations, load them, etc.
+	if (locale != "") {
+		translation_server->set_locale(locale);
+	}
+	translation_server->load_translations();
+	ResourceLoader::load_translation_remaps(); //load remaps for resources
+
+	ResourceLoader::load_path_remaps();
 
 	MAIN_PRINT("Main: Load Scene Types");
 
@@ -1442,18 +1460,6 @@ Error Main::setup2(Thread::ID p_main_tid_override) {
 
 	// This loads global classes, so it must happen before custom loaders and savers are registered
 	ScriptServer::init_languages();
-
-	MAIN_PRINT("Main: Load Translations");
-
-	translation_server->setup(); //register translations, load them, etc.
-	if (locale != "") {
-
-		translation_server->set_locale(locale);
-	}
-	translation_server->load_translations();
-	ResourceLoader::load_translation_remaps(); //load remaps for resources
-
-	ResourceLoader::load_path_remaps();
 
 	audio_server->load_default_bus_layout();
 
@@ -2204,9 +2210,10 @@ void Main::force_redraw() {
  * so that the engine closes cleanly without leaking memory or crashing.
  * The order matters as some of those steps are linked with each other.
  */
-void Main::cleanup() {
-
-	ERR_FAIL_COND(!_start_success);
+void Main::cleanup(bool p_force) {
+	if (!p_force) {
+		ERR_FAIL_COND(!_start_success);
+	}
 
 	if (script_debugger) {
 		// Flush any remaining messages

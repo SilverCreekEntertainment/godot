@@ -97,12 +97,18 @@ bool InputDefault::is_joy_button_pressed(int p_device, int p_button) const {
 }
 
 bool InputDefault::is_action_pressed(const StringName &p_action) const {
-
+#ifdef DEBUG_ENABLED
+	bool has_action = InputMap::get_singleton()->has_action(p_action);
+	ERR_FAIL_COND_V_MSG(!has_action, false, "Request for nonexistent InputMap action '" + String(p_action) + "'.");
+#endif
 	return action_state.has(p_action) && action_state[p_action].pressed;
 }
 
 bool InputDefault::is_action_just_pressed(const StringName &p_action) const {
-
+#ifdef DEBUG_ENABLED
+	bool has_action = InputMap::get_singleton()->has_action(p_action);
+	ERR_FAIL_COND_V_MSG(!has_action, false, "Request for nonexistent InputMap action '" + String(p_action) + "'.");
+#endif
 	const Map<StringName, Action>::Element *E = action_state.find(p_action);
 	if (!E)
 		return false;
@@ -115,7 +121,10 @@ bool InputDefault::is_action_just_pressed(const StringName &p_action) const {
 }
 
 bool InputDefault::is_action_just_released(const StringName &p_action) const {
-
+#ifdef DEBUG_ENABLED
+	bool has_action = InputMap::get_singleton()->has_action(p_action);
+	ERR_FAIL_COND_V_MSG(!has_action, false, "Request for nonexistent InputMap action '" + String(p_action) + "'.");
+#endif
 	const Map<StringName, Action>::Element *E = action_state.find(p_action);
 	if (!E)
 		return false;
@@ -128,6 +137,10 @@ bool InputDefault::is_action_just_released(const StringName &p_action) const {
 }
 
 float InputDefault::get_action_strength(const StringName &p_action) const {
+#ifdef DEBUG_ENABLED
+	bool has_action = InputMap::get_singleton()->has_action(p_action);
+	ERR_FAIL_COND_V_MSG(!has_action, false, "Request for nonexistent InputMap action '" + String(p_action) + "'.");
+#endif
 	const Map<StringName, Action>::Element *E = action_state.find(p_action);
 	if (!E)
 		return 0.0f;
@@ -1078,7 +1091,7 @@ void InputDefault::_get_mapped_hat_events(const JoyDeviceMapping &mapping, int p
 }
 
 // string names of the SDL buttons in the same order as input_event.h godot buttons
-static const char *_joy_buttons[] = { "a", "b", "x", "y", "leftshoulder", "rightshoulder", "lefttrigger", "righttrigger", "leftstick", "rightstick", "back", "start", "dpup", "dpdown", "dpleft", "dpright", "guide", nullptr };
+static const char *_joy_buttons[] = { "a", "b", "x", "y", "leftshoulder", "rightshoulder", "lefttrigger", "righttrigger", "leftstick", "rightstick", "back", "start", "dpup", "dpdown", "dpleft", "dpright", "guide", "misc1", "paddle1", "paddle2", "paddle3", "paddle4", "touchpad", nullptr };
 static const char *_joy_axes[] = { "leftx", "lefty", "rightx", "righty", nullptr };
 
 JoystickList InputDefault::_get_output_button(String output) {
@@ -1284,6 +1297,12 @@ static const char *_buttons[JOY_BUTTON_MAX] = {
 	"DPAD Down",
 	"DPAD Left",
 	"DPAD Right"
+	"Misc 1",
+	"Paddle 1",
+	"Paddle 2",
+	"Paddle 3",
+	"Paddle 4",
+	"Touchpad",
 };
 
 static const char *_axes[JOY_AXIS_MAX] = {

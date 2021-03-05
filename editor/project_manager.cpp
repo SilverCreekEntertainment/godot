@@ -499,6 +499,7 @@ private:
 					initial_settings["application/config/name"] = project_name->get_text();
 					initial_settings["application/config/icon"] = "res://icon.png";
 					initial_settings["rendering/environment/default_environment"] = "res://default_env.tres";
+					initial_settings["physics/common/enable_pause_aware_picking"] = true;
 
 					if (ProjectSettings::get_singleton()->save_custom(dir.plus_file("project.godot"), initial_settings, Vector<String>(), false) != OK) {
 						set_message(TTR("Couldn't create project.godot in project path."), MESSAGE_ERROR);
@@ -2039,6 +2040,10 @@ void ProjectManager::_global_menu_action(const Variant &p_id, const Variant &p_m
 
 void ProjectManager::_open_selected_projects() {
 
+	// Show loading text to tell the user that the project manager is busy loading.
+	// This is especially important for the HTML5 project manager.
+	loading_label->set_modulate(Color(1, 1, 1));
+
 	const Set<String> &selected_list = _project_list->get_selected_project_keys();
 
 	for (const Set<String>::Element *E = selected_list.front(); E; E = E->next()) {
@@ -2311,12 +2316,6 @@ void ProjectManager::_restart_confirm() {
 	get_tree()->quit();
 }
 
-void ProjectManager::_exit_dialog() {
-
-	_dim_window();
-	get_tree()->quit();
-}
-
 void ProjectManager::_install_project(const String &p_zip_path, const String &p_title) {
 
 	npdialog->set_mode(ProjectDialog::MODE_INSTALL);
@@ -2326,6 +2325,11 @@ void ProjectManager::_install_project(const String &p_zip_path, const String &p_
 }
 
 void ProjectManager::_files_dropped(PoolStringArray p_files, int p_screen) {
+	if (p_files.size() == 1 && p_files[0].ends_with(".zip")) {
+		const String file = p_files[0].get_file();
+		_install_project(p_files[0], file.substr(0, file.length() - 4).capitalize());
+		return;
+	}
 	Set<String> folders_set;
 	DirAccess *da = DirAccess::create(DirAccess::ACCESS_FILESYSTEM);
 	for (int i = 0; i < p_files.size(); i++) {
@@ -2401,7 +2405,6 @@ void ProjectManager::_bind_methods() {
 	ClassDB::bind_method("_erase_missing_projects_confirm", &ProjectManager::_erase_missing_projects_confirm);
 	ClassDB::bind_method("_language_selected", &ProjectManager::_language_selected);
 	ClassDB::bind_method("_restart_confirm", &ProjectManager::_restart_confirm);
-	ClassDB::bind_method("_exit_dialog", &ProjectManager::_exit_dialog);
 	ClassDB::bind_method("_on_order_option_changed", &ProjectManager::_on_order_option_changed);
 	ClassDB::bind_method("_on_filter_option_changed", &ProjectManager::_on_filter_option_changed);
 	ClassDB::bind_method("_on_projects_updated", &ProjectManager::_on_projects_updated);
@@ -2445,6 +2448,10 @@ ProjectManager::ProjectManager() {
 				if (OS::get_singleton()->get_screen_dpi(screen) >= 192 && OS::get_singleton()->get_screen_size(screen).y >= 1400) {
 					// hiDPI display.
 					scale = 2.0;
+				} else if (OS::get_singleton()->get_screen_size(screen).y >= 1700) {
+					// Likely a hiDPI display, but we aren't certain due to the returned DPI.
+					// Use an intermediate scale to handle this situation.
+					scale = 1.5;
 				} else if (OS::get_singleton()->get_screen_size(screen).y <= 800) {
 					// Small loDPI display. Use a smaller display scale so that editor elements fit more easily.
 					// Icons won't look great, but this is better than having editor elements overflow from its window.
@@ -2531,6 +2538,13 @@ ProjectManager::ProjectManager() {
 	search_tree_vb->set_h_size_flags(SIZE_EXPAND_FILL);
 
 	HBoxContainer *sort_filters = memnew(HBoxContainer);
+	loading_label = memnew(Label(TTR("Loading, please wait...")));
+	loading_label->add_font_override("font", get_font("bold", "EditorFonts"));
+	loading_label->set_h_size_flags(Control::SIZE_EXPAND_FILL);
+	sort_filters->add_child(loading_label);
+	// Hide the label but make it still take up space. This prevents reflows when showing the label.
+	loading_label->set_modulate(Color(0, 0, 0, 0));
+
 	Label *sort_label = memnew(Label);
 	sort_label->set_text(TTR("Sort:"));
 	sort_filters->add_child(sort_label);
@@ -2548,8 +2562,6 @@ ProjectManager::ProjectManager() {
 
 	int projects_sorting_order = (int)EditorSettings::get_singleton()->get("project_manager/sorting_order");
 	project_order_filter->set_filter_option((ProjectListFilter::FilterOption)projects_sorting_order);
-
-	sort_filters->add_spacer(true);
 
 	project_filter = memnew(ProjectListFilter);
 	project_filter->add_search_box();

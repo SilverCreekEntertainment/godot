@@ -94,7 +94,7 @@ Vector2 Camera2D::get_zoom() const {
 
 Transform2D Camera2D::get_camera_transform() {
 
-	if (!get_tree())
+	if (!get_tree() || !viewport)
 		return Transform2D();
 
 	ERR_FAIL_COND_V(custom_viewport && !ObjectDB::get_instance(custom_viewport_id), Transform2D());
@@ -269,6 +269,7 @@ void Camera2D::_notification(int p_what) {
 			viewport = NULL;
 
 		} break;
+#ifdef TOOLS_ENABLED
 		case NOTIFICATION_DRAW: {
 
 			if (!is_inside_tree() || !Engine::get_singleton()->is_editor_hint())
@@ -345,8 +346,8 @@ void Camera2D::_notification(int p_what) {
 					draw_line(inv_transform.xform(margin_endpoints[i]), inv_transform.xform(margin_endpoints[(i + 1) % 4]), margin_drawing_color, margin_drawing_width);
 				}
 			}
-
 		} break;
+#endif
 	}
 }
 
@@ -498,6 +499,7 @@ void Camera2D::reset_smoothing() {
 
 void Camera2D::align() {
 
+	ERR_FAIL_COND(!is_inside_tree() || !viewport);
 	ERR_FAIL_COND(custom_viewport && !ObjectDB::get_instance(custom_viewport_id));
 
 	Size2 screen_size = viewport->get_visible_rect().size;
@@ -643,7 +645,9 @@ Node *Camera2D::get_custom_viewport() const {
 
 void Camera2D::set_screen_drawing_enabled(bool enable) {
 	screen_drawing_enabled = enable;
+#ifdef TOOLS_ENABLED
 	update();
+#endif
 }
 
 bool Camera2D::is_screen_drawing_enabled() const {
@@ -652,7 +656,9 @@ bool Camera2D::is_screen_drawing_enabled() const {
 
 void Camera2D::set_limit_drawing_enabled(bool enable) {
 	limit_drawing_enabled = enable;
+#ifdef TOOLS_ENABLED
 	update();
+#endif
 }
 
 bool Camera2D::is_limit_drawing_enabled() const {
@@ -661,7 +667,9 @@ bool Camera2D::is_limit_drawing_enabled() const {
 
 void Camera2D::set_margin_drawing_enabled(bool enable) {
 	margin_drawing_enabled = enable;
+#ifdef TOOLS_ENABLED
 	update();
+#endif
 }
 
 bool Camera2D::is_margin_drawing_enabled() const {
