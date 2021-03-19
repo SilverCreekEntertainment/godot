@@ -160,8 +160,8 @@ def configure(env):
 
     env.Append(CPPDEFINES=["__WRL_NO_DEFAULT_LIB__", ("PNG_ABORT", "abort")])
 
-    env.Append(CPPFLAGS=["/AI", vc_base_path + "lib/store/references"])
-    env.Append(CPPFLAGS=["/AI", vc_base_path + "lib/x86/store/references"])
+    env.Append(CPPFLAGS=["/AI " + vc_base_path + "lib/store/references"])
+    env.Append(CPPFLAGS=["/AI " + vc_base_path + "lib/x86/store/references"])
 
     env.Append(
         CCFLAGS='/FS /MP /GS /wd"4453" /wd"28204" /wd"4291" /Zc:wchar_t /Gm- /fp:precise /errorReport:prompt /WX- /Zc:forScope /Gd /EHsc /nologo'.split()
@@ -170,10 +170,8 @@ def configure(env):
     env.Append(CXXFLAGS=["/ZW"])
     env.Append(
         CCFLAGS=[
-            "/AI",
-            vc_base_path + "\\vcpackages",
-            "/AI",
-            os.environ["WINDOWSSDKDIR"] + "\\References\\CommonConfiguration\\Neutral",
+            "/AI " + vc_base_path + "\\vcpackages",
+            "/AI " + os.environ["WINDOWSSDKDIR"] + "\\References\\CommonConfiguration\\Neutral",
         ]
     )
 
