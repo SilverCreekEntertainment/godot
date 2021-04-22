@@ -115,7 +115,11 @@ Error FileAccessWindows::_open(const String &p_path, int p_mode_flags) {
 		path = path + ".tmp";
 	}
 
-	errno_t errcode = _wfopen_s(&f, path.c_str(), mode_string);
+	// SCE Mod: _wfopen_s does not allow the file to be opened at all again, which prevents SGameTree::GenerateProblemReportFile from being able to copy godot.log
+	// So changed to _wfsopen to fix that.
+	// Original: errno_t errcode = _wfopen_s(&f, path.c_str(), mode_string);
+	f = _wfsopen(path.c_str(), mode_string, _SH_DENYWR);
+	errno_t errcode = errno;
 
 	if (f == NULL) {
 		switch (errcode) {
