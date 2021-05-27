@@ -578,6 +578,7 @@ void TileMapEditor::_update_palette() {
 		entries2.sort_custom<SwapComparator>();
 
 		Ref<Texture> tex = tileset->tile_get_texture(sel_tile);
+		Color modulate = tileset->tile_get_modulate(sel_tile);
 
 		for (int i = 0; i < entries2.size(); i++) {
 
@@ -594,6 +595,7 @@ void TileMapEditor::_update_palette() {
 					manual_palette->set_item_icon_region(manual_palette->get_item_count() - 1, region);
 
 				manual_palette->set_item_icon(manual_palette->get_item_count() - 1, tex);
+				manual_palette->set_item_icon_modulate(manual_palette->get_item_count() - 1, modulate);
 			}
 
 			manual_palette->set_item_metadata(manual_palette->get_item_count() - 1, entries2[i]);
@@ -662,11 +664,15 @@ PoolVector<Vector2> TileMapEditor::_bucket_fill(const Point2i &p_start, bool era
 	}
 
 	// Check if the tile variation is the same
-	Vector2 prev_position = node->get_cell_autotile_coord(p_start.x, p_start.y);
 	if (ids.size() == 1 && ids[0] == prev_id) {
 		int current = manual_palette->get_current();
-		Vector2 position = manual_palette->get_item_metadata(current);
-		if (prev_position == position) {
+		if (current == -1) {
+			// Same ID, no variation selected, nothing to change
+			return PoolVector<Vector2>();
+		}
+		Vector2 prev_autotile_coord = node->get_cell_autotile_coord(p_start.x, p_start.y);
+		Vector2 autotile_coord = manual_palette->get_item_metadata(current);
+		if (autotile_coord == prev_autotile_coord) {
 			// Same ID and variation, nothing to change
 			return PoolVector<Vector2>();
 		}
