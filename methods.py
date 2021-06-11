@@ -368,7 +368,7 @@ def split_lib(self, libname, src_list=None, env_lib=None):
             fname = env.File(f)[0].path
         fname = fname.replace("\\", "/")
         base = "/".join(fname.split("/")[:2])
-        if base != cur_base and len(list) > max_src:
+        if len(list) > max_src:
             if num > 0:
                 lib = env_lib.add_library(libname + str(num), list)
                 lib_list.append(lib)
