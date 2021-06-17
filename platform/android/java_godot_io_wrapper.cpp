@@ -53,6 +53,8 @@ GodotIOJavaWrapper::GodotIOJavaWrapper(JNIEnv *p_env, jobject p_godot_io_instanc
 		_get_locale = p_env->GetMethodID(cls, "getLocale", "()Ljava/lang/String;");
 		_get_model = p_env->GetMethodID(cls, "getModel", "()Ljava/lang/String;");
 		_get_screen_DPI = p_env->GetMethodID(cls, "getScreenDPI", "()I");
+		_get_screen_XDPI = p_env->GetMethodID(cls, "getScreenXDPI", "()I");
+		_get_screen_YDPI = p_env->GetMethodID(cls, "getScreenYDPI", "()I");
 		_get_window_safe_area = p_env->GetMethodID(cls, "getWindowSafeArea", "()[I"),
 		_get_unique_id = p_env->GetMethodID(cls, "getUniqueID", "()Ljava/lang/String;");
 		_show_keyboard = p_env->GetMethodID(cls, "showKeyboard", "(Ljava/lang/String;ZIII)V");
@@ -133,6 +135,26 @@ int GodotIOJavaWrapper::get_screen_dpi() {
 		return env->CallIntMethod(godot_io_instance, _get_screen_DPI);
 	} else {
 		return 160;
+	}
+}
+
+int GodotIOJavaWrapper::get_screen_xdpi() {
+	if (_get_screen_XDPI) {
+		JNIEnv *env = get_jni_env();
+		ERR_FAIL_COND_V(env == nullptr, get_screen_dpi());
+		return env->CallIntMethod(godot_io_instance, _get_screen_XDPI);
+	} else {
+		return get_screen_dpi();
+	}
+}
+
+int GodotIOJavaWrapper::get_screen_ydpi() {
+	if (_get_screen_YDPI) {
+		JNIEnv *env = get_jni_env();
+		ERR_FAIL_COND_V(env == nullptr, get_screen_dpi());
+		return env->CallIntMethod(godot_io_instance, _get_screen_YDPI);
+	} else {
+		return get_screen_dpi();
 	}
 }
 

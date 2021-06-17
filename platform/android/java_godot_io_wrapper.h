@@ -51,6 +51,8 @@ private:
 	jmethodID _get_locale = 0;
 	jmethodID _get_model = 0;
 	jmethodID _get_screen_DPI = 0;
+	jmethodID _get_screen_XDPI = 0;
+	jmethodID _get_screen_YDPI = 0;
 	jmethodID _get_window_safe_area = 0;
 	jmethodID _get_unique_id = 0;
 	jmethodID _show_keyboard = 0;
@@ -71,6 +73,8 @@ public:
 	String get_locale();
 	String get_model();
 	int get_screen_dpi();
+	int get_screen_xdpi();
+	int get_screen_ydpi();
 	void get_window_safe_area(int (&p_rect_xywh)[4]);
 	String get_unique_id();
 	bool has_vk();

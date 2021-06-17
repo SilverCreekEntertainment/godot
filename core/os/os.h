@@ -209,6 +209,8 @@ public:
 	virtual Point2 get_screen_position(int p_screen = -1) const { return Point2(); }
 	virtual Size2 get_screen_size(int p_screen = -1) const { return get_window_size(); }
 	virtual int get_screen_dpi(int p_screen = -1) const { return 72; }
+	virtual int get_screen_xdpi(int p_screen = -1) const { return get_screen_dpi(); } // Added by SCE to get more accurate dpi on Android
+	virtual int get_screen_ydpi(int p_screen = -1) const { return get_screen_dpi(); }
 	virtual float get_screen_scale(int p_screen = -1) const { return 1.0; }
 	virtual float get_screen_max_scale() const { return 1.0; };
 	virtual Point2 get_window_position() const { return Vector2(); }
