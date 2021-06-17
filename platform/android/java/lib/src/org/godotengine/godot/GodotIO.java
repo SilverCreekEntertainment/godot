@@ -162,6 +162,16 @@ public class GodotIO {
 		return fallback;
 	}
 
+	public int getScreenXDPI() {
+		DisplayMetrics metrics = activity.getApplicationContext().getResources().getDisplayMetrics();
+		return (int)(metrics.xdpi);
+	}
+
+	public int getScreenYDPI() {
+		DisplayMetrics metrics = activity.getApplicationContext().getResources().getDisplayMetrics();
+		return (int)(metrics.ydpi);
+	}
+
 	public int[] getWindowSafeArea() {
 		DisplayMetrics metrics = activity.getResources().getDisplayMetrics();
 		Display display = activity.getWindowManager().getDefaultDisplay();

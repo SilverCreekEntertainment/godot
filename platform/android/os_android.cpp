@@ -468,6 +468,14 @@ int OS_Android::get_screen_dpi(int p_screen) const {
 	return godot_io_java->get_screen_dpi();
 }
 
+int OS_Android::get_screen_xdpi(int p_screen) const {
+	return godot_io_java->get_screen_xdpi();
+}
+
+int OS_Android::get_screen_ydpi(int p_screen) const {
+	return godot_io_java->get_screen_ydpi();
+}
+
 float OS_Android::get_screen_scale(int p_screen) const {
 	return godot_io_java->get_scaled_density();
 }

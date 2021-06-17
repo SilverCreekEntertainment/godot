@@ -54,6 +54,8 @@ private:
 	jmethodID _get_screen_DPI = 0;
 	jmethodID _get_scaled_density = 0;
 	jmethodID _get_screen_refresh_rate = 0;
+	jmethodID _get_screen_XDPI = 0;
+	jmethodID _get_screen_YDPI = 0;
 	jmethodID _get_window_safe_area = 0;
 	jmethodID _get_unique_id = 0;
 	jmethodID _show_keyboard = 0;
@@ -75,6 +77,8 @@ public:
 	String get_model();
 	int get_screen_dpi();
 	float get_scaled_density();
+	int get_screen_xdpi();
+	int get_screen_ydpi();
 	void get_window_safe_area(int (&p_rect_xywh)[4]);
 	Array get_display_cutouts();
 	float get_screen_refresh_rate(float p_fallback);
