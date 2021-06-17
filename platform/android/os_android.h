@@ -151,6 +151,8 @@ public:
 	virtual String get_clipboard() const;
 	virtual String get_model_name() const;
 	virtual int get_screen_dpi(int p_screen = 0) const;
+	virtual int get_screen_xdpi(int p_screen = 0) const;
+	virtual int get_screen_ydpi(int p_screen = 0) const;
 
 	virtual bool get_window_per_pixel_transparency_enabled() const { return transparency_enabled; }
 	virtual void set_window_per_pixel_transparency_enabled(bool p_enabled) { ERR_FAIL_MSG("Setting per-pixel transparency is not supported at runtime, please set it in project settings instead."); }
