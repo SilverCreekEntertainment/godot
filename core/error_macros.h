@@ -113,12 +113,14 @@ void _err_print_index_error(const char *p_function, const char *p_file, int p_li
 #define GENERATE_TRAP __builtin_trap();
 #endif
 
+// Commented out by Dan@SCE to get more detailed error messages in release
 // Used to strip debug messages in release mode
-#ifdef DEBUG_ENABLED
+//#ifdef DEBUG_ENABLED
 #define DEBUG_STR(m_msg) m_msg
-#else
-#define DEBUG_STR(m_msg) ""
-#endif
+//#else
+//#define DEBUG_STR(m_msg) ""
+//#endif
+
 
 // (*): See https://stackoverflow.com/questions/257418/do-while-0-what-is-it-good-for
 
