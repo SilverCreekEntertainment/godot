@@ -401,7 +401,7 @@ def split_lib(self, libname, src_list=None, env_lib=None):
         return
 
     env["LINKCOM"] = str(env["LINKCOM"]).replace("$_LIBFLAGS", "-Wl,--start-group $_LIBFLAGS -Wl,--end-group")
-    env["SHLINKCOM"] = str(env["LINKCOM"]).replace("$_LIBFLAGS", "-Wl,--start-group $_LIBFLAGS -Wl,--end-group")
+    env["SHLINKCOM"] = str(env["SHLINKCOM"]).replace("$_LIBFLAGS", "-Wl,--start-group $_LIBFLAGS -Wl,--end-group")
 
 
 def save_active_platforms(apnames, ap):
