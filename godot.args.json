@@ -121,6 +121,16 @@
           "Command": "C:\\Projects\\gorogue\\VideoPoker\\GodotProject\\project.godot"
         }
       ]
+    },
+    {
+      "Id": "253b3f3f-02a9-4710-b820-39b0dedeb8ad",
+      "Command": "Install",
+      "Items": [
+        {
+          "Id": "7d6c72bb-7894-44df-8b8c-fc0e83197b16",
+          "Command": "-Install"
+        }
+      ]
     }
   ]
 }
