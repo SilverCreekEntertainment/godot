@@ -8,7 +8,7 @@
       "Items": [
         {
           "Id": "a1728d97-08cb-4410-bd66-aeef8759d45e",
-          "Command": "--path C:\\Projects\\rogue\\Backgammon\\GodotProject\\"
+          "Command": "--path ..\\rogue\\Backgammon\\GodotProject\\"
         }
       ]
     },
@@ -18,7 +18,7 @@
       "Items": [
         {
           "Id": "a90b96e7-befe-4bd1-b288-4c6d5ba2d857",
-          "Command": "C:\\Projects\\rogue\\Backgammon\\GodotProject\\project.godot"
+          "Command": "..\\rogue\\Backgammon\\GodotProject\\project.godot"
         }
       ]
     },
@@ -28,7 +28,7 @@
       "Items": [
         {
           "Id": "66725e0d-c2c3-4603-a452-e30d490cc43f",
-          "Command": "--path C:\\Projects\\rogue\\HardwoodEuchre\\GodotProject\\"
+          "Command": "--path ..\\rogue\\HardwoodEuchre\\GodotProject\\"
         }
       ]
     },
@@ -38,7 +38,7 @@
       "Items": [
         {
           "Id": "cf1d1480-d7f7-4a51-8e0b-236290c53053",
-          "Command": "C:\\Projects\\rogue\\HardwoodEuchre\\GodotProject\\project.godot"
+          "Command": "..\\rogue\\HardwoodEuchre\\GodotProject\\project.godot"
         }
       ]
     },
@@ -48,7 +48,7 @@
       "Items": [
         {
           "Id": "7d413337-201e-475d-8ac3-a0902b1bda54",
-          "Command": "--path C:\\Projects\\rogue\\HardwoodHearts\\GodotProject\\"
+          "Command": "--path ..\\rogue\\HardwoodHearts\\GodotProject\\"
         }
       ]
     },
@@ -58,7 +58,7 @@
       "Items": [
         {
           "Id": "8fca35d7-a908-4546-9b74-84dcce55b6fc",
-          "Command": "C:\\Projects\\rogue\\HardwoodHearts\\GodotProject\\project.godot"
+          "Command": "..\\rogue\\HardwoodHearts\\GodotProject\\project.godot"
         }
       ]
     },
@@ -68,7 +68,7 @@
       "Items": [
         {
           "Id": "b28bda4c-afa6-4abc-b4e0-0b656bfb7a17",
-          "Command": "--path C:\\Projects\\rogue\\HardwoodSpades\\GodotProject\\"
+          "Command": "--path ..\\rogue\\HardwoodSpades\\GodotProject\\"
         }
       ]
     },
@@ -78,7 +78,7 @@
       "Items": [
         {
           "Id": "af5c41f0-b6aa-4feb-bff6-3663996a5a1f",
-          "Command": "C:\\Projects\\rogue\\HardwoodSpades\\GodotProject\\project.godot"
+          "Command": "..\\rogue\\HardwoodSpades\\GodotProject\\project.godot"
         }
       ]
     },
@@ -88,7 +88,7 @@
       "Items": [
         {
           "Id": "923f08cf-7544-4679-a934-df0be63da4b7",
-          "Command": "--path C:\\Projects\\rogue\\Solitaire\\GodotProject\\"
+          "Command": "--path ..\\rogue\\Solitaire\\GodotProject\\"
         }
       ]
     },
@@ -98,7 +98,7 @@
       "Items": [
         {
           "Id": "7ab1bf69-6026-4bcb-b897-f34f985bf065",
-          "Command": "C:\\Projects\\rogue\\Solitaire\\GodotProject\\project.godot"
+          "Command": "..\\rogue\\Solitaire\\GodotProject\\project.godot"
         }
       ]
     },
@@ -108,7 +108,7 @@
       "Items": [
         {
           "Id": "087c5a11-be8e-4243-b5a0-00ad0387ca0b",
-          "Command": "--path C:\\Projects\\rogue\\VideoPoker\\GodotProject\\"
+          "Command": "--path ..\\rogue\\VideoPoker\\GodotProject\\"
         }
       ]
     },
@@ -118,7 +118,7 @@
       "Items": [
         {
           "Id": "3d46bd49-0fd6-452f-9556-6f563f47d592",
-          "Command": "C:\\Projects\\rogue\\VideoPoker\\GodotProject\\project.godot"
+          "Command": "..\\rogue\\VideoPoker\\GodotProject\\project.godot"
         }
       ]
     },
