@@ -918,11 +918,12 @@ LRESULT OS_Windows::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 					if (!motion)
 						return 0;
 
-					if (motion > 0)
+					if (motion > 0) {
 						mb->set_button_index(BUTTON_WHEEL_UP);
-					else
+					} else {
 						mb->set_button_index(BUTTON_WHEEL_DOWN);
-
+					}
+					mb->set_factor(fabs((double)motion / (double)WHEEL_DELTA));
 				} break;
 				case WM_MOUSEHWHEEL: {
 
@@ -933,11 +934,10 @@ LRESULT OS_Windows::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 					if (motion < 0) {
 						mb->set_button_index(BUTTON_WHEEL_LEFT);
-						mb->set_factor(fabs((double)motion / (double)WHEEL_DELTA));
 					} else {
 						mb->set_button_index(BUTTON_WHEEL_RIGHT);
-						mb->set_factor(fabs((double)motion / (double)WHEEL_DELTA));
 					}
+					mb->set_factor(fabs((double)motion / (double)WHEEL_DELTA));
 				} break;
 				case WM_XBUTTONDOWN: {
 
@@ -3524,8 +3524,7 @@ String OS_Windows::get_godot_dir_name() const {
 	return String(VERSION_SHORT_NAME).capitalize();
 }
 
-String OS_Windows::get_system_dir(SystemDir p_dir) const {
-
+String OS_Windows::get_system_dir(SystemDir p_dir, bool p_shared_storage) const {
 	KNOWNFOLDERID id;
 
 	switch (p_dir) {

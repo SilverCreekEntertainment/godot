@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Godot Engine editor\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2021-05-14 11:20+0000\n"
-"Last-Translator: Kongfa Waroros <gongpha@hotmail.com>\n"
+"PO-Revision-Date: 2021-06-07 23:43+0000\n"
+"Last-Translator: Atirut Wattanamongkol <artjang301@gmail.com>\n"
 "Language-Team: Thai <https://hosted.weblate.org/projects/godot-engine/godot/"
 "th/>\n"
 "Language: th\n"
@@ -427,10 +427,6 @@ msgid "Animation tracks can only point to AnimationPlayer nodes."
 msgstr "แทร็กอนิเมชั่นสามารถติดไว้บนโหนด AnimationPlayer เท่านั้น"
 
 #: editor/animation_track_editor.cpp
-msgid "An animation player can't animate itself, only other players."
-msgstr "แทร็กอนิเมชั่นไม่สามารถเล่นตัวมันเองได้ แต่สามารถเล่นตัวเล่นอื่นได้"
-
-#: editor/animation_track_editor.cpp
 msgid "Not possible to add a new track without a root"
 msgstr "ไม่สามารถที่จะเพิ่มแทร็กใหม่โดยที่ไม่มีรูท"
 
@@ -475,8 +471,9 @@ msgid "Anim Move Keys"
 msgstr "ย้ายคีย์แอนิเมชัน"
 
 #: editor/animation_track_editor.cpp
-msgid "Clipboard is empty"
-msgstr "คลิปบอร์ดว่างเปล่า"
+#: modules/visual_script/visual_script_editor.cpp
+msgid "Clipboard is empty!"
+msgstr "คลิปบอร์ดว่างเปล่า!"
 
 #: editor/animation_track_editor.cpp
 msgid "Paste Tracks"
@@ -1122,6 +1119,10 @@ msgstr "แก้ไขค่าดิกชันนารี"
 #: editor/editor_about.cpp
 msgid "Thanks from the Godot community!"
 msgstr "ขอขอบคุณจากชุมชนผู้ใช้ Godot!"
+
+#: editor/editor_about.cpp editor/editor_node.cpp editor/project_manager.cpp
+msgid "Click to copy."
+msgstr ""
 
 #: editor/editor_about.cpp
 msgid "Godot Engine contributors"
@@ -1956,7 +1957,7 @@ msgstr "มีการนำเข้าไฟล์ %s หลายอัน �
 
 #: editor/editor_file_system.cpp
 msgid "(Re)Importing Assets"
-msgstr "นำเข้าทรัพยากร(อีกครั้ง)"
+msgstr "กำลังนำเข้าทรัพยากร(อีกครั้ง)"
 
 #: editor/editor_help.cpp editor/plugins/spatial_editor_plugin.cpp
 msgid "Top"
@@ -2479,7 +2480,7 @@ msgid "Save changes to the following scene(s) before quitting?"
 msgstr "บันทึกฉากต่อไปนี้ก่อนปิดโปรแกรมหรือไม่?"
 
 #: editor/editor_node.cpp
-msgid "Save changes the following scene(s) before opening Project Manager?"
+msgid "Save changes to the following scene(s) before opening Project Manager?"
 msgstr "บันทึกฉากต่อไปนี้ก่อนกลับสู่ตัวจัดการโปรเจกต์หรือไม่?"
 
 #: editor/editor_node.cpp
@@ -3465,7 +3466,7 @@ msgstr "กำลังคลายเทมเพลตส่งออก"
 
 #: editor/export_template_manager.cpp
 msgid "Importing:"
-msgstr "นำเข้า:"
+msgstr "กำลังนำเข้า:"
 
 #: editor/export_template_manager.cpp
 msgid "Error getting the list of mirrors."
@@ -5124,9 +5125,10 @@ msgstr ""
 "ลองบันทึกฉากของคุณแล้วลองอีกครั้ง"
 
 #: editor/plugins/baked_lightmap_editor_plugin.cpp
+#, fuzzy
 msgid ""
-"No meshes to bake. Make sure they contain an UV2 channel and that the 'Bake "
-"Light' flag is on."
+"No meshes to bake. Make sure they contain an UV2 channel and that the 'Use "
+"In Baked Light' and 'Generate Lightmap' flags are on."
 msgstr ""
 "ไม่มีพื้นผิวให้สร้าง lightmap กรุณาตรวจสอบว่าพื้นผิวมี UV2 และได้เปิดใช้งาน 'Bake Light'"
 
@@ -7236,6 +7238,28 @@ msgid "View Plane Transform."
 msgstr "ดูระนาบการย้าย"
 
 #: editor/plugins/spatial_editor_plugin.cpp
+#: editor/plugins/texture_region_editor_plugin.cpp
+#: scene/resources/visual_shader.cpp
+msgid "None"
+msgstr "ไม่มี"
+
+#: editor/plugins/spatial_editor_plugin.cpp
+#, fuzzy
+msgid "Rotate"
+msgstr "รัฐ"
+
+#. TRANSLATORS: This refers to the movement that changes the position of an object.
+#: editor/plugins/spatial_editor_plugin.cpp
+#, fuzzy
+msgid "Translate"
+msgstr "เคลื่อนย้าย:"
+
+#: editor/plugins/spatial_editor_plugin.cpp
+#, fuzzy
+msgid "Scale"
+msgstr "อัตราส่วน:"
+
+#: editor/plugins/spatial_editor_plugin.cpp
 msgid "Scaling: "
 msgstr "อัตราส่วน: "
 
@@ -7885,11 +7909,6 @@ msgstr "ตั้งระยะขอบ"
 #: editor/plugins/texture_region_editor_plugin.cpp
 msgid "Snap Mode:"
 msgstr "โหมดสแนป:"
-
-#: editor/plugins/texture_region_editor_plugin.cpp
-#: scene/resources/visual_shader.cpp
-msgid "None"
-msgstr "ไม่มี"
 
 #: editor/plugins/texture_region_editor_plugin.cpp
 msgid "Pixel Snap"
@@ -9976,7 +9995,7 @@ msgstr "ปุ่มเมาส์"
 
 #: editor/project_settings_editor.cpp
 msgid ""
-"Invalid action name. it cannot be empty nor contain '/', ':', '=', '\\' or "
+"Invalid action name. It cannot be empty nor contain '/', ':', '=', '\\' or "
 "'\"'"
 msgstr "ชื่อผิดพลาด ไม่สามารถเป็นช่องว่างหรือประกอบด้วย '/', ':', '=', '\\' หรือ '\"'"
 
@@ -11382,6 +11401,11 @@ msgid "GridMap Paint"
 msgstr "วาด GridMap"
 
 #: modules/gridmap/grid_map_editor_plugin.cpp
+#, fuzzy
+msgid "GridMap Selection"
+msgstr "เติมที่เลือกใน GridMap"
+
+#: modules/gridmap/grid_map_editor_plugin.cpp
 msgid "Grid Map"
 msgstr "จำกัดด้วยเส้นตาราง"
 
@@ -11625,6 +11649,16 @@ msgid "Add Output Port"
 msgstr "เพิ่มพอร์ตเอาท์พุต"
 
 #: modules/visual_script/visual_script_editor.cpp
+#, fuzzy
+msgid "Change Port Type"
+msgstr "เปลี่ยนชนิด"
+
+#: modules/visual_script/visual_script_editor.cpp
+#, fuzzy
+msgid "Change Port Name"
+msgstr "เปลี่ยนชื่อพอร์ตอินพุต"
+
+#: modules/visual_script/visual_script_editor.cpp
 msgid "Override an existing built-in function."
 msgstr "เขียนทับฟังก์ชันบิวท์อินที่มีอยู่"
 
@@ -11795,10 +11829,6 @@ msgstr "แก้ขนาดคอมเม้นต์"
 #: modules/visual_script/visual_script_editor.cpp
 msgid "Can't copy the function node."
 msgstr "คัดลอกโหนดฟังก์ชันไม่ได้"
-
-#: modules/visual_script/visual_script_editor.cpp
-msgid "Clipboard is empty!"
-msgstr "คลิปบอร์ดว่างเปล่า!"
 
 #: modules/visual_script/visual_script_editor.cpp
 msgid "Paste VisualScript Nodes"
@@ -12005,8 +12035,20 @@ msgid ""
 msgstr "เทมเพลตการสร้างสำหรับแอนดรอยด์ไม่ถูกติดตั้ง สามารถติดตั้งจากเมนูโปรเจกต์"
 
 #: platform/android/export/export.cpp
+msgid ""
+"Either Debug Keystore, Debug User AND Debug Password settings must be "
+"configured OR none of them."
+msgstr ""
+
+#: platform/android/export/export.cpp
 msgid "Debug keystore not configured in the Editor Settings nor in the preset."
 msgstr "ดีบัก Keystore ไม่ได้ถูกตั้งไว้ในตั้งค่าของตัวแก้ไขหรือในพรีเซ็ต"
+
+#: platform/android/export/export.cpp
+msgid ""
+"Either Release Keystore, Release User AND Release Password settings must be "
+"configured OR none of them."
+msgstr ""
 
 #: platform/android/export/export.cpp
 msgid "Release keystore incorrectly configured in the export preset."
@@ -12896,6 +12938,12 @@ msgstr "Varyings สามารถกำหนดในังก์ชันเ
 #: servers/visual/shader_language.cpp
 msgid "Constants cannot be modified."
 msgstr "ค่าคงที่ไม่สามารถแก้ไขได้"
+
+#~ msgid "An animation player can't animate itself, only other players."
+#~ msgstr "แทร็กอนิเมชั่นไม่สามารถเล่นตัวมันเองได้ แต่สามารถเล่นตัวเล่นอื่นได้"
+
+#~ msgid "Clipboard is empty"
+#~ msgstr "คลิปบอร์ดว่างเปล่า"
 
 #~ msgid ""
 #~ "InterpolatedCamera has been deprecated and will be removed in Godot 4.0."
@@ -14561,9 +14609,6 @@ msgstr "ค่าคงที่ไม่สามารถแก้ไขได
 
 #~ msgid "City"
 #~ msgstr "เมือง"
-
-#~ msgid "State"
-#~ msgstr "รัฐ"
 
 #~ msgid "2 letter country code"
 #~ msgstr "รหัสประเทศ 2 ตัวอักษร"

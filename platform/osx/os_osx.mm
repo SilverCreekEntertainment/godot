@@ -2299,8 +2299,7 @@ String OS_OSX::get_godot_dir_name() const {
 	return String(VERSION_SHORT_NAME).capitalize();
 }
 
-String OS_OSX::get_system_dir(SystemDir p_dir) const {
-
+String OS_OSX::get_system_dir(SystemDir p_dir, bool p_shared_storage) const {
 	NSSearchPathDirectory id;
 	bool found = true;
 
@@ -3329,6 +3328,12 @@ void OS_OSX::set_mouse_mode(MouseMode p_mode) {
 	ignore_warp = true;
 	warp_events.clear();
 	mouse_mode = p_mode;
+
+	if (mouse_mode == MOUSE_MODE_VISIBLE || mouse_mode == MOUSE_MODE_CONFINED) {
+		CursorShape p_shape = cursor_shape;
+		cursor_shape = OS::CURSOR_MAX;
+		set_cursor_shape(p_shape);
+	}
 }
 
 OS::MouseMode OS_OSX::get_mouse_mode() const {
