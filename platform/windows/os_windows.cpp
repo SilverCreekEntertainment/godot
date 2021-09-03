@@ -2242,7 +2242,7 @@ void OS_Windows::set_window_fullscreen(bool p_enabled) {
 		MoveWindow(hWnd, pos.x, pos.y, size.width, size.height, TRUE);
 
 		SystemParametersInfoA(SPI_GETMOUSETRAILS, 0, &restore_mouse_trails, 0);
-		if(restore_mouse_trails > 0)
+		if (restore_mouse_trails > 0)
 			SystemParametersInfoA(SPI_SETMOUSETRAILS, 0, 0, 0);
 	} else {
 
