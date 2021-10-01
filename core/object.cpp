@@ -356,12 +356,12 @@ bool Object::Connection::operator<(const Connection &p_conn) const {
 				return method < p_conn.method;
 			} else {
 
-				return target < p_conn.target;
+				return target->get_instance_id() < p_conn.target->get_instance_id();
 			}
 		} else
 			return signal < p_conn.signal;
 	} else {
-		return source < p_conn.source;
+		return source->get_instance_id() < p_conn.source->get_instance_id();
 	}
 }
 Object::Connection::Connection(const Variant &p_variant) {
