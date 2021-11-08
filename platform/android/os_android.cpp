@@ -448,8 +448,6 @@ int OS_Android::get_screen_ydpi(int p_screen) const {
 }
 
 String OS_Android::get_user_data_dir() const {
-
-String OS_Android::get_user_data_dir() const {
 	if (data_dir_cache != String())
 		return data_dir_cache;
 
