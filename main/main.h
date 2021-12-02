@@ -41,6 +41,7 @@ class Main {
 	static uint32_t frames;
 	static uint32_t frame;
 	static bool force_redraw_requested;
+	static uint32_t low_processor_usage_mode_force_redraw_frames;
 	static int iterating;
 	static bool agile_input_event_flushing;
 
