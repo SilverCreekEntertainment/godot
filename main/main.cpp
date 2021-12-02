@@ -2087,6 +2087,7 @@ uint64_t Main::last_ticks = 0;
 uint32_t Main::frames = 0;
 uint32_t Main::frame = 0;
 bool Main::force_redraw_requested = false;
+uint32_t Main::low_processor_usage_mode_force_redraw_frames = 0;
 int Main::iterating = 0;
 bool Main::agile_input_event_flushing = false;
 
@@ -2210,7 +2211,18 @@ bool Main::iteration() {
 
 	if (OS::get_singleton()->can_draw() && VisualServer::get_singleton()->is_render_loop_enabled()) {
 		if ((!force_redraw_requested) && OS::get_singleton()->is_in_low_processor_usage_mode()) {
-			if (VisualServer::get_singleton()->has_changed()) {
+			if (VisualServer::get_singleton()->has_changed() || low_processor_usage_mode_force_redraw_frames > 0) {
+
+#ifdef ANDROID_ENABLED
+					// On Android in low_processor_usage_mode there can be horrible flickering when it stops drawing
+					// Fix by force drawing 2 more frames after last changed frame.
+					if (VisualServer::get_singleton()->has_changed()) {
+						low_processor_usage_mode_force_redraw_frames = 2;
+					}
+					else {
+						low_processor_usage_mode_force_redraw_frames--;
+					}
+#endif
 				VisualServer::get_singleton()->draw(true, scaled_step); // flush visual commands
 				Engine::get_singleton()->frames_drawn++;
 			}
