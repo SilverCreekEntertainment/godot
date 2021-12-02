@@ -2214,14 +2214,13 @@ bool Main::iteration() {
 			if (VisualServer::get_singleton()->has_changed() || low_processor_usage_mode_force_redraw_frames > 0) {
 
 #ifdef ANDROID_ENABLED
-					// On Android in low_processor_usage_mode there can be horrible flickering when it stops drawing
-					// Fix by force drawing 2 more frames after last changed frame.
-					if (VisualServer::get_singleton()->has_changed()) {
-						low_processor_usage_mode_force_redraw_frames = 2;
-					}
-					else {
-						low_processor_usage_mode_force_redraw_frames--;
-					}
+				// On Android in low_processor_usage_mode there can be horrible flickering when it stops drawing
+				// Fix by force drawing 2 more frames after last changed frame.
+				if (VisualServer::get_singleton()->has_changed()) {
+					low_processor_usage_mode_force_redraw_frames = 2;
+				} else {
+					low_processor_usage_mode_force_redraw_frames--;
+				}
 #endif
 				VisualServer::get_singleton()->draw(true, scaled_step); // flush visual commands
 				Engine::get_singleton()->frames_drawn++;
