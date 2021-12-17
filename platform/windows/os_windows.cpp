@@ -1437,7 +1437,6 @@ Error OS_Windows::initialize(const VideoMode &p_desired, int p_video_driver, int
 	DWORD dwStyle;
 
 	if (video_mode.fullscreen || video_mode.borderless_window || video_mode.titlebarless_window) {
-
 		dwExStyle = WS_EX_APPWINDOW;
 		dwStyle = WS_POPUP;
 
@@ -1447,7 +1446,6 @@ Error OS_Windows::initialize(const VideoMode &p_desired, int p_video_driver, int
 		}
 
 	} else {
-
 		dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 		dwStyle = WS_OVERLAPPEDWINDOW;
 		if (video_mode.resizable) {
@@ -2336,7 +2334,6 @@ void OS_Windows::_update_window_style(bool p_repaint, bool p_maximized) {
 	if (video_mode.fullscreen || video_mode.borderless_window) {
 		SetWindowLongPtr(hWnd, GWL_STYLE, WS_SYSMENU | WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE);
 	} else if (video_mode.titlebarless_window) {
-
 		DWORD dwStyle = WS_POPUP | WS_VISIBLE | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
 		if (video_mode.resizable) {
 			dwStyle |= WS_THICKFRAME;

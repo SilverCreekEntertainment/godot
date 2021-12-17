@@ -439,8 +439,8 @@ int OS_Android::get_screen_dpi(int p_screen) const {
 String OS_Android::get_data_path() const {
 	return get_user_data_dir();
 }
-int OS_Android::get_screen_xdpi(int p_screen) const {
 
+int OS_Android::get_screen_xdpi(int p_screen) const 
 	return godot_io_java->get_screen_xdpi();
 }
 

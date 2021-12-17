@@ -2223,8 +2223,10 @@ bool Main::iteration() {
 			} else {
 				draw = false;
 			}
-
 		}
+
+		//if(draw == false && force_redraw_frames > 0)
+		//	print_line(vformat("Main::iteration  force_redraw_frames: %d", force_redraw_frames));
 
 		if (draw || force_redraw_frames > 0) {
 			VisualServer::get_singleton()->draw(true, scaled_step); // flush visual commands
