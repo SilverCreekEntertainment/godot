@@ -1612,10 +1612,9 @@ Error OS_Windows::initialize(const VideoMode &p_desired, int p_video_driver, int
 
 	if (gl_initialization_error) {
 		OS::get_singleton()->alert(
-			"Uh oh! This game requires OpenGL 2.1. You may be able to fix this issue by updating your video drivers.\n\n"
-			"If that doesn't work, you can download the prior version at https://www.hardwoodgames.com/downloads/"
-			,
-			"Unable to initialize Video driver");
+				"Uh oh! This game requires OpenGL 2.1. You may be able to fix this issue by updating your video drivers.\n\n"
+				"If that doesn't work, you can download the prior version at https://www.hardwoodgames.com/downloads/",
+				"Unable to initialize Video driver");
 		return ERR_UNAVAILABLE;
 	}
 
