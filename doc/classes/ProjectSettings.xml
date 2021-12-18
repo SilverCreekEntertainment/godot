@@ -494,6 +494,9 @@
 		<member name="display/window/size/test_width" type="int" setter="" getter="" default="0">
 			If greater than zero, overrides the window width when running the game. Useful for testing stretch modes.
 		</member>
+		<member name="display/window/size/titlebarless" type="bool" setter="" getter="" default="false">
+			Turn off OS titlebar.
+		</member>
 		<member name="display/window/size/width" type="int" setter="" getter="" default="1024">
 			Sets the game's main viewport width. On desktop platforms, this is the default window size. Stretch mode settings also use this as a reference when enabled.
 		</member>
