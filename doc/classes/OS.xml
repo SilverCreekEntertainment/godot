@@ -1000,6 +1000,9 @@
 		<member name="window_size" type="Vector2" setter="set_window_size" getter="get_window_size" default="Vector2( 0, 0 )">
 			The size of the window (without counting window manager decorations).
 		</member>
+		<member name="window_titlebarless" type="bool" setter="set_titlebarless_window" getter="get_titlebarless_window" default="false">
+			Turn off OS titlebar.
+		</member>
 	</members>
 	<constants>
 		<constant name="VIDEO_DRIVER_GLES2" value="1" enum="VideoDriver">
