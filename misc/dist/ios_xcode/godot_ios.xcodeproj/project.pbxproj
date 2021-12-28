@@ -39,7 +39,7 @@
 		1FF4C1881F584E6300A41E41 /* $binary.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "$binary.entitlements"; sourceTree = "<group>"; };
 		1FF8DBB01FBA9DE1009DE660 /* dummy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dummy.cpp; sourceTree = "<group>"; };
 		3FAF0C8F2772B08B0017D6B0 /* dummy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dummy.swift; sourceTree = "<group>"; };
-		3FAF0C8E2772B08B0017D6B0 /* solitaire-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "solitaire-Bridging-Header.h"; sourceTree = "<group>"; };
+		3FAF0C8E2772B08B0017D6B0 /* dummy-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "dummy-Bridging-Header.h"; sourceTree = "<group>"; };
 		D07CD44D1C5D589C00B7FB28 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		D0BCFE3418AEBDA2004A7AAE /* $binary.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "$binary.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0BCFE4318AEBDA2004A7AAE /* $binary-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "$binary-Info.plist"; sourceTree = "<group>"; };
@@ -103,7 +103,7 @@
 				D0BCFE4218AEBDA2004A7AAE /* Supporting Files */,
 				1FF8DBB01FBA9DE1009DE660 /* dummy.cpp */,
 				3FAF0C8F2772B08B0017D6B0 /* dummy.swift */,
-				3FAF0C8E2772B08B0017D6B0 /* solitaire-Bridging-Header.h */,
+				3FAF0C8E2772B08B0017D6B0 /* dummy-Bridging-Header.h */,
 			);
 			path = "$binary";
 			sourceTree = "<group>";
@@ -322,7 +322,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "$provisioning_profile_uuid_debug";
 				SWIFT_VERSION = "5.0";
-				SWIFT_OBJC_BRIDGING_HEADER = "solitaire/solitaire-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$binary/dummy-Bridging-Header.h";
 				TARGETED_DEVICE_FAMILY = "$targeted_device_family";
 				VALID_ARCHS = "armv7 armv7s arm64 i386 x86_64";
 				WRAPPER_EXTENSION = app;
@@ -354,7 +354,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "$provisioning_profile_uuid_release";
  				SWIFT_VERSION = "5.0";
-				SWIFT_OBJC_BRIDGING_HEADER = "solitaire/solitaire-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$binary/dummy-Bridging-Header.h";
 				TARGETED_DEVICE_FAMILY = "$targeted_device_family";
 				VALID_ARCHS = "armv7 armv7s arm64 i386 x86_64";
 				WRAPPER_EXTENSION = app;
