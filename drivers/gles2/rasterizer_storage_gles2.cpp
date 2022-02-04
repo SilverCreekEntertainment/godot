@@ -6177,6 +6177,20 @@ void RasterizerStorageGLES2::initialize() {
 	config.pvrtc_supported = config.extensions.has("GL_IMG_texture_compression_pvrtc") || config.extensions.has("WEBGL_compressed_texture_pvrtc");
 	config.support_npot_repeat_mipmap = config.extensions.has("GL_OES_texture_npot");
 
+	// Special override for running under target platforms that may support S3TC,
+	// but do not include S3TC files in the exported package.
+	// E.g. The Android exporter (android exporter, exporter.cpp, get_preset_features())
+	// specifically prevents s3tc being written to the APK.
+	// However the .import file still contains a reference to the s3tc
+	// file, and any Android device that supports s3tc will attempt to load the resource and fail,
+	// causing exit.
+	// An simple way to prevent this circumstance is to pretend that hardware support does not exist
+	// for S3TC on all such devices, which prevents the attempt at loading.
+	// An alternative method maybe to remove the reference to the s3tc in the .import file.
+#if !defined(TOOLS_ENABLED) && defined(ANDROID_ENABLED)
+	config.s3tc_supported = false;
+#endif
+
 #ifdef JAVASCRIPT_ENABLED
 	// RenderBuffer internal format must be 16 bits in WebGL,
 	// but depth_texture should default to 32 always
@@ -6194,6 +6208,7 @@ void RasterizerStorageGLES2::initialize() {
 		config.depth_type = GL_UNSIGNED_SHORT;
 	}
 #endif
+
 #endif
 
 #ifndef GLES_OVER_GL
