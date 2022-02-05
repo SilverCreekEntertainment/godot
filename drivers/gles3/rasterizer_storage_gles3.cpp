@@ -39,7 +39,7 @@
 #include "rasterizer_scene_gles3.h"
 #include "servers/visual_server.h"
 
-#if defined(IPHONE_ENABLED) || defined(ANDROID_ENABLED)
+#if defined(UIKIT_ENABLED) || defined(ANDROID_ENABLED)
 #include <dlfcn.h>
 #endif
 
@@ -8130,10 +8130,10 @@ void RasterizerStorageGLES3::initialize() {
 			glMaxShaderCompilerThreadsKHR(ShaderGLES3::max_simultaneous_compiles);
 		}
 #else
-#if defined(IPHONE_ENABLED) || defined(ANDROID_ENABLED) // TODO: Consider more platforms?
+#if defined(UIKIT_ENABLED) || defined(ANDROID_ENABLED) // TODO: Consider more platforms?
 		void *gles3_lib = nullptr;
 		void (*MaxShaderCompilerThreads)(GLuint) = nullptr;
-#if defined(IPHONE_ENABLED)
+#if defined(UIKIT_ENABLED)
 		gles3_lib = dlopen(nullptr, RTLD_LAZY);
 #elif defined(ANDROID_ENABLED)
 		gles3_lib = dlopen("libGLESv3.so", RTLD_LAZY);
