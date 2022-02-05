@@ -1,5 +1,5 @@
 /*************************************************************************/
-/*  display_layer.h                                                      */
+/*  uikit_display_layer.h                                                */
 /*************************************************************************/
 /*                       This file is part of:                           */
 /*                           GODOT ENGINE                                */
@@ -31,7 +31,7 @@
 #import <OpenGLES/EAGLDrawable.h>
 #import <QuartzCore/QuartzCore.h>
 
-@protocol DisplayLayer <NSObject>
+@protocol UIKitDisplayLayer <NSObject>
 
 - (void)startRenderDisplayLayer;
 - (void)stopRenderDisplayLayer;
@@ -40,6 +40,6 @@
 
 @end
 
-@interface GodotOpenGLLayer : CAEAGLLayer <DisplayLayer>
+@interface UIKitOpenGLLayer : CAEAGLLayer <UIKitDisplayLayer>
 
 @end

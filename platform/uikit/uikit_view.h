@@ -1,5 +1,5 @@
 /*************************************************************************/
-/*  view_controller.h                                                    */
+/*  uikit_view.h                                                         */
 /*************************************************************************/
 /*                       This file is part of:                           */
 /*                           GODOT ENGINE                                */
@@ -28,22 +28,42 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
+#import <AVFoundation/AVFoundation.h>
+#import <MediaPlayer/MediaPlayer.h>
+#import <OpenGLES/EAGL.h>
+#import <OpenGLES/ES1/gl.h>
+#import <OpenGLES/ES1/glext.h>
 #import <UIKit/UIKit.h>
 
-@class GodotView;
-@class GodotNativeVideoView;
-@class GodotKeyboardInputView;
+class String;
 
-@interface ViewController : UIViewController
+@class UIKitView;
+@protocol UIKitDisplayLayer;
+@protocol UIKitViewRendererProtocol;
 
-@property(nonatomic, readonly, strong) GodotView *godotView;
-@property(nonatomic, readonly, strong) GodotNativeVideoView *videoView;
-@property(nonatomic, readonly, strong) GodotKeyboardInputView *keyboardView;
+@protocol UIKitViewDelegate
 
-// MARK: Native Video Player
+- (BOOL)uikitViewFinishedSetup:(UIKitView *)view;
 
-- (BOOL)playVideoAtPath:(NSString *)filePath volume:(float)videoVolume audio:(NSString *)audioTrack subtitle:(NSString *)subtitleTrack;
+@end
 
-- (void)createKeyboardView;
+@interface UIKitView : UIView
+
+@property(assign, nonatomic) id<UIKitViewRendererProtocol> renderer;
+@property(assign, nonatomic) id<UIKitViewDelegate> delegate;
+
+@property(assign, readonly, nonatomic) BOOL isActive;
+
+@property(strong, readonly, nonatomic) CALayer<UIKitDisplayLayer> *renderingLayer;
+@property(assign, readonly, nonatomic) BOOL canRender;
+
+@property(assign, nonatomic) NSTimeInterval renderingInterval;
+
+- (CALayer<UIKitDisplayLayer> *)initializeRendering;
+- (void)stopRendering;
+- (void)startRendering;
+- (void)drawView;
+
+@property(nonatomic, assign) BOOL useCADisplayLink;
 
 @end
