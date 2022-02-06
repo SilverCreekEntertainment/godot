@@ -44,8 +44,6 @@
 @property(strong, nonatomic) GodotNativeVideoView *videoView;
 @property(strong, nonatomic) GodotKeyboardInputView *keyboardView;
 
-@property(strong, nonatomic) UIView *godotLoadingOverlay;
-
 @end
 
 @implementation GodotViewController

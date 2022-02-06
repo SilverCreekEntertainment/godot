@@ -1,5 +1,5 @@
 /*************************************************************************/
-/*  uikit_joypad.h                                                       */
+/*  godot_view_controller.mm                                             */
 /*************************************************************************/
 /*                       This file is part of:                           */
 /*                           GODOT ENGINE                                */
@@ -28,27 +28,83 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
-#import <GameController/GameController.h>
+#import "godot_view_controller.h"
 
-class String;
+#include "core/project_settings.h"
+#import "godot_view.h"
+#import "godot_view_renderer.h"
+#import "keyboard_input_view.h"
+#include "os_tvos.h"
 
-@interface UIKitJoypadObserver : NSObject
+@interface GodotViewController ()
 
-- (void)startObserving;
-- (void)startProcessing;
-- (void)finishObserving;
+@property(strong, nonatomic) GodotViewRenderer *renderer;
+@property(strong, nonatomic) GodotKeyboardInputView *keyboardView;
 
 @end
 
-class UIKitJoypad {
-private:
-	UIKitJoypadObserver *observer;
+@implementation GodotViewController
 
-public:
-	UIKitJoypad();
-	~UIKitJoypad();
+- (GodotView *)godotView {
+	return (GodotView *)self.view;
+}
 
-	void start_processing();
+- (void)loadView {
+	GodotView *view = [[GodotView alloc] init];
+	[view initializeRendering];
 
-	int joy_id_for_name(const String &p_name);
-};
+	GodotViewRenderer *renderer = [[GodotViewRenderer alloc] init];
+
+	self.renderer = renderer;
+	self.view = view;
+
+	view.renderer = self.renderer;
+	view.delegate = self;
+}
+
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+	self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+
+	if (self) {
+		[self godot_commonInit];
+	}
+
+	return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder {
+	self = [super initWithCoder:coder];
+
+	if (self) {
+		[self godot_commonInit];
+	}
+
+	return self;
+}
+
+- (void)godot_commonInit {
+	// Initialize view controller values.
+}
+
+- (void)viewDidLoad {
+	[super viewDidLoad];
+
+	[self observeKeyboard];
+}
+
+- (void)observeKeyboard {
+	printf("******** setting up keyboard input view\n");
+	self.keyboardView = [GodotKeyboardInputView new];
+	[self.view addSubview:self.keyboardView];
+}
+
+- (void)dealloc {
+	[self.keyboardView removeFromSuperview];
+	self.keyboardView = nil;
+
+	self.renderer = nil;
+
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+@end
