@@ -657,6 +657,9 @@
 		<member name="layer_names/2d_navigation/layer_10" type="String" setter="" getter="" default="&quot;&quot;">
 			Optional name for the 2D navigation layer 10. If left empty, the layer will display as "Layer 10".
 		</member>
+		<member name="input_devices/pointing/tvos/press_end_delay" type="float" setter="" getter="" default="0.15">
+			Default delay for end press events. This only affects tvOS devices.
+		</member>
 		<member name="layer_names/2d_navigation/layer_11" type="String" setter="" getter="" default="&quot;&quot;">
 			Optional name for the 2D navigation layer 11. If left empty, the layer will display as "Layer 11".
 		</member>
