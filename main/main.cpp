@@ -2218,7 +2218,7 @@ bool Main::iteration() {
 #ifdef ANDROID_ENABLED
 				// On Android in low_processor_usage_mode there can be horrible flickering when it stops drawing
 				// Fix by force drawing 2 more frames after last changed frame.
-				force_redraw_frames = 3; // needs to be 3 to draw 2 more after this frame
+				force_redraw_frames = 4; // needs to be 3 to draw 2 more after this frame
 #endif
 			} else {
 				draw = false;
