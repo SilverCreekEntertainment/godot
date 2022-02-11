@@ -61,6 +61,7 @@ public class GodotEditText extends EditText {
 	private String mOriginText;
 	private int mMaxInputLength = Integer.MAX_VALUE;
 	private boolean mMultiline = false;
+	private String mInputType;
 
 	private static class EditHandler extends Handler {
 		private final WeakReference<GodotEditText> mEdit;
@@ -122,9 +123,22 @@ public class GodotEditText extends EditText {
 					}
 
 					int inputType = InputType.TYPE_CLASS_TEXT;
+					switch (mInputType) {
+						case "Email":
+							inputType |= InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
+							break;
+						case "Password":
+							inputType |= InputType.TYPE_TEXT_VARIATION_PASSWORD;
+							break;
+						case "NoSuggestions":
+							inputType |= InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
+							break;
+					}
+
 					if (edit.isMultiline()) {
 						inputType |= InputType.TYPE_TEXT_FLAG_MULTI_LINE;
 					}
+
 					edit.setInputType(inputType);
 
 					edit.mInputWrapper.setOriginText(text);
@@ -197,7 +211,7 @@ public class GodotEditText extends EditText {
 	// ===========================================================
 	// Methods
 	// ===========================================================
-	public void showKeyboard(String p_existing_text, boolean p_multiline, int p_max_input_length, int p_cursor_start, int p_cursor_end) {
+	public void showKeyboard(String p_existing_text, boolean p_multiline, int p_max_input_length, int p_cursor_start, int p_cursor_end, String p_input_type) {
 		int maxInputLength = (p_max_input_length <= 0) ? Integer.MAX_VALUE : p_max_input_length;
 		if (p_cursor_start == -1) { // cursor position not given
 			this.mOriginText = p_existing_text;
@@ -211,6 +225,7 @@ public class GodotEditText extends EditText {
 		}
 
 		this.mMultiline = p_multiline;
+		this.mInputType = p_input_type;
 
 		final Message msg = new Message();
 		msg.what = HANDLER_OPEN_IME_KEYBOARD;
