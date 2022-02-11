@@ -360,9 +360,9 @@ int OS_Android::get_virtual_keyboard_height() const {
 	// return 0;
 }
 
-void OS_Android::show_virtual_keyboard(const String &p_existing_text, const Rect2 &p_screen_rect, bool p_multiline, int p_max_input_length, int p_cursor_start, int p_cursor_end) {
+void OS_Android::show_virtual_keyboard(const String &p_existing_text, const Rect2 &p_screen_rect, bool p_multiline, int p_max_input_length, int p_cursor_start, int p_cursor_end, const String &p_input_type) {
 	if (godot_io_java->has_vk()) {
-		godot_io_java->show_vk(p_existing_text, p_multiline, p_max_input_length, p_cursor_start, p_cursor_end);
+		godot_io_java->show_vk(p_existing_text, p_multiline, p_max_input_length, p_cursor_start, p_cursor_end, p_input_type);
 	} else {
 		ERR_PRINT("Virtual keyboard not available");
 	};
