@@ -29,6 +29,7 @@ def get_opts():
         ("ndk_platform", 'Target platform (android-<api>, e.g. "android-19")', "android-19"),
         EnumVariable("android_arch", "Target architecture", "armv7", ("armv7", "arm64v8", "x86", "x86_64")),
         BoolVariable("android_neon", "Enable NEON support (armv7 only)", True),
+        BoolVariable("debug_symbols", "Add debugging symbols to release/release_debug builds", True),
     ]
 
 
@@ -198,6 +199,9 @@ def configure(env):
         elif env["optimize"] == "size":  # optimize for size
             env.Append(CCFLAGS=["-Os"])
             env.Append(LINKFLAGS=["-Os"])
+
+        if env["debug_symbols"]:
+            env.Prepend(CCFLAGS=["-g"])
 
         env.Append(CPPDEFINES=["NDEBUG"])
         if can_vectorize:
