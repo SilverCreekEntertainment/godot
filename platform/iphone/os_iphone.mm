@@ -479,7 +479,6 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 		//   Pre-Godot, we didn't set textContentType (It's an iOS 11+ feature), we just disabled suggestions
 		//   so we'll do that here as well
 
-
 		/*
 		if(@available(iOS 11.0, *))
 		{
