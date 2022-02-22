@@ -455,8 +455,7 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 		// But as of 2/21/2022, Rogue is not using it
 
 		if (@available(iOS 11.0, *)) {
-			if(AppDelegate.viewController.keyboardView.textContentType != UITextContentTypeUsername)
-			{
+			if (AppDelegate.viewController.keyboardView.textContentType != UITextContentTypeUsername) {
 				AppDelegate.viewController.keyboardView.textContentType = UITextContentTypeUsername;
 				bChanged = true;
 			}
@@ -464,8 +463,7 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 			// For iOS 10, let's at least stop suggestions
 			input_type = "NoSuggestions";
 		}
-	}
-	else if (input_type == "Password") {
+	} else if (input_type == "Password") {
 		// iOS also has UITextContentTypeNewPassword
 
 		// XXX - Once you set UITextContentTypePassword, it sticks permanently
@@ -497,10 +495,8 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 			// For iOS 10, let's at least stop suggestions
 			input_type = "NoSuggestions";
 		}
-	}
-	else if (input_type == "Email") {
-		if(AppDelegate.viewController.keyboardView.textContentType != UITextContentTypeEmailAddress)
-		{
+	} else if (input_type == "Email") {
+		if (AppDelegate.viewController.keyboardView.textContentType != UITextContentTypeEmailAddress) {
 			AppDelegate.viewController.keyboardView.textContentType = UITextContentTypeEmailAddress;
 			bChanged = true;
 		}
