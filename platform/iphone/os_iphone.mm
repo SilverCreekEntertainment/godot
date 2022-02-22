@@ -437,6 +437,127 @@ bool OSIPhone::has_virtual_keyboard() const {
 void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 &p_screen_rect, bool p_multiline, int p_max_input_length, int p_cursor_start, int p_cursor_end, const String &p_input_type) {
 	NSString *existingString = [[NSString alloc] initWithUTF8String:p_existing_text.utf8().get_data()];
 
+	// There doesn't appear to be a list of possible p_input_type, I found these by searching:
+	//  Email
+	//  Password
+	//  MultiLine
+	//  NoSuggestions
+
+	// Copy p_input_type in case we need to change it for iOS 10 passwords
+	String input_type = p_input_type;
+
+	// If we change with the keyboard open
+	// it needs to be hidden and re-shown
+	bool bChanged = false;
+
+	if(input_type == "Username")
+	{
+		// Added Username for completeness for iOS Password Auto Fill
+		// But as of 2/21/2022, Rogue is not using it
+
+		if(@available(iOS 11.0, *))
+		{
+			if(AppDelegate.viewController.keyboardView.textContentType != UITextContentTypeUsername)
+			{
+				AppDelegate.viewController.keyboardView.textContentType = UITextContentTypeUsername;
+				bChanged = true;
+			}
+		}
+		else
+		{
+			// For iOS 10, let's at least stop suggestions
+			input_type = "NoSuggestions";
+		}
+	}
+	else if(input_type == "Password")
+	{
+		// iOS also has UITextContentTypeNewPassword
+
+		// XXX - Once you set UITextContentTypePassword, it sticks permanently
+		//   Tried:
+		//     Setting back to nil doesn't work
+		//     Setting "" instead of nil doesn't work
+		//     Also clearing secureTextEntry doesn't work
+		//     releaseFirstResponder instead of reloadInputViews doesn't work
+		//   Not tried:
+		//     setting UITextContentTypeOneTimeCode (Some people had success with this, but it is the wrong type and will prompt to insert code if you get a text message with a code)
+		//     hacking an undocument field to delete the password button (Somebody suggested this, but it is not documented)
+		//
+		//   Pre-Godot, we didn't set textContentType (It's an iOS 11+ feature), we just disabled suggestions
+		//   so we'll do that here as well
+
+
+		/*
+		if(@available(iOS 11.0, *))
+		{
+			if(AppDelegate.viewController.keyboardView.textContentType != UITextContentTypePassword)
+			{
+				AppDelegate.viewController.keyboardView.textContentType = UITextContentTypePassword;
+				bChanged = true;
+			}
+		}
+		else
+		*/
+		{
+			// For iOS 10, let's at least stop suggestions
+			input_type = "NoSuggestions";
+		}
+	}
+	else if(input_type == "Email")
+	{
+		if(AppDelegate.viewController.keyboardView.textContentType != UITextContentTypeEmailAddress)
+		{
+			AppDelegate.viewController.keyboardView.textContentType = UITextContentTypeEmailAddress;
+			bChanged = true;
+		}
+	}
+	else
+	{
+		if(AppDelegate.viewController.keyboardView.textContentType != nil)
+		{
+			AppDelegate.viewController.keyboardView.textContentType = nil;
+			bChanged = true;
+		}
+	}
+
+	// In RogueViewControler.mm
+	// We handled "MultiLine" in textFieldShouldReturn
+	// It returned NO if MultiLine, YES otherwise
+	// There doesn't appear to be anything to do for Godot here
+
+	if(input_type == "NoSuggestions")
+	{
+		if(AppDelegate.viewController.keyboardView.autocorrectionType != UITextAutocorrectionTypeNo)
+		{
+			AppDelegate.viewController.keyboardView.autocorrectionType = UITextAutocorrectionTypeNo;
+			bChanged = true;
+		}
+	}
+	else
+	{
+		if(AppDelegate.viewController.keyboardView.autocorrectionType != UITextAutocorrectionTypeDefault)
+		{
+			AppDelegate.viewController.keyboardView.autocorrectionType = UITextAutocorrectionTypeDefault;
+			bChanged = true;
+		}
+	}
+
+	if(@available(iOS 11.0, *))
+	{
+		// Disable Smart Quotes & Dashes
+		// We could do this once in rogue_ios.mm
+		// But doing it here keeps all of our Godot keyboard modifications together
+		AppDelegate.viewController.keyboardView.smartQuotesType = UITextSmartQuotesTypeNo;
+		AppDelegate.viewController.keyboardView.smartDashesType = UITextSmartDashesTypeNo;
+	}
+
+	if(bChanged)
+	{
+		// If the keyboard was shown, we need to reload the keyboard
+		// Otherwise, switching between username and password, for example, doesn't change the keyboard as expected
+		[AppDelegate.viewController.keyboardView reloadInputViews];
+	}
+
 	[AppDelegate.viewController.keyboardView
 			becomeFirstResponderWithString:existingString
 								 multiline:p_multiline
