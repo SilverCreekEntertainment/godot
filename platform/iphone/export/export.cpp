@@ -351,10 +351,10 @@ void EditorExportPlatformIOS::get_export_options(List<ExportOption> *r_options) 
 	r_options->push_back(ExportOption(PropertyInfo(Variant::STRING, "application/app_store_team_id"), ""));
 
 	r_options->push_back(ExportOption(PropertyInfo(Variant::STRING, "application/provisioning_profile_uuid_debug"), ""));
-	r_options->push_back(ExportOption(PropertyInfo(Variant::STRING, "application/code_sign_identity_debug", PROPERTY_HINT_PLACEHOLDER_TEXT, "iPhone Developer"), ""));
+	r_options->push_back(ExportOption(PropertyInfo(Variant::STRING, "application/code_sign_identity_debug", PROPERTY_HINT_PLACEHOLDER_TEXT, "Apple Development"), ""));
 	r_options->push_back(ExportOption(PropertyInfo(Variant::INT, "application/export_method_debug", PROPERTY_HINT_ENUM, "App Store,Development,Ad-Hoc,Enterprise"), 1));
 	r_options->push_back(ExportOption(PropertyInfo(Variant::STRING, "application/provisioning_profile_uuid_release"), ""));
-	r_options->push_back(ExportOption(PropertyInfo(Variant::STRING, "application/code_sign_identity_release", PROPERTY_HINT_PLACEHOLDER_TEXT, "iPhone Distribution"), ""));
+	r_options->push_back(ExportOption(PropertyInfo(Variant::STRING, "application/code_sign_identity_release", PROPERTY_HINT_PLACEHOLDER_TEXT, "Apple Development"), ""));
 	r_options->push_back(ExportOption(PropertyInfo(Variant::INT, "application/export_method_release", PROPERTY_HINT_ENUM, "App Store,Development,Ad-Hoc,Enterprise"), 0));
 
 	r_options->push_back(ExportOption(PropertyInfo(Variant::INT, "application/targeted_device_family", PROPERTY_HINT_ENUM, "iPhone,iPad,iPhone & iPad"), 2));
@@ -448,10 +448,17 @@ void EditorExportPlatformIOS::_fix_config_file(const Ref<EditorExportPreset> &p_
 		"scaleAspectFill",
 		"scaleToFill"
 	};
-	String dbg_sign_id = p_preset->get("application/code_sign_identity_debug").operator String().empty() ? "iPhone Developer" : p_preset->get("application/code_sign_identity_debug");
-	String rel_sign_id = p_preset->get("application/code_sign_identity_release").operator String().empty() ? "iPhone Distribution" : p_preset->get("application/code_sign_identity_release");
-	bool dbg_manual = !p_preset->get("application/provisioning_profile_uuid_debug").operator String().empty() || (dbg_sign_id != "iPhone Developer");
-	bool rel_manual = !p_preset->get("application/provisioning_profile_uuid_release").operator String().empty() || (rel_sign_id != "iPhone Distribution");
+
+	// SCE (Manny) 2/28/2022
+	// Godot's default's here cause signing errors with the release build
+	// If you change code_sign_identity_release, Godot automatically sets manual signing, which again breaks the release build
+	// So instead I've changed both defaults to "Apple Development", which seems to make Xcode happy
+	// I'm not sure the final exported .ipa file ends up properly signed for distribution this way
+
+	String dbg_sign_id = p_preset->get("application/code_sign_identity_debug").operator String().empty() ? "Apple Development" : p_preset->get("application/code_sign_identity_debug");
+	String rel_sign_id = p_preset->get("application/code_sign_identity_release").operator String().empty() ? "Apple Development" : p_preset->get("application/code_sign_identity_release");
+	bool dbg_manual = !p_preset->get("application/provisioning_profile_uuid_debug").operator String().empty() || (dbg_sign_id != "Apple Development");
+	bool rel_manual = !p_preset->get("application/provisioning_profile_uuid_release").operator String().empty() || (rel_sign_id != "Apple Development");
 	String str;
 	String strnew;
 	str.parse_utf8((const char *)pfile.ptr(), pfile.size());
@@ -1064,9 +1071,9 @@ Error EditorExportPlatformIOS::_codesign(String p_file, void *p_userdata) {
 
 		String sign_id;
 		if (data->debug) {
-			sign_id = data->preset->get("application/code_sign_identity_debug").operator String().empty() ? "iPhone Developer" : data->preset->get("application/code_sign_identity_debug");
+			sign_id = data->preset->get("application/code_sign_identity_debug").operator String().empty() ? "Apple Development" : data->preset->get("application/code_sign_identity_debug");
 		} else {
-			sign_id = data->preset->get("application/code_sign_identity_release").operator String().empty() ? "iPhone Distribution" : data->preset->get("application/code_sign_identity_release");
+			sign_id = data->preset->get("application/code_sign_identity_release").operator String().empty() ? "Apple Development" : data->preset->get("application/code_sign_identity_release");
 		}
 
 		List<String> codesign_args;
