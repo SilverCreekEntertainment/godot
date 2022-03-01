@@ -4,7 +4,12 @@
     package="com.godot.game"
     android:versionCode="1"
     android:versionName="1.0"
-    android:installLocation="auto" >
+    android:installLocation="auto"
+    android:targetSandboxVersion="2"> 
+    <!-- We(Silver Creek) had to set android:targetSandboxVersion="2"  because we had previously set that value. Without it Google Play warns:
+            Some users will be downgrading their Target Sandbox Version which is not allowed. Ensure that your release includes APKs with a 
+            higher Target Sandbox Version to match the version of your old APKs.
+     -->
 
     <!-- Adding custom text to the manifest is fine, but do it outside the custom USER and APPLICATION BEGIN/END comments, -->
     <!-- as that gets rewritten. -->
