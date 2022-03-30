@@ -45,6 +45,8 @@ import org.godotengine.godot.xr.regular.RegularFallbackConfigChooser;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.os.Build;
+
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -126,6 +128,11 @@ public class GodotView extends GLSurfaceView {
 	private void init(XRMode xrMode, boolean translucent) {
 		setPreserveEGLContextOnPause(true);
 		setFocusableInTouchMode(true);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ) {
+			setDefaultFocusHighlightEnabled(false);
+		}
+
 		switch (xrMode) {
 			case OVR:
 			case OPENXR:
