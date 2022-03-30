@@ -136,7 +136,10 @@ public class GodotTextInputWrapper implements TextWatcher, OnEditorActionListene
 			}
 		}
 
-		if (pActionID == EditorInfo.IME_ACTION_DONE) {
+		
+		// Onscreen softkeyoard sends EditorInfo.IME_ACTION_DONE, physical keyboard sends EditorInfo.IME_ACTION_UNSPECIFIED with keycode KeyEvent.KEYCODE_ENTER
+		if (pActionID == EditorInfo.IME_ACTION_DONE || 
+			(pActionID == EditorInfo.IME_ACTION_UNSPECIFIED && pKeyEvent != null && pKeyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
 			// Enter key has been pressed
 			mView.queueEvent(() -> {
 				GodotLib.key(KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_ENTER, 0, true);
