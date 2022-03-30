@@ -120,6 +120,7 @@ public class GodotView extends GLSurfaceView {
 	private void init(XRMode xrMode, boolean translucent, int depth, int stencil) {
 		setPreserveEGLContextOnPause(true);
 		setFocusableInTouchMode(true);
+		setDefaultFocusHighlightEnabled(false);
 		switch (xrMode) {
 			case OVR:
 			case OPENXR:
