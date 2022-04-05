@@ -102,7 +102,7 @@ void AndroidInputHandler::process_key_event(int p_keycode, int p_scancode, int p
 	} else if (val == 61453) {
 		ev->set_scancode(KEY_ENTER);
 		ev->set_unicode(KEY_ENTER);
-	} else if (p_scancode == 4) {
+	} else if (p_scancode == AKEYCODE_BACK && p_keycode != AKEYCODE_3) {
 		if (MainLoop *main_loop = OS::get_singleton()->get_main_loop()) {
 			main_loop->call_deferred("notification", MainLoop::NOTIFICATION_WM_GO_BACK_REQUEST);
 		}
