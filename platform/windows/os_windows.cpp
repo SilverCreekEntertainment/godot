@@ -3000,8 +3000,9 @@ void OS_Windows::set_native_icon(const String &p_filename) {
 	pos += sizeof(WORD);
 	f->seek(pos);
 
-	icon_dir = (ICONDIR *)memrealloc(icon_dir, 3 * sizeof(WORD) + icon_dir->idCount * sizeof(ICONDIRENTRY));
-	f->get_buffer((uint8_t *)&icon_dir->idEntries[0], icon_dir->idCount * sizeof(ICONDIRENTRY));
+
+	ICONDIRENTRY *icon_dir_entries = (ICONDIRENTRY *)memalloc(icon_dir->idCount * sizeof(ICONDIRENTRY));
+	f->get_buffer((uint8_t *)&icon_dir_entries[0], icon_dir->idCount * sizeof(ICONDIRENTRY));
 
 	int small_icon_index = -1; // Select 16x16 with largest color count
 	int small_icon_cc = 0;
@@ -3010,8 +3011,8 @@ void OS_Windows::set_native_icon(const String &p_filename) {
 	int big_icon_cc = 0;
 
 	for (int i = 0; i < icon_dir->idCount; i++) {
-		int colors = (icon_dir->idEntries[i].bColorCount == 0) ? 32768 : icon_dir->idEntries[i].bColorCount;
-		int width = (icon_dir->idEntries[i].bWidth == 0) ? 256 : icon_dir->idEntries[i].bWidth;
+		int colors = (icon_dir_entries[i].bColorCount == 0) ? 32768 : icon_dir_entries[i].bColorCount;
+		int width = (icon_dir_entries[i].bWidth == 0) ? 256 : icon_dir_entries[i].bWidth;
 		if (width == 16) {
 			if (colors >= small_icon_cc) {
 				small_icon_index = i;
@@ -3036,20 +3037,20 @@ void OS_Windows::set_native_icon(const String &p_filename) {
 	}
 
 	// Read the big icon
-	DWORD bytecount_big = icon_dir->idEntries[big_icon_index].dwBytesInRes;
+	DWORD bytecount_big = icon_dir_entries[big_icon_index].dwBytesInRes;
 	Vector<uint8_t> data_big;
 	data_big.resize(bytecount_big);
-	pos = icon_dir->idEntries[big_icon_index].dwImageOffset;
+	pos = icon_dir_entries[big_icon_index].dwImageOffset;
 	f->seek(pos);
 	f->get_buffer((uint8_t *)&data_big.write[0], bytecount_big);
 	HICON icon_big = CreateIconFromResource((PBYTE)&data_big.write[0], bytecount_big, TRUE, 0x00030000);
 	ERR_FAIL_COND_MSG(!icon_big, "Could not create " + itos(big_icon_width) + "x" + itos(big_icon_width) + " @" + itos(big_icon_cc) + " icon, error: " + format_error_message(GetLastError()) + ".");
 
 	// Read the small icon
-	DWORD bytecount_small = icon_dir->idEntries[small_icon_index].dwBytesInRes;
+	DWORD bytecount_small = icon_dir_entries[small_icon_index].dwBytesInRes;
 	Vector<uint8_t> data_small;
 	data_small.resize(bytecount_small);
-	pos = icon_dir->idEntries[small_icon_index].dwImageOffset;
+	pos = icon_dir_entries[small_icon_index].dwImageOffset;
 	f->seek(pos);
 	f->get_buffer((uint8_t *)&data_small.write[0], bytecount_small);
 	HICON icon_small = CreateIconFromResource((PBYTE)&data_small.write[0], bytecount_small, TRUE, 0x00030000);
@@ -3069,6 +3070,7 @@ void OS_Windows::set_native_icon(const String &p_filename) {
 
 	memdelete(f);
 	memdelete(icon_dir);
+	memdelete(icon_dir_entries);
 }
 
 void OS_Windows::set_icon(const Ref<Image> &p_icon) {
