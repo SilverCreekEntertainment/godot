@@ -168,7 +168,14 @@
 // MARK: Orientation
 
 - (UIRectEdge)preferredScreenEdgesDeferringSystemGestures {
-	return UIRectEdgeAll;
+	//return UIRectEdgeAll;
+
+	// SCE 4/19/2022
+	// On newer SDKs, hiding the home indicator is re-showing it brightly on any touch to the screen
+	// (It's intended for video playback)
+	// Instead, if we disable hiding (done in project settings), are return "Bottom" here
+	// the home indicator will always show, but dim greay, and only get brighter if touched nearby
+	return UIRectEdgeBottom;
 }
 
 - (BOOL)shouldAutorotate {
