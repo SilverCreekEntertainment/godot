@@ -193,4 +193,52 @@
 	self.previousSelectedRange = self.selectedRange;
 }
 
+- (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+	// The intent here to block cursor keys, which confuse this keyboard_input_view
+	// Cursor keys are only available with an external keyboard, Universal Control, or a third party keyboard
+	// For some reason, maybe something else gets the events first, simply returning here does what we need
+	// Normal text input continues to work
+
+	return;
+
+	/*
+	[super pressesBegan:presses withEvent:event];
+
+	for(UIPress *pPress in presses)
+	{
+		//NSLog(@"[pressesBegan] type: %li, modifierFlags: %li, keyCode: %li, characters: %@\n", pPress.type, pPress.key.modifierFlags, pPress.key.keyCode, pPress.key.characters);
+
+		// From the documentation I expected to get pPress.type = UIPressTypeLeftArrow, but instead it was 2080 for left (80 is UIKeyboardHIDUsageKeyboardLeftArrow)
+		// Using pPress.key.keyCode works
+
+		// Send left/right arrow keys only
+		if(pPress.key.keyCode == UIKeyboardHIDUsageKeyboardLeftArrow)
+			OSIPhone::get_singleton()->key(KEY_LEFT, true);
+		else if(pPress.key.keyCode == UIKeyboardHIDUsageKeyboardRightArrow)
+			OSIPhone::get_singleton()->key(KEY_RIGHT, true);
+	}*/
+
+}
+
+- (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+	return;
+
+	/*
+	[super pressesEnded:presses withEvent:event];
+
+	for(UIPress *pPress in presses)
+	{
+		//NSLog(@"[pressesEnded] type: %li, modifierFlags: %li, keyCode: %li, characters: %@\n", pPress.type, pPress.key.modifierFlags, pPress.key.keyCode, pPress.key.characters);
+
+		// Send left/right arrow keys only
+		if(pPress.key.keyCode == UIKeyboardHIDUsageKeyboardLeftArrow)
+			OSIPhone::get_singleton()->key(KEY_LEFT, false);
+		else if(pPress.key.keyCode == UIKeyboardHIDUsageKeyboardRightArrow)
+			OSIPhone::get_singleton()->key(KEY_RIGHT, false);
+	}
+	*/
+}
+
 @end
