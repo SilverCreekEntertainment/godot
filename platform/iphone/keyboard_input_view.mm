@@ -217,7 +217,6 @@
 		else if(pPress.key.keyCode == UIKeyboardHIDUsageKeyboardRightArrow)
 			OSIPhone::get_singleton()->key(KEY_RIGHT, true);
 	}*/
-
 }
 
 - (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
