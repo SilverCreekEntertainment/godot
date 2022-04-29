@@ -193,8 +193,7 @@
 	self.previousSelectedRange = self.selectedRange;
 }
 
-- (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
-{
+- (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
 	// The intent here to block cursor keys, which confuse this keyboard_input_view
 	// Cursor keys are only available with an external keyboard, Universal Control, or a third party keyboard
 	// For some reason, maybe something else gets the events first, simply returning here does what we need
@@ -221,8 +220,7 @@
 
 }
 
-- (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
-{
+- (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
 	return;
 
 	/*
