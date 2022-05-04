@@ -621,8 +621,7 @@ int OSIPhone::get_screen_dpi(int p_screen) const {
 		if ([keyArray containsObject:string]) {
 			NSNumber *value = iOSModelToDPI[keyArray];
 
-			if (idiom == UIUserInterfaceIdiomPad)
-			{
+			if (idiom == UIUserInterfaceIdiomPad) {
 				// SCE 5/4/22 - Old build fudged DPI up 1.35 on iPad, so we'll do the same thing here to match
 				return [value intValue] * 135 / 100;
 			}
