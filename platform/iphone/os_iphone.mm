@@ -528,15 +528,15 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 	// There is no customization of the return key, you must choose one of the available options
 	// RogueViewController was setting UIReturnKeyNext by default, which seems weird, so I set UIReturnKeyDefault instead
 	UIReturnKeyType returnKeyType = UIReturnKeyDefault;
-	if(p_done_label == "Go")
+	if (p_done_label == "Go")
 		returnKeyType = UIReturnKeyGo;
-	else if(p_done_label == "Join")
+	else if (p_done_label == "Join")
 		returnKeyType = UIReturnKeyJoin;
-	else if(p_done_label == "Next")
+	else if (p_done_label == "Next")
 		returnKeyType = UIReturnKeyNext;
-	else if(p_done_label == "Send")
+	else if (p_done_label == "Send")
 		returnKeyType = UIReturnKeySend;
-	else if(p_done_label == "Done")
+	else if (p_done_label == "Done")
 		returnKeyType = UIReturnKeyDone;
 
 	if (AppDelegate.viewController.keyboardView.returnKeyType != returnKeyType) {
