@@ -523,6 +523,27 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 		}
 	}
 
+	// Set return key label
+	// XXX - This will break down if sDoneLabel is localized, which seems likely...
+	// There is no customization of the return key, you must choose one of the available options
+	// RogueViewController was setting UIReturnKeyNext by default, which seems weird, so I set UIReturnKeyDefault instead
+	UIReturnKeyType returnKeyType = UIReturnKeyDefault;
+	if(p_done_label == "Go")
+		returnKeyType = UIReturnKeyGo;
+	else if(p_done_label == "Join")
+		returnKeyType = UIReturnKeyJoin;
+	else if(p_done_label == "Next")
+		returnKeyType = UIReturnKeyNext;
+	else if(p_done_label == "Send")
+		returnKeyType = UIReturnKeySend;
+	else if(p_done_label == "Done")
+		returnKeyType = UIReturnKeyDone;
+
+	if (AppDelegate.viewController.keyboardView.returnKeyType != returnKeyType) {
+		AppDelegate.viewController.keyboardView.returnKeyType = returnKeyType;
+		bChanged = true;
+	}
+
 	if (@available(iOS 11.0, *)) {
 		// Disable Smart Quotes & Dashes
 		// We could do this once in rogue_ios.mm
