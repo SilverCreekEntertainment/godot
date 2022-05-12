@@ -434,7 +434,7 @@ bool OSIPhone::has_virtual_keyboard() const {
 	return true;
 };
 
-void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 &p_screen_rect, bool p_multiline, int p_max_input_length, int p_cursor_start, int p_cursor_end, const String &p_input_type) {
+void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 &p_screen_rect, bool p_multiline, int p_max_input_length, int p_cursor_start, int p_cursor_end, const String &p_input_type, const String &p_done_label) {
 	NSString *existingString = [[NSString alloc] initWithUTF8String:p_existing_text.utf8().get_data()];
 
 	// There doesn't appear to be a list of possible p_input_type, I found these by searching:
