@@ -288,6 +288,7 @@ public:
 	virtual bool is_window_always_on_top() const;
 	virtual bool is_window_focused() const;
 	virtual void request_attention();
+	virtual void *get_native_handle(int p_handle_type);
 	virtual String get_joy_guid(int p_device) const;
 
 	virtual void set_borderless_window(bool p_borderless);

@@ -2881,6 +2881,11 @@ void OS_OSX::request_attention() {
 	[NSApp requestUserAttention:NSCriticalRequest];
 }
 
+void *OS_OSX::get_native_handle(int p_handle_type)
+{
+	return window_object;
+}
+
 bool OS_OSX::get_window_per_pixel_transparency_enabled() const {
 	if (!is_layered_allowed())
 		return false;
