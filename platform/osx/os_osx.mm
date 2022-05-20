@@ -2881,8 +2881,7 @@ void OS_OSX::request_attention() {
 	[NSApp requestUserAttention:NSCriticalRequest];
 }
 
-void *OS_OSX::get_native_handle(int p_handle_type)
-{
+void *OS_OSX::get_native_handle(int p_handle_type) {
 	return window_object;
 }
 
