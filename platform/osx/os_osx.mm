@@ -2798,7 +2798,10 @@ void OS_OSX::set_window_minimized(bool p_enabled) {
 	}
 
 	if (p_enabled)
-		[window_object performMiniaturize:nil];
+		if (get_titlebarless_window())
+			[window_object miniaturize:nil];
+		else
+			[window_object performMiniaturize:nil];
 	else
 		[window_object deminiaturize:nil];
 };
