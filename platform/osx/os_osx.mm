@@ -1568,7 +1568,11 @@ Error OS_OSX::initialize(const VideoMode &p_desired, int p_video_driver, int p_a
 		styleMask = NSWindowStyleMaskBorderless;
 	} else {
 		resizable = p_desired.resizable;
-		styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | (p_desired.resizable ? NSWindowStyleMaskResizable : 0);
+		if (p_desired.titlebarless_window) {
+			styleMask = NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | (p_desired.resizable ? NSWindowStyleMaskResizable : 0);
+		} else {
+			styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | (p_desired.resizable ? NSWindowStyleMaskResizable : 0);
+		}
 	}
 
 	float displayScale = get_screen_max_scale();
@@ -2939,6 +2943,35 @@ void OS_OSX::set_borderless_window(bool p_borderless) {
 
 bool OS_OSX::get_borderless_window() {
 	return [window_object styleMask] == NSWindowStyleMaskBorderless;
+}
+
+void OS_OSX::set_titlebarless_window(bool p_titlebarless) {
+	if (is_no_window_mode_enabled()) {
+		return;
+	}
+
+	// OrderOut prevents a lose focus bug with the window
+	[window_object orderOut:nil];
+
+	if (p_titlebarless) {
+		[window_object setStyleMask:NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | (resizable ? NSWindowStyleMaskResizable : 0)];
+	} else {
+		[window_object setStyleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | (resizable ? NSWindowStyleMaskResizable : 0)];
+
+		// Force update of the window styles
+		NSRect frameRect = [window_object frame];
+		[window_object setFrame:NSMakeRect(frameRect.origin.x, frameRect.origin.y, frameRect.size.width + 1, frameRect.size.height) display:NO];
+		[window_object setFrame:frameRect display:NO];
+
+		// Restore the window title
+		[window_object setTitle:[NSString stringWithUTF8String:title.utf8().get_data()]];
+	}
+
+	_update_window();
+}
+
+bool OS_OSX::get_titlebarless_window() {
+	return !([window_object styleMask] & NSWindowStyleMaskTitled);
 }
 
 String OS_OSX::get_executable_path() const {
