@@ -463,8 +463,7 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 		textContentType = UITextContentTypePassword;
 	} else if (p_input_type == "Email") {
 		textContentType = UITextContentTypeEmailAddress;
-	}
-	else if (p_input_type == "NoSuggestions") {
+	} else if (p_input_type == "NoSuggestions") {
 		autocorrectionType = UITextAutocorrectionTypeNo;
 	}
 
