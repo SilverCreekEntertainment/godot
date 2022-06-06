@@ -31,10 +31,10 @@
 #import "view_controller.h"
 
 #include "core/project_settings.h"
-#include "main/main.h"
 #import "godot_view.h"
 #import "godot_view_renderer.h"
 #import "keyboard_input_view.h"
+#include "main/main.h"
 #import "native_video_view.h"
 #include "os_iphone.h"
 

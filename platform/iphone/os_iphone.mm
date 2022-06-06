@@ -464,7 +464,7 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 	} else if (p_input_type == "Email") {
 		textContentType = UITextContentTypeEmailAddress;
 	}
-	else if(p_input_type == "NoSuggestions") {
+	else if (p_input_type == "NoSuggestions") {
 		autocorrectionType = UITextAutocorrectionTypeNo;
 	}
 
@@ -479,7 +479,7 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 	} else {
 		// textContentType is not supported before iOS 11
 		// If textContentType is not default, disable auto correction
-		if(textContentType != nil)
+		if (textContentType != nil)
 			autocorrectionType = UITextAutocorrectionTypeNo;
 	}
 
