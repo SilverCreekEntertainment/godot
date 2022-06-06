@@ -443,85 +443,49 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 	//  MultiLine
 	//  NoSuggestions
 
-	// Copy p_input_type in case we need to change it for iOS 10 passwords
-	String input_type = p_input_type;
+	// default is nil
+	// UITextContentTypeUsername
+	// UITextContentTypePassword
+	// UITextContentTypeNewPassword
+	// UITextContentTypeEmailAddress
+	UITextContentType textContentType = nil;
+
+	// UITextAutocorrectionTypeDefault
+	// UITextAutocorrectionTypeNo
+	UITextAutocorrectionType autocorrectionType = UITextAutocorrectionTypeDefault;
+
+	if (p_input_type == "Username") {
+		// Added Username for completeness for iOS Password Auto Fill
+		// But as of 2/21/2022, Rogue is not using it
+		textContentType = UITextContentTypeUsername;
+	} else if (p_input_type == "Password") {
+		// iOS also has UITextContentTypeNewPassword
+		textContentType = UITextContentTypePassword;
+	} else if (p_input_type == "Email") {
+		textContentType = UITextContentTypeEmailAddress;
+	}
+	else if(p_input_type == "NoSuggestions") {
+		autocorrectionType = UITextAutocorrectionTypeNo;
+	}
+
+	// textContentType seems to be sticky
+	// at least setting UITextContentTypePassword seems to make the input permanently a password input
+	// If textContentType has changed, we'll re-create the keyboardView as a workaround
+	if (@available(iOS 11.0, *)) {
+		if (AppDelegate.viewController.keyboardView.textContentType != textContentType) {
+			[AppDelegate.viewController createKeyboardView];
+			AppDelegate.viewController.keyboardView.textContentType = textContentType;
+		}
+	} else {
+		// textContentType is not supported before iOS 11
+		// If textContentType is not default, disable auto correction
+		if(textContentType != nil)
+			autocorrectionType = UITextAutocorrectionTypeNo;
+	}
 
 	// If we change with the keyboard open
 	// it needs to be hidden and re-shown
 	bool bChanged = false;
-
-	if (input_type == "Username") {
-		// Added Username for completeness for iOS Password Auto Fill
-		// But as of 2/21/2022, Rogue is not using it
-
-		if (@available(iOS 11.0, *)) {
-			if (AppDelegate.viewController.keyboardView.textContentType != UITextContentTypeUsername) {
-				AppDelegate.viewController.keyboardView.textContentType = UITextContentTypeUsername;
-				bChanged = true;
-			}
-		} else {
-			// For iOS 10, let's at least stop suggestions
-			input_type = "NoSuggestions";
-		}
-	} else if (input_type == "Password") {
-		// iOS also has UITextContentTypeNewPassword
-
-		// XXX - Once you set UITextContentTypePassword, it sticks permanently
-		//   Tried:
-		//     Setting back to nil doesn't work
-		//     Setting "" instead of nil doesn't work
-		//     Also clearing secureTextEntry doesn't work
-		//     releaseFirstResponder instead of reloadInputViews doesn't work
-		//   Not tried:
-		//     setting UITextContentTypeOneTimeCode (Some people had success with this, but it is the wrong type and will prompt to insert code if you get a text message with a code)
-		//     hacking an undocument field to delete the password button (Somebody suggested this, but it is not documented)
-		//
-		//   Pre-Godot, we didn't set textContentType (It's an iOS 11+ feature), we just disabled suggestions
-		//   so we'll do that here as well
-
-		/*
-		if(@available(iOS 11.0, *))
-		{
-			if(AppDelegate.viewController.keyboardView.textContentType != UITextContentTypePassword)
-			{
-				AppDelegate.viewController.keyboardView.textContentType = UITextContentTypePassword;
-				bChanged = true;
-			}
-		}
-		else
-		*/
-		{
-			// For iOS 10, let's at least stop suggestions
-			input_type = "NoSuggestions";
-		}
-	} else if (input_type == "Email") {
-		if (AppDelegate.viewController.keyboardView.textContentType != UITextContentTypeEmailAddress) {
-			AppDelegate.viewController.keyboardView.textContentType = UITextContentTypeEmailAddress;
-			bChanged = true;
-		}
-	} else {
-		if (AppDelegate.viewController.keyboardView.textContentType != nil) {
-			AppDelegate.viewController.keyboardView.textContentType = nil;
-			bChanged = true;
-		}
-	}
-
-	// In RogueViewControler.mm
-	// We handled "MultiLine" in textFieldShouldReturn
-	// It returned NO if MultiLine, YES otherwise
-	// There doesn't appear to be anything to do for Godot here
-
-	if (input_type == "NoSuggestions") {
-		if (AppDelegate.viewController.keyboardView.autocorrectionType != UITextAutocorrectionTypeNo) {
-			AppDelegate.viewController.keyboardView.autocorrectionType = UITextAutocorrectionTypeNo;
-			bChanged = true;
-		}
-	} else {
-		if (AppDelegate.viewController.keyboardView.autocorrectionType != UITextAutocorrectionTypeDefault) {
-			AppDelegate.viewController.keyboardView.autocorrectionType = UITextAutocorrectionTypeDefault;
-			bChanged = true;
-		}
-	}
 
 	// Set return key label
 	// XXX - This will break down if sDoneLabel is localized, which seems likely...
@@ -544,17 +508,19 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 		bChanged = true;
 	}
 
+	if (AppDelegate.viewController.keyboardView.autocorrectionType != autocorrectionType) {
+		AppDelegate.viewController.keyboardView.autocorrectionType = autocorrectionType;
+		bChanged = true;
+	}
+
 	if (@available(iOS 11.0, *)) {
 		// Disable Smart Quotes & Dashes
-		// We could do this once in rogue_ios.mm
-		// But doing it here keeps all of our Godot keyboard modifications together
 		AppDelegate.viewController.keyboardView.smartQuotesType = UITextSmartQuotesTypeNo;
 		AppDelegate.viewController.keyboardView.smartDashesType = UITextSmartDashesTypeNo;
 	}
 
 	if (bChanged) {
 		// If the keyboard was shown, we need to reload the keyboard
-		// Otherwise, switching between username and password, for example, doesn't change the keyboard as expected
 		[AppDelegate.viewController.keyboardView reloadInputViews];
 	}
 

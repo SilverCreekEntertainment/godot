@@ -40,6 +40,8 @@
 @property(nonatomic, readonly, strong) GodotNativeVideoView *videoView;
 @property(nonatomic, readonly, strong) GodotKeyboardInputView *keyboardView;
 
+- (void)createKeyboardView;
+
 // MARK: Native Video Player
 
 - (BOOL)playVideoAtPath:(NSString *)filePath volume:(float)videoVolume audio:(NSString *)audioTrack subtitle:(NSString *)subtitleTrack;
