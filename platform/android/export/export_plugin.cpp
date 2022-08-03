@@ -225,8 +225,8 @@ static const char *APK_ASSETS_DIRECTORY = "res://android/build/assets";
 static const char *AAB_ASSETS_DIRECTORY = "res://android/build/assetPacks/installTime/src/main/assets";
 
 static const int DEFAULT_MIN_SDK_VERSION = 19; // Should match the value in 'platform/android/java/app/config.gradle#minSdk'
-static const int DEFAULT_TARGET_SDK_VERSION = 30; // Should match the value in 'platform/android/java/app/config.gradle#targetSdk'
-const String SDK_VERSION_RANGE = vformat("%s,%s,1", DEFAULT_MIN_SDK_VERSION, DEFAULT_TARGET_SDK_VERSION);
+static const int DEFAULT_TARGET_SDK_VERSION = 31; // Should match the value in 'platform/android/java/app/config.gradle#targetSdk'
+const String SDK_VERSION_RANGE = vformat("%s,%s,1,or_greater", DEFAULT_MIN_SDK_VERSION, DEFAULT_TARGET_SDK_VERSION + 1);
 
 void EditorExportPlatformAndroid::_check_for_changes_poll_thread(void *ud) {
 	EditorExportPlatformAndroid *ea = (EditorExportPlatformAndroid *)ud;
@@ -985,29 +985,34 @@ void EditorExportPlatformAndroid::_fix_manifest(const Ref<EditorExportPreset> &p
 						encode_uint32(min_gles3 ? 0x00030000 : 0x00020000, &p_manifest.write[iofs + 16]);
 					}
 
-					if (tname == "meta-data" && attrname == "name" && value == "xr_mode_metadata_name") {
-						// Update the meta-data 'android:name' attribute based on the selected XR mode.
-						if (xr_mode_index == XR_MODE_OVR) {
+					if (xr_mode_index == XR_MODE_OVR) {
+						if (tname == "meta-data" && attrname == "name" && value == "xr_mode_metadata_name") {
+							// Update the meta-data 'android:name' attribute based on the selected XR mode.
 							string_table.write[attr_value] = "com.samsung.android.vr.application.mode";
 						}
-					}
 
-					if (tname == "meta-data" && attrname == "value" && value == "xr_mode_metadata_value") {
-						// Update the meta-data 'android:value' attribute based on the selected XR mode.
-						if (xr_mode_index == XR_MODE_OVR) {
+						if (tname == "meta-data" && attrname == "value" && value == "xr_mode_metadata_value") {
+							// Update the meta-data 'android:value' attribute based on the selected XR mode.
 							string_table.write[attr_value] = "vr_only";
 						}
 					}
 
-					if (tname == "meta-data" && attrname == "name" && value == "xr_hand_tracking_metadata_name") {
-						if ((xr_mode_index == XR_MODE_OVR || xr_mode_index == XR_MODE_OPENXR) && hand_tracking_index > XR_HAND_TRACKING_NONE) {
+					// Hand tracking related configurations
+					if ((xr_mode_index == XR_MODE_OVR || xr_mode_index == XR_MODE_OPENXR) && hand_tracking_index > XR_HAND_TRACKING_NONE) {
+						if (tname == "meta-data" && attrname == "name" && value == "xr_hand_tracking_metadata_name") {
 							string_table.write[attr_value] = "com.oculus.handtracking.frequency";
 						}
-					}
 
-					if (tname == "meta-data" && attrname == "value" && value == "xr_hand_tracking_metadata_value") {
-						if ((xr_mode_index == XR_MODE_OVR || xr_mode_index == XR_MODE_OPENXR) && hand_tracking_index > XR_HAND_TRACKING_NONE) {
+						if (tname == "meta-data" && attrname == "value" && value == "xr_hand_tracking_metadata_value") {
 							string_table.write[attr_value] = (hand_tracking_frequency_index == XR_HAND_TRACKING_FREQUENCY_LOW ? "LOW" : "HIGH");
+						}
+
+						if (tname == "meta-data" && attrname == "name" && value == "xr_hand_tracking_version_name") {
+							string_table.write[attr_value] = "com.oculus.handtracking.version";
+						}
+
+						if (tname == "meta-data" && attrname == "name" && value == "xr_hand_tracking_version_value") {
+							string_table.write[attr_value] = "V2.0";
 						}
 					}
 
@@ -2244,20 +2249,34 @@ bool EditorExportPlatformAndroid::can_export(const Ref<EditorExportPreset> &p_pr
 		err += "\n";
 	}
 
-	// Check the min sdk version
+	// Check the min and target sdk version.
+
+	// They're only used for custom_build_enabled, but since we save their default values
+	// in the export preset, users would get an unexpected error when updating to a Godot
+	// version that has different values (GH-62465).
+	// So we don't make a blocking error, instead we just show a warning.
+
 	int min_sdk_version = p_preset->get("version/min_sdk");
 	if (min_sdk_version != DEFAULT_MIN_SDK_VERSION && !custom_build_enabled) {
-		valid = false;
-		err += TTR("Changing the \"Min Sdk\" is only valid when \"Use Custom Build\" is enabled.");
+		err += vformat(TTR("\"Min Sdk\" was changed from the default \"%d\" to \"%d\". This option requires \"Use Custom Build\" to be enabled.\n>> Change it to \"%d\" to silence this warning, or enable \"Use Custom Build\" to use this min SDK."), DEFAULT_MIN_SDK_VERSION, min_sdk_version, DEFAULT_MIN_SDK_VERSION);
 		err += "\n";
 	}
 
-	// Check the target sdk version
+	// Here we also handle compatibility with Godot 3.4 to 3.4.4 where target SDK was 30.
+	// Version 3.4.5 updated it to 31 to match platform requirements, so make sure that
+	// users notice it.
 	int target_sdk_version = p_preset->get("version/target_sdk");
-	if (target_sdk_version != DEFAULT_TARGET_SDK_VERSION && !custom_build_enabled) {
-		valid = false;
-		err += TTR("Changing the \"Target Sdk\" is only valid when \"Use Custom Build\" is enabled.");
-		err += "\n";
+	if (target_sdk_version != DEFAULT_TARGET_SDK_VERSION) {
+		if (!custom_build_enabled) {
+			err += vformat(TTR("\"Target Sdk\" was changed from the default \"%d\" to \"%d\". This option requires \"Use Custom Build\" to be enabled.\n>> Change it to \"%d\" to silence this warning, or enable \"Use Custom Build\" to use this target SDK."), DEFAULT_TARGET_SDK_VERSION, target_sdk_version, DEFAULT_TARGET_SDK_VERSION);
+			err += "\n";
+		} else if (target_sdk_version == 30) { // Compatibility with < 3.4.5.
+			err += vformat(TTR("\"Target Sdk\" is set to 30, while the current default is \"%d\". This might be due to upgrading from a previous Godot release.\n>> Consider changing it to \"%d\" to stay up-to-date with platform requirements."), DEFAULT_TARGET_SDK_VERSION, DEFAULT_TARGET_SDK_VERSION);
+			err += "\n";
+		} else if (target_sdk_version > DEFAULT_TARGET_SDK_VERSION) {
+			err += vformat(TTR("\"Target Sdk\" %d is higher than the default version %d. This may work, but wasn't tested and may be unstable."), target_sdk_version, DEFAULT_TARGET_SDK_VERSION);
+			err += "\n";
+		}
 	}
 
 	if (target_sdk_version < min_sdk_version) {

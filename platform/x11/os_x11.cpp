@@ -1416,6 +1416,8 @@ void OS_X11::set_window_size(const Size2 p_size) {
 	int old_h = xwa.height;
 
 	Size2 size = p_size;
+
+	ERR_FAIL_COND(Math::is_nan(size.x) || Math::is_nan(size.y));
 	size.x = MAX(1, size.x);
 	size.y = MAX(1, size.y);
 
@@ -1667,8 +1669,15 @@ bool OS_X11::window_maximize_check(const char *p_atom_name) const {
 
 	if (result == Success) {
 		Atom *atoms = (Atom *)data;
-		Atom wm_act_max_horz = XInternAtom(x11_display, "_NET_WM_ACTION_MAXIMIZE_HORZ", False);
-		Atom wm_act_max_vert = XInternAtom(x11_display, "_NET_WM_ACTION_MAXIMIZE_VERT", False);
+		Atom wm_act_max_horz;
+		Atom wm_act_max_vert;
+		if (strcmp(p_atom_name, "_NET_WM_STATE") == 0) {
+			wm_act_max_horz = XInternAtom(x11_display, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+			wm_act_max_vert = XInternAtom(x11_display, "_NET_WM_STATE_MAXIMIZED_VERT", False);
+		} else {
+			wm_act_max_horz = XInternAtom(x11_display, "_NET_WM_ACTION_MAXIMIZE_HORZ", False);
+			wm_act_max_vert = XInternAtom(x11_display, "_NET_WM_ACTION_MAXIMIZE_VERT", False);
+		}
 		bool found_wm_act_max_horz = false;
 		bool found_wm_act_max_vert = false;
 
@@ -1686,6 +1695,49 @@ bool OS_X11::window_maximize_check(const char *p_atom_name) const {
 			}
 		}
 
+		XFree(data);
+	}
+
+	return retval;
+}
+
+bool OS_X11::window_fullscreen_check() const {
+	// Using EWMH -- Extended Window Manager Hints
+	Atom property = XInternAtom(x11_display, "_NET_WM_STATE", False);
+	Atom type;
+	int format;
+	unsigned long len;
+	unsigned long remaining;
+	unsigned char *data = nullptr;
+	bool retval = false;
+
+	if (property == None) {
+		return retval;
+	}
+
+	int result = XGetWindowProperty(
+			x11_display,
+			x11_window,
+			property,
+			0,
+			1024,
+			False,
+			XA_ATOM,
+			&type,
+			&format,
+			&len,
+			&remaining,
+			&data);
+
+	if (result == Success) {
+		Atom *atoms = (Atom *)data;
+		Atom wm_fullscreen = XInternAtom(x11_display, "_NET_WM_STATE_FULLSCREEN", False);
+		for (uint64_t i = 0; i < len; i++) {
+			if (atoms[i] == wm_fullscreen) {
+				retval = true;
+				break;
+			}
+		}
 		XFree(data);
 	}
 
@@ -2529,6 +2581,8 @@ void OS_X11::process_xevents() {
 
 		switch (event.type) {
 			case Expose:
+				current_videomode.fullscreen = window_fullscreen_check();
+
 				Main::force_redraw();
 				break;
 
@@ -2591,7 +2645,7 @@ void OS_X11::process_xevents() {
 				window_focused = false;
 
 				if (mouse_mode_grab) {
-					//dear X11, I try, I really try, but you never work, you do whathever you want.
+					//dear X11, I try, I really try, but you never work, you do whatever you want.
 					if (mouse_mode == MOUSE_MODE_CAPTURED) {
 						// Show the cursor if we're in captured mode so it doesn't look weird.
 						XUndefineCursor(x11_display, x11_window);
@@ -3827,7 +3881,7 @@ Error OS_X11::move_to_trash(const String &p_path) {
 		DirAccessRef dir_access = DirAccess::create(DirAccess::ACCESS_FILESYSTEM);
 		Error err = dir_access->make_dir_recursive(trash_path);
 
-		// Issue an error if trash can is not created proprely.
+		// Issue an error if trash can is not created properly.
 		ERR_FAIL_COND_V_MSG(err != OK, err, "Could not create the trash path \"" + trash_path + "\"");
 		err = dir_access->make_dir_recursive(trash_path + "/files");
 		ERR_FAIL_COND_V_MSG(err != OK, err, "Could not create the trash path \"" + trash_path + "/files\"");

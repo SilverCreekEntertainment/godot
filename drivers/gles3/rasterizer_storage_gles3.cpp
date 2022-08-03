@@ -4279,7 +4279,7 @@ void RasterizerStorageGLES3::mesh_render_blend_shapes(Surface *s, const float *p
 
 	shaders.blend_shapes.set_uniform(BlendShapeShaderGLES3::BLEND_AMOUNT, base_weight);
 	glEnable(GL_RASTERIZER_DISCARD);
-
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, resources.transform_feedback_buffers[0]);
 	glBeginTransformFeedback(GL_POINTS);
 	glDrawArrays(GL_POINTS, 0, s->array_len);
@@ -8062,6 +8062,12 @@ void RasterizerStorageGLES3::initialize() {
 	config.framebuffer_float_supported = config.extensions.has("GL_EXT_color_buffer_float");
 	config.framebuffer_half_float_supported = config.extensions.has("GL_EXT_color_buffer_half_float") || config.framebuffer_float_supported;
 
+	// If the desktop build is using S3TC, and you export / run from the IDE for android, if the device supports
+	// S3TC it will crash trying to load these textures, as they are not exported in the APK. This is a simple way
+	// to prevent Android devices trying to load S3TC, by faking lack of hardware support.
+#if defined(ANDROID_ENABLED) || defined(IPHONE_ENABLED)
+	config.s3tc_supported = false;
+#endif
 #endif
 
 	// not yet detected on GLES3 (is this mandated?)

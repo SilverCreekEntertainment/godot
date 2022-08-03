@@ -261,20 +261,17 @@ changes are marked with `// -- GODOT --` comments.
 
 ## mbedtls
 
-- Upstream: https://tls.mbed.org/
-- Version: 2.16.12 (cf4667126010c665341f9e50ef691b7ef8294188, 2021)
+- Upstream: https://github.com/Mbed-TLS/mbedtls
+- Version: 2.18.1 (dd79db10014d85b26d11fe57218431f2e5ede6f2, 2022)
 - License: Apache 2.0
 
 File extracted from upstream release tarball:
 
-- All `*.h` from `include/mbedtls/` to `thirdparty/mbedtls/include/mbedtls/`.
-- All `*.c` from `library/` to `thirdparty/mbedtls/library/`.
-- `LICENSE` and `apache-2.0.txt` files.
+- All `*.h` from `include/mbedtls/` to `thirdparty/mbedtls/include/mbedtls/` except `config_psa.h` and `psa_util.h`.
+- All `*.c` and `*.h` from `library/` to `thirdparty/mbedtls/library/` except those starting with `psa_*`.
+- The `LICENSE` file.
 - Applied the patch in `patches/1453.diff` (upstream PR:
   https://github.com/ARMmbed/mbedtls/pull/1453).
-- Applied the patch in `patches/padlock.diff`. This disables VIA padlock
-  support which defines a symbol `unsupported` which clashes with a
-  pre-defined symbol.
 - Added 2 files `godot_core_mbedtls_platform.c` and `godot_core_mbedtls_config.h`
   providing configuration for light bundling with core.
 
@@ -315,17 +312,17 @@ https://github.com/miniupnp/miniupnp/commit/3a08dd4b89af2e9effa22a136bac86f2f306
 
 ## minizip
 
-- Upstream: http://www.zlib.net
-- Version: 1.2.11 (zlib contrib, 2017)
+- Upstream: https://www.zlib.net
+- Version: 1.2.12 (zlib contrib, 2022)
 - License: zlib
 
 Files extracted from the upstream source:
 
-- contrib/minizip/{crypt.h,ioapi.{c,h},zip.{c,h},unzip.{c,h}}
+- contrib/minizip/{crypt.h,ioapi.{c,h},unzip.{c,h},zip.{c,h}}
 
 Important: Some files have Godot-made changes for use in core/io.
 They are marked with `/* GODOT start */` and `/* GODOT end */`
-comments and a patch is provided in the minizip/ folder.
+comments and a patch is provided in the `patches` folder.
 
 
 ## misc
@@ -558,8 +555,8 @@ Files extracted from upstream source:
 
 ## zlib
 
-- Upstream: http://www.zlib.net
-- Version: 1.2.11 (2017)
+- Upstream: https://www.zlib.net
+- Version: 1.2.12 (2022)
 - License: zlib
 
 Files extracted from upstream source:
