@@ -630,7 +630,7 @@ int OSIPhone::get_screen_dpi(int p_screen) const {
 		case UIUserInterfaceIdiomPhone: {
 			if (scale == 3) {
 				CGFloat nativeScale = [UIScreen mainScreen].nativeScale;
-				return nativeScale == 3 ? 458 : 401;
+				return nativeScale >= 3 ? 458 : 401;
 			}
 
 			return 326;
