@@ -185,16 +185,22 @@
 
 // MARK: Orientation
 
+/*
 - (UIRectEdge)preferredScreenEdgesDeferringSystemGestures {
-	//return UIRectEdgeAll;
+	// SCE Disabled 8/23/2022
+	// The problem here is the dimmed bar is poorly implemented by Apple
+	// It's tricky and inconsistent to activate it
+	// So instead we're just leaving the Home Indicator always showing
+	// (The other choice is to auto hide, but any tap anywhere brings it back)
 
 	// SCE 4/19/2022
-	// On newer SDKs, hiding the home indicator is re-showing it brightly on any touch to the screen
+		// On newer SDKs, hiding the home indicator is re-showing it brightly on any touch to the screen
 	// (It's intended for video playback)
 	// Instead, if we disable hiding (done in project settings), are return "Bottom" here
-	// the home indicator will always show, but dim greay, and only get brighter if touched nearby
+	// the home indicator will always show, but dim grey, and only get brighter if touched nearby
 	return UIRectEdgeBottom;
 }
+*/
 
 - (BOOL)shouldAutorotate {
 	if (!OSIPhone::get_singleton()) {
