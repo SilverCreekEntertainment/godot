@@ -1386,6 +1386,10 @@ Error EditorExportPlatformIOS::_export_additional_assets(const String &p_out_dir
 			r_exported_assets.push_back(exported_asset);
 		} else {
 			Error err = _copy_asset(p_out_dir, asset, nullptr, p_is_framework, p_should_embed, r_exported_assets);
+			if(err)
+			{
+				print_line(vformat("MISSING FILE: %s", asset));
+			}
 			ERR_FAIL_COND_V(err, err);
 		}
 	}
