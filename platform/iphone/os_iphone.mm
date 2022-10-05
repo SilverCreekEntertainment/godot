@@ -454,7 +454,10 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 
 	// UITextAutocorrectionTypeDefault
 	// UITextAutocorrectionTypeNo
-	UITextAutocorrectionType autocorrectionType = UITextAutocorrectionTypeDefault;
+	// 10/5/2022 - The new idea is to disable Auto Correct, but enable Spell Check
+	// This seems to give us a suggestion bar, but by default sends what you typed unmodified
+	UITextAutocorrectionType autocorrectionType = UITextAutocorrectionTypeNo;
+	UITextSpellCheckingType spellCheckingType = UITextSpellCheckingTypeYes;
 
 	if (p_input_type == "Username") {
 		// Added Username for completeness for iOS Password Auto Fill
@@ -467,6 +470,7 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 		textContentType = UITextContentTypeEmailAddress;
 	} else if (p_input_type == "NoSuggestions") {
 		autocorrectionType = UITextAutocorrectionTypeNo;
+		spellCheckingType = UITextSpellCheckingTypeNo;
 	}
 
 	// textContentType seems to be sticky
@@ -482,6 +486,7 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 		// If textContentType is not default, disable auto correction
 		if (textContentType != nil)
 			autocorrectionType = UITextAutocorrectionTypeNo;
+			spellCheckingType = UITextSpellCheckingTypeNo;
 	}
 
 	// If we change with the keyboard open
@@ -511,6 +516,11 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 
 	if (AppDelegate.viewController.keyboardView.autocorrectionType != autocorrectionType) {
 		AppDelegate.viewController.keyboardView.autocorrectionType = autocorrectionType;
+		bChanged = true;
+	}
+
+	if(AppDelegate.viewController.keyboardView.spellCheckingType != spellCheckingType) {
+		AppDelegate.viewController.keyboardView.spellCheckingType = spellCheckingType;
 		bChanged = true;
 	}
 
