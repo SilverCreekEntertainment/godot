@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<style name="GodotAppMainTheme" parent="@android:style/Theme.Black.NoTitleBar"/>
+	<style name="GodotAppMainTheme" parent="@android:style/Theme.Black.NoTitleBar">
+		<item name="android:windowLayoutInDisplayCutoutMode">
+			never <!-- default, shortEdges, or never -->
+		</item>
+	</style>
 
 	<style name="GodotAppSplashTheme" parent="@android:style/Theme.Black.NoTitleBar.Fullscreen">
 		<item name="android:windowBackground">@drawable/splash_drawable</item>
