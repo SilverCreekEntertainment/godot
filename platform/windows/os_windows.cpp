@@ -1316,8 +1316,7 @@ Error OS_Windows::initialize(const VideoMode &p_desired, int p_video_driver, int
 	HWND wnd = FindWindowW(class_name.ptrw(), NULL);
 	if (!wnd)
 		wnd = FindWindowW(L"RprWindowClass", class_name.ptrw()); // Old games with buggy RPR
-	if (wnd)
-	{
+	if (wnd) {
 		ShowWindow(wnd, SW_SHOWNORMAL);
 		BringWindowToTop(wnd);
 		SetForegroundWindow(wnd);
