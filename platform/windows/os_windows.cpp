@@ -1306,6 +1306,25 @@ int OS_Windows::get_current_video_driver() const {
 }
 
 Error OS_Windows::initialize(const VideoMode &p_desired, int p_video_driver, int p_audio_driver) {
+	// Prevent multiple copies of game from running, instead bring previous instance to top
+	bool valid = false;
+	String class_name = ProjectSettings::get_singleton()->get("application/config/windows_class_name", &valid);
+	if(!valid)
+		class_name = L"Engine";
+
+	#ifndef DEBUG_ENABLED
+		HWND wnd = FindWindowW(class_name.ptrw(), NULL);
+		if(!wnd)
+			wnd = FindWindowW(L"RprWindowClass", class_name.ptrw()); // Old games with buggy RPR
+		if(wnd)
+		{
+			ShowWindow(wnd, SW_SHOWNORMAL);
+			BringWindowToTop(wnd);
+			SetForegroundWindow(wnd);
+			return ERR_UNAVAILABLE;
+		}
+	#endif
+
 	main_loop = NULL;
 	outside = true;
 	window_has_focus = true;
@@ -1346,7 +1365,7 @@ Error OS_Windows::initialize(const VideoMode &p_desired, int p_video_driver, int
 	wc.hCursor = NULL; //LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = NULL;
 	wc.lpszMenuName = NULL;
-	wc.lpszClassName = L"Engine";
+	wc.lpszClassName = class_name.ptrw();
 
 	if (!RegisterClassExW(&wc)) {
 		MessageBox(NULL, "Failed To Register The Window Class.", "ERROR", MB_OK | MB_ICONEXCLAMATION);
@@ -1481,7 +1500,7 @@ Error OS_Windows::initialize(const VideoMode &p_desired, int p_video_driver, int
 	} else {
 		hWnd = CreateWindowExW(
 				dwExStyle,
-				L"Engine", L"",
+				class_name.ptrw(), L"",
 				dwStyle | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
 				(GetSystemMetrics(SM_CXSCREEN) - WindowRect.right) / 2,
 				(GetSystemMetrics(SM_CYSCREEN) - WindowRect.bottom) / 2,
