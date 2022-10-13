@@ -46,7 +46,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Build;
-
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
