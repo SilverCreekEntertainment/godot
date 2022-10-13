@@ -1309,21 +1309,21 @@ Error OS_Windows::initialize(const VideoMode &p_desired, int p_video_driver, int
 	// Prevent multiple copies of game from running, instead bring previous instance to top
 	bool valid = false;
 	String class_name = ProjectSettings::get_singleton()->get("application/config/windows_class_name", &valid);
-	if(!valid)
+	if (!valid)
 		class_name = L"Engine";
 
-	#ifndef DEBUG_ENABLED
-		HWND wnd = FindWindowW(class_name.ptrw(), NULL);
-		if(!wnd)
-			wnd = FindWindowW(L"RprWindowClass", class_name.ptrw()); // Old games with buggy RPR
-		if(wnd)
-		{
-			ShowWindow(wnd, SW_SHOWNORMAL);
-			BringWindowToTop(wnd);
-			SetForegroundWindow(wnd);
-			return ERR_UNAVAILABLE;
-		}
-	#endif
+#ifndef DEBUG_ENABLED
+	HWND wnd = FindWindowW(class_name.ptrw(), NULL);
+	if (!wnd)
+		wnd = FindWindowW(L"RprWindowClass", class_name.ptrw()); // Old games with buggy RPR
+	if (wnd)
+	{
+		ShowWindow(wnd, SW_SHOWNORMAL);
+		BringWindowToTop(wnd);
+		SetForegroundWindow(wnd);
+		return ERR_UNAVAILABLE;
+	}
+#endif
 
 	main_loop = NULL;
 	outside = true;
@@ -1437,7 +1437,6 @@ Error OS_Windows::initialize(const VideoMode &p_desired, int p_video_driver, int
 	DWORD dwStyle;
 
 	if (video_mode.fullscreen || video_mode.borderless_window || video_mode.titlebarless_window) {
-
 		dwExStyle = WS_EX_APPWINDOW;
 		dwStyle = WS_POPUP;
 
@@ -1445,9 +1444,7 @@ Error OS_Windows::initialize(const VideoMode &p_desired, int p_video_driver, int
 		if (!video_mode.fullscreen && !video_mode.borderless_window) {
 			dwStyle |= WS_THICKFRAME | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
 		}
-
 	} else {
-
 		dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 		dwStyle = WS_OVERLAPPEDWINDOW;
 		if (video_mode.resizable) {
@@ -2368,7 +2365,6 @@ void OS_Windows::_update_window_style(bool p_repaint, bool p_maximized) {
 	if (video_mode.fullscreen || video_mode.borderless_window) {
 		SetWindowLongPtr(hWnd, GWL_STYLE, WS_SYSMENU | WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE);
 	} else if (video_mode.titlebarless_window) {
-
 		DWORD dwStyle = WS_POPUP | WS_VISIBLE | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
 		if (video_mode.resizable) {
 			dwStyle |= WS_THICKFRAME;
@@ -3112,7 +3108,6 @@ void OS_Windows::set_native_icon(const String &p_filename) {
 	icon_dir->idCount = f->get_32();
 	pos += sizeof(WORD);
 	f->seek(pos);
-
 
 	ICONDIRENTRY *icon_dir_entries = (ICONDIRENTRY *)memalloc(icon_dir->idCount * sizeof(ICONDIRENTRY));
 	f->get_buffer((uint8_t *)&icon_dir_entries[0], icon_dir->idCount * sizeof(ICONDIRENTRY));

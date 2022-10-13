@@ -129,7 +129,7 @@ public class GodotView extends GLSurfaceView {
 		setPreserveEGLContextOnPause(true);
 		setFocusableInTouchMode(true);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			setDefaultFocusHighlightEnabled(false);
 		}
 
