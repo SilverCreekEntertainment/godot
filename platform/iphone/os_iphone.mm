@@ -538,9 +538,17 @@ int OSIPhone::get_screen_dpi(int p_screen) const {
 
 	NSDictionary *iOSModelToDPI = [GodotDeviceMetrics dpiList];
 
+	UIUserInterfaceIdiom idiom = [UIDevice currentDevice].userInterfaceIdiom;
+
 	for (NSArray *keyArray in iOSModelToDPI) {
 		if ([keyArray containsObject:string]) {
 			NSNumber *value = iOSModelToDPI[keyArray];
+
+			if (idiom == UIUserInterfaceIdiomPad) {
+				// SCE 5/4/22 - Old build fudged DPI up 1.35 on iPad, so we'll do the same thing here to match
+				return [value intValue] * 135 / 100;
+			}
+
 			return [value intValue];
 		}
 	}
@@ -549,15 +557,15 @@ int OSIPhone::get_screen_dpi(int p_screen) const {
 	// make a best guess from device metrics.
 	CGFloat scale = [UIScreen mainScreen].scale;
 
-	UIUserInterfaceIdiom idiom = [UIDevice currentDevice].userInterfaceIdiom;
-
 	switch (idiom) {
 		case UIUserInterfaceIdiomPad:
-			return scale == 2 ? 264 : 132;
+			//return scale == 2 ? 264 : 132;
+			// SCE 5/4/22 - Old build fudged DPI up 1.35 on iPad, so we'll do the same thing here to match
+			return scale == 2 ? 356 : 178;
 		case UIUserInterfaceIdiomPhone: {
 			if (scale == 3) {
 				CGFloat nativeScale = [UIScreen mainScreen].nativeScale;
-				return nativeScale == 3 ? 458 : 401;
+				return nativeScale >= 3 ? 458 : 401;
 			}
 
 			return 326;
