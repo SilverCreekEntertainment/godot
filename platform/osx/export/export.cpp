@@ -972,6 +972,10 @@ Error EditorExportPlatformOSX::export_project(const Ref<EditorExportPreset> &p_p
 			file = "Contents/MacOS/" + pkg_name;
 		}
 
+		if (file.begins_with("Contents/MacOS/crashpad_handler")) {
+			is_execute = true;
+		}
+
 		if (file == "Contents/Resources/icon.icns") {
 			// See if there is an icon.
 			String iconpath;
