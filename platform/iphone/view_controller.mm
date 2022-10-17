@@ -31,6 +31,7 @@
 #import "view_controller.h"
 
 #include "core/project_settings.h"
+#include "main/main.h"
 #import "godot_view.h"
 #import "godot_view_renderer.h"
 #import "keyboard_input_view.h"
@@ -104,6 +105,23 @@
 	if (@available(iOS 11.0, *)) {
 		[self setNeedsUpdateOfScreenEdgesDeferringSystemGestures];
 	}
+}
+
+- (void)createKeyboardView {
+	// Remove old keyboard view, arc should delete it after we assign the new one
+	[self.keyboardView removeFromSuperview];
+
+	// Create new view and add it as a subview
+	self.keyboardView = [GodotKeyboardInputView new];
+	[self.view addSubview:self.keyboardView];
+
+	// Force redrawing for a few frames
+	// In testing, switch between username & password
+	// the keyboard switched fine, but the game would go blank for a second sometimes
+	// maybe until the cursor blinked.
+	// calling VisualServerRaster::redraw_request() did not work
+	// force_redraw of 3 seems to solve it (I didn't test 1 or 2)
+	Main::force_redraw(3);
 }
 
 - (void)observeKeyboard {
