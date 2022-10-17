@@ -193,4 +193,35 @@
 	self.previousSelectedRange = self.selectedRange;
 }
 
+- (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
+	// Block left/right cursor keys because they can cause the view to get out of sync
+
+	for(UIPress *pPress in presses)
+	{
+		switch(pPress.key.keyCode)
+		{
+			case UIKeyboardHIDUsageKeyboardLeftArrow:
+			case UIKeyboardHIDUsageKeyboardRightArrow:
+				return;
+		}
+	}
+
+	[super pressesBegan:presses withEvent:event];
+}
+
+- (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
+	// Block left/right cursor keys because they can cause the view to get out of sync
+	for(UIPress *pPress in presses)
+	{
+		switch(pPress.key.keyCode)
+		{
+			case UIKeyboardHIDUsageKeyboardLeftArrow:
+			case UIKeyboardHIDUsageKeyboardRightArrow:
+				return;
+		}
+	}
+
+	[super pressesEnded:presses withEvent:event];
+}
+
 @end
