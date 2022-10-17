@@ -197,7 +197,7 @@
 	// Block left/right cursor keys because they can cause the view to get out of sync
 
 	for (UIPress *pPress in presses) {
-		switch(pPress.key.keyCode) {
+		switch (pPress.key.keyCode) {
 			case UIKeyboardHIDUsageKeyboardLeftArrow:
 			case UIKeyboardHIDUsageKeyboardRightArrow:
 				return;
@@ -209,8 +209,8 @@
 
 - (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
 	// Block left/right cursor keys because they can cause the view to get out of sync
-	for (UIPress *pPress in presses)	{
-		switch(pPress.key.keyCode) {
+	for (UIPress *pPress in presses) {
+		switch (pPress.key.keyCode) {
 			case UIKeyboardHIDUsageKeyboardLeftArrow:
 			case UIKeyboardHIDUsageKeyboardRightArrow:
 				return;
