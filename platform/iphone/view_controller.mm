@@ -31,10 +31,10 @@
 #import "view_controller.h"
 
 #include "core/project_settings.h"
-#include "main/main.h"
 #import "godot_view.h"
 #import "godot_view_renderer.h"
 #import "keyboard_input_view.h"
+#include "main/main.h"
 #import "native_video_view.h"
 #include "os_iphone.h"
 
@@ -121,7 +121,8 @@
 	// maybe until the cursor blinked.
 	// calling VisualServerRaster::redraw_request() did not work
 	// force_redraw of 3 seems to solve it (I didn't test 1 or 2)
-	Main::force_redraw(3);
+	//Main::force_redraw(3);
+	Main::force_redraw();
 }
 
 - (void)observeKeyboard {

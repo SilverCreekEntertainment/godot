@@ -44,4 +44,6 @@
 
 - (BOOL)playVideoAtPath:(NSString *)filePath volume:(float)videoVolume audio:(NSString *)audioTrack subtitle:(NSString *)subtitleTrack;
 
+- (void)createKeyboardView;
+
 @end
