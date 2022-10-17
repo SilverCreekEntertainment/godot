@@ -456,6 +456,102 @@ bool OSIPhone::has_virtual_keyboard() const {
 void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 &p_screen_rect, bool p_multiline, int p_max_input_length, int p_cursor_start, int p_cursor_end, const String &p_input_type, const String &p_done_label) {
 	NSString *existingString = [[NSString alloc] initWithUTF8String:p_existing_text.utf8().get_data()];
 
+	// There doesn't appear to be a list of possible p_input_type, I found these by searching:
+	//  Email
+	//  Password
+	//  MultiLine
+	//  NoSuggestions
+
+	// default is nil
+	// UITextContentTypeUsername
+	// UITextContentTypePassword
+	// UITextContentTypeNewPassword
+	// UITextContentTypeEmailAddress
+	UITextContentType textContentType = nil;
+
+	// UITextAutocorrectionTypeDefault
+	// UITextAutocorrectionTypeNo
+	// 10/5/2022 - The new idea is to disable Auto Correct, but enable Spell Check
+	// This seems to give us a suggestion bar, but by default sends what you typed unmodified
+	UITextAutocorrectionType autocorrectionType = UITextAutocorrectionTypeNo;
+	UITextSpellCheckingType spellCheckingType = UITextSpellCheckingTypeYes;
+
+	if (p_input_type == "Username") {
+		// Added Username for completeness for iOS Password Auto Fill
+		// But as of 2/21/2022, Rogue is not using it
+		textContentType = UITextContentTypeUsername;
+	} else if (p_input_type == "Password") {
+		// iOS also has UITextContentTypeNewPassword
+		textContentType = UITextContentTypePassword;
+	} else if (p_input_type == "Email") {
+		textContentType = UITextContentTypeEmailAddress;
+	} else if (p_input_type == "NoSuggestions") {
+		autocorrectionType = UITextAutocorrectionTypeNo;
+		spellCheckingType = UITextSpellCheckingTypeNo;
+	}
+
+	// textContentType seems to be sticky
+	// at least setting UITextContentTypePassword seems to make the input permanently a password input
+	// If textContentType has changed, we'll re-create the keyboardView as a workaround
+	if (@available(iOS 11.0, *)) {
+		if (AppDelegate.viewController.keyboardView.textContentType != textContentType) {
+			[AppDelegate.viewController createKeyboardView];
+			AppDelegate.viewController.keyboardView.textContentType = textContentType;
+		}
+	} else {
+		// textContentType is not supported before iOS 11
+		// If textContentType is not default, disable auto correction
+		if (textContentType != nil)
+			autocorrectionType = UITextAutocorrectionTypeNo;
+			spellCheckingType = UITextSpellCheckingTypeNo;
+	}
+
+	// If we change with the keyboard open
+	// it needs to be hidden and re-shown
+	bool bChanged = false;
+
+	// Set return key label
+	// XXX - This will break down if sDoneLabel is localized, which seems likely...
+	// There is no customization of the return key, you must choose one of the available options
+	// RogueViewController was setting UIReturnKeyNext by default, which seems weird, so I set UIReturnKeyDefault instead
+	UIReturnKeyType returnKeyType = UIReturnKeyDefault;
+	if (p_done_label == "Go")
+		returnKeyType = UIReturnKeyGo;
+	else if (p_done_label == "Join")
+		returnKeyType = UIReturnKeyJoin;
+	else if (p_done_label == "Next")
+		returnKeyType = UIReturnKeyNext;
+	else if (p_done_label == "Send")
+		returnKeyType = UIReturnKeySend;
+	else if (p_done_label == "Done")
+		returnKeyType = UIReturnKeyDone;
+
+	if (AppDelegate.viewController.keyboardView.returnKeyType != returnKeyType) {
+		AppDelegate.viewController.keyboardView.returnKeyType = returnKeyType;
+		bChanged = true;
+	}
+
+	if (AppDelegate.viewController.keyboardView.autocorrectionType != autocorrectionType) {
+		AppDelegate.viewController.keyboardView.autocorrectionType = autocorrectionType;
+		bChanged = true;
+	}
+
+	if(AppDelegate.viewController.keyboardView.spellCheckingType != spellCheckingType) {
+		AppDelegate.viewController.keyboardView.spellCheckingType = spellCheckingType;
+		bChanged = true;
+	}
+
+	if (@available(iOS 11.0, *)) {
+		// Disable Smart Quotes & Dashes
+		AppDelegate.viewController.keyboardView.smartQuotesType = UITextSmartQuotesTypeNo;
+		AppDelegate.viewController.keyboardView.smartDashesType = UITextSmartDashesTypeNo;
+	}
+
+	if (bChanged) {
+		// If the keyboard was shown, we need to reload the keyboard
+		[AppDelegate.viewController.keyboardView reloadInputViews];
+	}
+
 	[AppDelegate.viewController.keyboardView
 			becomeFirstResponderWithString:existingString
 								 multiline:p_multiline
