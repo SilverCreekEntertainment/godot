@@ -501,9 +501,10 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 	} else {
 		// textContentType is not supported before iOS 11
 		// If textContentType is not default, disable auto correction
-		if (textContentType != nil)
+		if (textContentType != nil) {
 			autocorrectionType = UITextAutocorrectionTypeNo;
 			spellCheckingType = UITextSpellCheckingTypeNo;
+		}
 	}
 
 	// If we change with the keyboard open
@@ -536,7 +537,7 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 		bChanged = true;
 	}
 
-	if(AppDelegate.viewController.keyboardView.spellCheckingType != spellCheckingType) {
+	if (AppDelegate.viewController.keyboardView.spellCheckingType != spellCheckingType) {
 		AppDelegate.viewController.keyboardView.spellCheckingType = spellCheckingType;
 		bChanged = true;
 	}
