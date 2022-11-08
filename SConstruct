@@ -59,13 +59,11 @@ custom_tools = ["default"]
 
 platform_arg = ARGUMENTS.get("platform", ARGUMENTS.get("p", False))
 
-if platform_arg == "android":
-    custom_tools = ["clang", "clang++", "as", "ar", "link"]
+if os.name == "nt" and (platform_arg == "android" or methods.get_cmdline_bool("use_mingw", False)):
+    custom_tools = ["mingw"]
 elif platform_arg == "javascript":
     # Use generic POSIX build toolchain for Emscripten.
     custom_tools = ["cc", "c++", "ar", "link", "textfile", "zip"]
-elif os.name == "nt" and methods.get_cmdline_bool("use_mingw", False):
-    custom_tools = ["mingw"]
 
 # We let SCons build its default ENV as it includes OS-specific things which we don't
 # want to have to pull in manually.
@@ -368,7 +366,10 @@ if selected_platform in platform_list:
     sys.path.insert(0, tmppath)
     import detect
 
-    env = env_base.Clone()
+    if "create" in dir(detect):
+        env = detect.create(env_base)
+    else:
+        env = env_base.Clone()
 
     # Default num_jobs to local cpu count if not user specified.
     # SCons has a peculiarity where user-specified options won't be overridden
