@@ -89,6 +89,9 @@
                 <!-- Enable access to OpenXR on Oculus mobile devices, no-op on other Android
                 platforms. -->
                 <category android:name="com.oculus.intent.category.VR" />
+
+<!--CHUNK_INTENT_FILTER_BEGIN-->
+<!--CHUNK_INTENT_FILTER_END-->
             </intent-filter>
         </activity>
 
