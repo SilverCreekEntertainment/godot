@@ -243,7 +243,7 @@ OSStatus AudioDriverCoreAudio::input_callback(void *inRefCon,
 }
 
 void AudioDriverCoreAudio::start() {
-	if(!audio_unit)
+	if (!audio_unit)
 		return;
 
 	if (!active) {
@@ -257,7 +257,7 @@ void AudioDriverCoreAudio::start() {
 };
 
 void AudioDriverCoreAudio::stop() {
-	if(!audio_unit)
+	if (!audio_unit)
 		return;
 
 	if (active) {
