@@ -281,6 +281,14 @@ void JoypadIPhone::start_processing() {
 			} else if (element == gamepad.rightTrigger) {
 				OSIPhone::get_singleton()->joy_button(joy_id, JOY_R2,
 						gamepad.rightTrigger.isPressed);
+			// XXX - SCE - check buttonMenu and buttonOptions //
+			} else if (element == gamepad.buttonMenu) {
+				OSIPhone::get_singleton()->joy_button(joy_id, JOY_START,
+						gamepad.buttonMenu.isPressed);
+			} else if (element == gamepad.buttonOptions) {
+				OSIPhone::get_singleton()->joy_button(joy_id, JOY_SELECT,
+						gamepad.buttonOptions.isPressed);
+			// SCE ////////////////////////////////////////////
 			} else if (element == gamepad.dpad) {
 				OSIPhone::get_singleton()->joy_button(joy_id, JOY_DPAD_UP,
 						gamepad.dpad.up.isPressed);
