@@ -315,11 +315,11 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
 						gamepad.rightTrigger.isPressed);
 			} else if (element == gamepad.buttonMenu) {
 				// SCE - check buttonMenu
-				OSIPhone::get_singleton()->joy_button(joy_id, JOY_START,
+				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_START,
 						gamepad.buttonMenu.isPressed);
 			} else if (element == gamepad.buttonOptions) {
 				// SCE - check buttonOptions
-				OSIPhone::get_singleton()->joy_button(joy_id, JOY_SELECT,
+				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_SELECT,
 						gamepad.buttonOptions.isPressed);
 			} else if (element == gamepad.dpad) {
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_DPAD_UP,
