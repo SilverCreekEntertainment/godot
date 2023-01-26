@@ -142,7 +142,9 @@ String OSAppleTV::get_model_name() const {
 }
 
 int OSAppleTV::get_screen_dpi(int p_screen) const {
-	return 96;
+	// Set DPI to 160.0 at 720p to match Android TV DPI
+	Size2 screen_size = get_screen_size(p_screen);
+	return 160 * screen_size.height / 720;
 }
 
 Rect2 OSAppleTV::get_window_safe_area() const {
