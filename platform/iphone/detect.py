@@ -64,6 +64,11 @@ def configure(env):
         env.Append(CCFLAGS=["-gdwarf-2", "-O0"])
         env.Append(CPPDEFINES=["_DEBUG", ("DEBUG", 1)])
 
+    if env["target"] == "release":
+        min_version = "13.0"
+    else:
+        min_version = "12.0"
+
     if env["use_lto"]:
         env.Append(CCFLAGS=["-flto"])
         env.Append(LINKFLAGS=["-flto"])
@@ -104,18 +109,18 @@ def configure(env):
         env["S_compiler"] = ccache_path + " " + s_compiler_path + "gcc"
     env["AR"] = compiler_path + "ar"
     env["RANLIB"] = compiler_path + "ranlib"
-
+ 
     ## Compile flags
 
     if env["ios_simulator"]:
         detect_darwin_sdk_path("iphonesimulator", env)
-        env.Append(CCFLAGS=["-mios-simulator-version-min=10.0"])
-        env.Append(LINKFLAGS=["-mios-simulator-version-min=10.0"])
+        env.Append(CCFLAGS=[f"-mios-simulator-version-min={min_version}" ])
+        env.Append(LINKFLAGS=[f"-mios-simulator-version-min={min_version}"])
         env.extra_suffix = ".simulator" + env.extra_suffix
     else:
         detect_darwin_sdk_path("iphone", env)
-        env.Append(CCFLAGS=["-miphoneos-version-min=10.0"])
-        env.Append(LINKFLAGS=["-miphoneos-version-min=10.0"])
+        env.Append(CCFLAGS=[f"-miphoneos-version-min={min_version}"])
+        env.Append(LINKFLAGS=[f"-miphoneos-version-min={min_version}"])
 
     if env["arch"] == "x86" or env["arch"] == "x86_64":
         if not env["ios_simulator"]:

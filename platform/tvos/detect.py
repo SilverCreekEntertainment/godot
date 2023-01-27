@@ -63,6 +63,11 @@ def configure(env):
         env.Append(CCFLAGS=["-gdwarf-2", "-O0"])
         env.Append(CPPDEFINES=["_DEBUG", ("DEBUG", 1), "DEBUG_ENABLED"])
 
+    if env["target"] == "release":
+        min_version = "13.0"
+    else:
+        min_version = "12.0"
+
     if env["use_lto"]:
         env.Append(CCFLAGS=["-flto=thin"])
         env.Append(LINKFLAGS=["-flto=thin"])
@@ -105,13 +110,13 @@ def configure(env):
 
     if env["simulator"]:
         detect_darwin_sdk_path("tvossimulator", env)
-        env.Append(CCFLAGS=("-isysroot $TVOSSDK -mappletvsimulator-version-min=10.0").split())
-        env.Append(LINKFLAGS=["-mappletvsimulator-version-min=10.0"])
+        env.Append(CCFLAGS=(f"-isysroot $TVOSSDK -mappletvsimulator-version-min={min_version}").split())
+        env.Append(LINKFLAGS=[f"-mappletvsimulator-version-min={min_version}"])
         env["LIBSUFFIX"] = ".simulator" + env["LIBSUFFIX"]
     else:
         detect_darwin_sdk_path("tvos", env)
-        env.Append(CCFLAGS=("-isysroot $TVOSSDK -mappletvos-version-min=10.0").split())
-        env.Append(LINKFLAGS=["-mappletvos-version-min=10.0"])
+        env.Append(CCFLAGS=(f"-isysroot $TVOSSDK -mappletvos-version-min={min_version}").split())
+        env.Append(LINKFLAGS=[f"-mappletvos-version-min={min_version}"])
 
     if env["arch"] == "x86" or env["arch"] == "x86_64":
         env["ENV"]["MACOSX_DEPLOYMENT_TARGET"] = "10.9"
