@@ -313,10 +313,6 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
 			} else if (element == gamepad.rightTrigger) {
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_R2,
 						gamepad.rightTrigger.isPressed);
-			} else if (element == gamepad.buttonMenu) {
-				// SCE - check buttonMenu
-				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_START,
-						gamepad.buttonMenu.isPressed);
 			} else if (element == gamepad.buttonOptions) {
 				// SCE - check buttonOptions
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_SELECT,
@@ -396,6 +392,15 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_DPAD_UP, gamepad.dpad.up.isPressed);
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_DPAD_DOWN, gamepad.dpad.down.isPressed);
 			}
+
+			// SCE: tvOS remote Menu button
+            if (@available(iOS 13.0, tvOS 13.0, *)) {
+                if (element == gamepad.buttonMenu) {
+					// Menu on tvOS is used as a back button in game, so we'll send JOY_BUTTON_1 (B/Circle) instead of JOY_START
+                    OS_UIKit::get_singleton()->joy_button(joy_id, JOY_BUTTON_1,
+                            gamepad.buttonMenu.isPressed);
+                }
+            }
 		};
 	}
 
