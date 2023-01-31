@@ -39,6 +39,10 @@
 
 #import "godot_view_gesture_recognizer.h"
 
+// For tvOS menu button
+#include "rpr/Godot/GodotImplement.h"
+
+
 @interface GodotView ()
 
 @property(strong, nonatomic) GodotViewGestureRecognizer *delayGestureRecognizer;
@@ -86,6 +90,18 @@
 // MARK: Menu Button
 
 - (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
+	// SCE 1/27/2023
+	// The problem here is that pressing circle on the DS4 controller (B on an xbox controller)
+	// shows up here as a menu button press indistinguishable from the remote menu button
+	// We also seperately get the button press from uikit_joypad
+	//
+	// https://developer.apple.com/library/archive/documentation/ServicesDiscovery/Conceptual/GameControllerPG/ControllingInputontvOS/ControllingInputontvOS.html#//apple_ref/doc/uid/TP40013276-CH7-DontLinkElementID_6
+	// Suggests putting game content in GCEventViewController
+	// But if you can't, override pressesBegan and don't pass to super class
+	//
+	// Since we're requiring tvOS 13.0, we can block pressesBegan and check for Menu in uikit_joypad instead
+
+	/*
 	if (!self.delayGestureRecognizer.overridesRemoteButtons) {
 		return [super pressesEnded:presses withEvent:event];
 	}
@@ -100,9 +116,29 @@
 			[super pressesBegan:presses withEvent:event];
 		}
 	}
+	*/
+
+	// SCE: Ask GodotImplement to decide if the Remote Menu button should exit to the home screen
+
+	for(UIPress *pPress in presses)
+	{
+		if(pPress.type == UIPressTypeMenu)
+		{
+			GodotImplement* pGodotImplement = GetGodotImplement();
+			if(pGodotImplement && pGodotImplement->RemoteMenuShouldExit())
+			{
+				[super pressesBegan:presses withEvent:event];
+				return;
+			}
+		}
+	}
+
 }
 
 - (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
+	// SCE 1/27/2023 - see note in pressesBegan
+
+	/*
 	if (!self.delayGestureRecognizer.overridesRemoteButtons) {
 		return [super pressesEnded:presses withEvent:event];
 	}
@@ -117,9 +153,28 @@
 			[super pressesEnded:presses withEvent:event];
 		}
 	}
+	*/
+
+	// SCE: Ask GodotImplement to decide if the Remote Menu button should exit to the home screen
+
+	for(UIPress *pPress in presses)
+	{
+		if(pPress.type == UIPressTypeMenu)
+		{
+			GodotImplement* pGodotImplement = GetGodotImplement();
+			if(pGodotImplement && pGodotImplement->RemoteMenuShouldExit())
+			{
+				[super pressesEnded:presses withEvent:event];
+				return;
+			}
+		}
+	}
 }
 
 - (void)pressesCancelled:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
+	// SCE 1/27/2023 - see note in pressesBegan
+
+	/*
 	if (!self.delayGestureRecognizer.overridesRemoteButtons) {
 		return [super pressesEnded:presses withEvent:event];
 	}
@@ -134,6 +189,7 @@
 			[super pressesCancelled:presses withEvent:event];
 		}
 	}
+	*/
 }
 
 @end
