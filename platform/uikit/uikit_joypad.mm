@@ -28,6 +28,11 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
 
+#import "app_delegate.h"
+#import "godot_view.h"
+#import "godot_view_controller.h"
+#import "keyboard_input_view.h"
+
 #import "uikit_joypad.h"
 
 #include "core/project_settings.h"
@@ -287,6 +292,12 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
 			_strongify(self);
 			_strongify(controller);
 
+			// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
+			if([AppDelegate.viewController.keyboardView isFirstResponder]) {
+				OS_UIKit::get_singleton()->release_pressed_events();
+				return;
+			}
+
 			int joy_id = [self getJoyIdForController:controller];
 
 			if (element == gamepad.buttonA) {
@@ -364,6 +375,12 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
 		controller.microGamepad.valueChangedHandler = ^(GCMicroGamepad *, GCControllerElement *element) {
 			_strongify(self);
 			_strongify(controller);
+
+			// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
+			if([AppDelegate.viewController.keyboardView isFirstResponder]) {
+				OS_UIKit::get_singleton()->release_pressed_events();
+				return;
+			}
 
 			// Callback gamepad sometimes has different address then
 			// the one used by `controller.microGamepad` instance
