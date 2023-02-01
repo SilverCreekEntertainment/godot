@@ -296,6 +296,11 @@ void OS_UIKit::joy_axis(int p_device, int p_axis, float p_value) {
 	input->joy_axis(p_device, p_axis, p_value);
 }
 
+void OS_UIKit::release_pressed_events() {
+	input->release_pressed_events();
+}
+
+
 void OS_UIKit::delete_main_loop() {
 	if (main_loop) {
 		main_loop->finish();
