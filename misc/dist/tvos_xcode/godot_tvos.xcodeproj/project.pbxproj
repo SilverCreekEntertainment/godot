@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F6679B9298C4930005BF8F8 /* sce_screen_hd_1080px.png in Resources */ = {isa = PBXBuildFile; fileRef = 3F6679B8298C4930005BF8F8 /* sce_screen_hd_1080px.png */; };
 		1F1575721F582BE20003B888 /* dylibs in Resources */ = {isa = PBXBuildFile; fileRef = 1F1575711F582BE20003B888 /* dylibs */; };
 		9088C79E25C98AF800FCAE9A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9088C79D25C98AF800FCAE9A /* Assets.xcassets */; };
 		9088C7A125C98AF800FCAE9A /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9088C79F25C98AF800FCAE9A /* Launch Screen.storyboard */; };
@@ -31,6 +32,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3F6679B8298C4930005BF8F8 /* sce_screen_hd_1080px.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sce_screen_hd_1080px.png; sourceTree = "<group>"; };
 		1F1575711F582BE20003B888 /* dylibs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = dylibs; path = "$binary/dylibs"; sourceTree = "<group>"; };
 		9088C79125C98AF700FCAE9A /* $binary.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "$binary.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9088C79D25C98AF800FCAE9A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 		9088C79325C98AF700FCAE9A /* $binary */ = {
 			isa = PBXGroup;
 			children = (
+				3F6679B8298C4930005BF8F8 /* sce_screen_hd_1080px.png */,
 				9088C79D25C98AF800FCAE9A /* Assets.xcassets */,
 				9088C79F25C98AF800FCAE9A /* Launch Screen.storyboard */,
 				90C4BA1025C9A5FC00CD5FD1 /* $binary.pck */,
@@ -156,6 +159,7 @@
 				9088C7A125C98AF800FCAE9A /* Launch Screen.storyboard in Resources */,
 				9088C79E25C98AF800FCAE9A /* Assets.xcassets in Resources */,
 				90C4BA1125C9A60500CD5FD1 /* $binary.pck in Resources */,
+				3F6679B9298C4930005BF8F8 /* sce_screen_hd_1080px.png in Resources */,
 				$additional_pbx_resources_build
 			);
 			runOnlyForDeploymentPostprocessing = 0;

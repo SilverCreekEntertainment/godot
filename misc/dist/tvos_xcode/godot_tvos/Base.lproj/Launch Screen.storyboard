@@ -1,24 +1,43 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder.AppleTV.Storyboard" version="3.0" toolsVersion="13122.16" targetRuntime="AppleTV" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder.AppleTV.Storyboard" version="3.0" toolsVersion="21507" targetRuntime="AppleTV" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Xgj-up-wSf">
+    <device id="appleTV" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13104.12"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
-        <scene sceneID="tne-QT-ifu">
+        <scene sceneID="9lE-WX-96o">
             <objects>
-                <viewController id="BYZ-38-t0r" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                <viewController id="Xgj-up-wSf" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="aTn-mJ-5lt"/>
+                        <viewControllerLayoutGuide type="bottom" id="BrO-eL-FPV"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Oo6-ab-TCE">
                         <rect key="frame" x="0.0" y="0.0" width="1920" height="1080"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
-                        <viewLayoutGuide key="safeArea" id="wu6-TO-1qx"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="sce_screen_hd_1080px" translatesAutoresizingMaskIntoConstraints="NO" id="ob3-ls-dbh">
+                                <rect key="frame" x="0.0" y="0.0" width="1920" height="1080"/>
+                            </imageView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="Rbh-h3-eDf"/>
+                        <constraints>
+                            <constraint firstItem="ob3-ls-dbh" firstAttribute="leading" secondItem="Oo6-ab-TCE" secondAttribute="leading" id="4mP-xl-5Wp"/>
+                            <constraint firstAttribute="trailing" secondItem="ob3-ls-dbh" secondAttribute="trailing" id="7OY-lO-bXQ"/>
+                            <constraint firstAttribute="bottom" secondItem="ob3-ls-dbh" secondAttribute="bottom" id="Pki-pn-H8Y"/>
+                            <constraint firstItem="ob3-ls-dbh" firstAttribute="top" secondItem="Oo6-ab-TCE" secondAttribute="top" id="vdA-eR-3lg"/>
+                        </constraints>
                     </view>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="7uX-ET-Cqw" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="19" y="-146"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="sce_screen_hd_1080px" width="1920" height="1080"/>
+    </resources>
 </document>
