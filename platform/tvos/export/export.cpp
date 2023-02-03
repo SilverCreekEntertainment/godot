@@ -338,6 +338,8 @@ void EditorExportPlatformTVOS::get_export_options(List<ExportOption> *r_options)
 
 	plugins_changed.clear();
 	plugins = found_plugins;
+
+	r_options->push_back(ExportOption(PropertyInfo(Variant::STRING, "icons/brandassets", PROPERTY_HINT_DIR, "*.brandassets"), ""));
 }
 
 void EditorExportPlatformTVOS::_fix_config_file(const Ref<EditorExportPreset> &p_preset, Vector<uint8_t> &pfile, const TVOSConfigData &p_config, bool p_debug) {
@@ -1256,6 +1258,22 @@ Error EditorExportPlatformTVOS::export_project(const Ref<EditorExportPreset> &p_
 	f->store_buffer(project_file_data.ptr(), project_file_data.size());
 	f->close();
 	memdelete(f);
+
+	// SCE - Replace icon brandassets folder
+	String icon_path = p_preset->get("icons/brandassets");
+	if (icon_path != "") {
+		String real_icon_path = ProjectSettings::get_singleton()->globalize_path(icon_path);
+		// Copy brandassets folder to export dir
+		DirAccess *da = DirAccess::create(DirAccess::ACCESS_FILESYSTEM);
+		if (da) {
+			String current_dir = da->get_current_dir();
+			if (da->change_dir(real_icon_path) == OK) {
+				da->copy_dir(real_icon_path, dest_dir + binary_name + "/Assets.xcassets/App Icon & Top Shelf Image.brandassets");
+			}
+			da->change_dir(current_dir);
+			memdelete(da);
+		}
+	}
 
 	return OK;
 }
