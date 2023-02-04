@@ -1180,6 +1180,7 @@ Error EditorExportPlatformTVOS::export_project(const Ref<EditorExportPreset> &p_
 	files_to_parse.insert("godot_tvos/dummy.cpp");
 	files_to_parse.insert("godot_tvos.xcodeproj/project.xcworkspace/contents.xcworkspacedata");
 	files_to_parse.insert("godot_tvos.xcodeproj/xcshareddata/xcschemes/godot_tvos.xcscheme");
+	files_to_parse.insert("godot_tvos/godot_tvos.entitlements");
 	files_to_parse.insert("godot_tvos/Launch Screen.storyboard");
 
 	TVOSConfigData config_data = {

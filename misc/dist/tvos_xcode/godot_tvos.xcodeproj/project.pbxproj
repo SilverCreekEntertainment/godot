@@ -41,6 +41,7 @@
 		9088C7A325C98AF800FCAE9A /* dummy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = dummy.cpp; sourceTree = "<group>"; };
 		DEADBEEF1F582BE20003B888 /* $binary.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = godot; path = "$binary.xcframework"; sourceTree = "<group>"; };
 		90C4BA1025C9A5FC00CD5FD1 /* $binary.pck */ = {isa = PBXFileReference; lastKnownFileType = file; path = "$binary.pck"; sourceTree = SOURCE_ROOT; };
+		1FF4C1881F584E6300A41E41 /* $binary.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "$binary.entitlements"; sourceTree = "<group>"; };
 		$additional_pbx_files
 /* End PBXFileReference section */
 
@@ -89,6 +90,7 @@
 		9088C79325C98AF700FCAE9A /* $binary */ = {
 			isa = PBXGroup;
 			children = (
+				1FF4C1881F584E6300A41E41 /* $binary.entitlements */,
 				3F6679B8298C4930005BF8F8 /* sce_screen_hd_1080px.png */,
 				9088C79D25C98AF800FCAE9A /* Assets.xcassets */,
 				9088C79F25C98AF800FCAE9A /* Launch Screen.storyboard */,
@@ -309,6 +311,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = "$binary/$binary.entitlements";
 				DEVELOPMENT_TEAM = "$team_id";
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/**";
 				INFOPLIST_FILE = "$binary/Info.plist";
@@ -333,6 +336,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = "$binary/$binary.entitlements";
 				DEVELOPMENT_TEAM = "$team_id";
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/**";
 				INFOPLIST_FILE = "$binary/Info.plist";
