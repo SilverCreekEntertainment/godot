@@ -213,4 +213,12 @@
 	self.previousSelectedRange = self.selectedRange;
 }
 
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+	OSAppleTV::get_singleton()->key(KEY_ENTER, true);
+	OSAppleTV::get_singleton()->key(KEY_ENTER, false);
+	return YES;
+}
+
+
 @end
