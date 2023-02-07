@@ -276,6 +276,31 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
 	};
 }
 
++ (UIViewController*) topMostController
+{
+    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+
+    while (topController.presentedViewController) {
+        topController = topController.presentedViewController;
+    }
+
+    return topController;
+}
+
++ (bool) isKeyboardVisible
+{
+	UIViewController *topController = [UIKitJoypadObserver topMostController];
+
+	// If the tvOS keyboard is up, the top controller is "UISystemInputController", which is undocumented.
+	// So we'll check for GodotViewController instead.
+
+	if ([topController isKindOfClass:[GodotViewController class]]) {
+		return false;
+	}
+
+	return true;
+}
+
 - (void)setControllerInputHandler:(GCController *)controller {
 	// Hook in the callback handler for the correct gamepad profile.
 	// This is a bit of a weird design choice on Apples part.
@@ -293,7 +318,7 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
 			_strongify(controller);
 
 			// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
-			if([AppDelegate.viewController.keyboardView isFirstResponder]) {
+			if([UIKitJoypadObserver isKeyboardVisible]) {
 				OS_UIKit::get_singleton()->release_pressed_events();
 				return;
 			}
@@ -377,7 +402,7 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
 			_strongify(controller);
 
 			// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
-			if([AppDelegate.viewController.keyboardView isFirstResponder]) {
+			if([UIKitJoypadObserver isKeyboardVisible]) {
 				OS_UIKit::get_singleton()->release_pressed_events();
 				return;
 			}
