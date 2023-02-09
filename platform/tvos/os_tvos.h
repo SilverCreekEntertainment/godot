@@ -42,7 +42,8 @@ private:
 
 	tvOS *tvos;
 
-	bool overrides_menu_button = true;
+	// SCE 2/9/2023 - This was defaulting to true, but that doubled up menu button events, causing the game to exit after backing out of submenues.
+	bool overrides_menu_button = false;
 
 	virtual Error initialize(const VideoMode &p_desired, int p_video_driver, int p_audio_driver);
 	virtual void finalize();
