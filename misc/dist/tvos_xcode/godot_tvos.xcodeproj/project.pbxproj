@@ -12,6 +12,8 @@
 		9088C79E25C98AF800FCAE9A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9088C79D25C98AF800FCAE9A /* Assets.xcassets */; };
 		9088C7A125C98AF800FCAE9A /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9088C79F25C98AF800FCAE9A /* Launch Screen.storyboard */; };
 		9088C7A425C98AF800FCAE9A /* dummy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9088C7A325C98AF800FCAE9A /* dummy.cpp */; };
+		3FAF0C902772B08B0017D6B0 /* dummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FAF0C8F2772B08B0017D6B0 /* dummy.swift */; };
+		3FAF0C8E2772B08B0017D6B0 /* dummy-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "dummy-Bridging-Header.h"; sourceTree = "<group>"; };
 		DEADBEEF2F582BE20003B888 /* $binary.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = DEADBEEF1F582BE20003B888 /* $binary.xcframework */; };
 		90C4BA1125C9A60500CD5FD1 /* $binary.pck in Resources */ = {isa = PBXBuildFile; fileRef = 90C4BA1025C9A5FC00CD5FD1 /* $binary.pck */; };
 /* End PBXBuildFile section */
@@ -39,6 +41,7 @@
 		9088C7A025C98AF800FCAE9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = "Base.lproj/Launch Screen.storyboard"; sourceTree = "<group>"; };
 		9088C7A225C98AF800FCAE9A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9088C7A325C98AF800FCAE9A /* dummy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = dummy.cpp; sourceTree = "<group>"; };
+		3FAF0C8F2772B08B0017D6B0 /* dummy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dummy.swift; sourceTree = "<group>"; };
 		DEADBEEF1F582BE20003B888 /* $binary.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = godot; path = "$binary.xcframework"; sourceTree = "<group>"; };
 		90C4BA1025C9A5FC00CD5FD1 /* $binary.pck */ = {isa = PBXFileReference; lastKnownFileType = file; path = "$binary.pck"; sourceTree = SOURCE_ROOT; };
 		1FF4C1881F584E6300A41E41 /* $binary.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "$binary.entitlements"; sourceTree = "<group>"; };
@@ -97,6 +100,8 @@
 				90C4BA1025C9A5FC00CD5FD1 /* $binary.pck */,
 				9088C7A225C98AF800FCAE9A /* Info.plist */,
 				9088C7A325C98AF800FCAE9A /* dummy.cpp */,
+				3FAF0C8F2772B08B0017D6B0 /* dummy.swift */,
+				3FAF0C8E2772B08B0017D6B0 /* dummy-Bridging-Header.h */,
 			);
 			path = "$binary";
 			sourceTree = "<group>";
@@ -174,6 +179,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9088C7A425C98AF800FCAE9A /* dummy.cpp in Sources */,
+				3FAF0C902772B08B0017D6B0 /* dummy.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,7 +253,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "$linker_flags";
 				SDKROOT = appletvos;
-				TVOS_DEPLOYMENT_TARGET = 12.0;
+				TVOS_DEPLOYMENT_TARGET = 13.0;
 			};
 			name = Debug;
 		};
@@ -326,7 +332,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$bundle_identifier";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 12.0;
+				TVOS_DEPLOYMENT_TARGET = 13.0;
+				SWIFT_VERSION = "5.0";
+				SWIFT_OBJC_BRIDGING_HEADER = "$binary/dummy-Bridging-Header.h";
 			};
 			name = Debug;
 		};
@@ -352,6 +360,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 13.0;
+				SWIFT_VERSION = "5.0";
+				SWIFT_OBJC_BRIDGING_HEADER = "$binary/dummy-Bridging-Header.h";
 			};
 			name = Release;
 		};
