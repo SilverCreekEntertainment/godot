@@ -30,6 +30,7 @@
 
 #import "godot_view.h"
 
+#include "core/os/keyboard.h"
 #include "core/project_settings.h"
 #include "os_tvos.h"
 #include "servers/audio_server.h"
@@ -41,12 +42,15 @@
 
 // For tvOS menu button
 #include "rpr/Godot/GodotImplement.h"
+#include "roguec/SUtil.h"
 
 
 @interface GodotView ()
-
-@property(strong, nonatomic) GodotViewGestureRecognizer *delayGestureRecognizer;
-
+{
+	float m_fLastPanX;
+	float m_fLastPanY;
+	int m_nKeyPresses;
+}
 @end
 
 @implementation GodotView
@@ -73,16 +77,36 @@
 
 // Stop animating and release resources when they are no longer needed.
 - (void)dealloc {
-	if (self.delayGestureRecognizer) {
-		self.delayGestureRecognizer = nil;
-	}
 }
 
 - (void)godot_commonInit {
-	// Initialize delay gesture recognizer
-	GodotViewGestureRecognizer *gestureRecognizer = [[GodotViewGestureRecognizer alloc] init];
-	self.delayGestureRecognizer = gestureRecognizer;
-	[self addGestureRecognizer:self.delayGestureRecognizer];
+	// SCE - removed GodotViewGestureRecognizer
+	//       Instead we'll add the two recognizers from old Rogue
+
+	// Pan gesture recognizer
+	UIPanGestureRecognizer *pPan;
+	pPan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(OnPan:)];
+	[self addGestureRecognizer:pPan];
+
+	// Add tap gesture recognizers
+	UITapGestureRecognizer *pTap;
+
+	// Watch for up/down/left/right taps on the apple remote
+	pTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(OnTapUp:)];
+	pTap.allowedPressTypes = @[@(UIPressTypeUpArrow)];
+	[self addGestureRecognizer:pTap];
+
+	pTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(OnTapDown:)];
+	pTap.allowedPressTypes = @[@(UIPressTypeDownArrow)];
+	[self addGestureRecognizer:pTap];
+
+	pTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(OnTapLeft:)];
+	pTap.allowedPressTypes = @[@(UIPressTypeLeftArrow)];
+	[self addGestureRecognizer:pTap];
+
+	pTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(OnTapRight:)];
+	pTap.allowedPressTypes = @[@(UIPressTypeRightArrow)];
+	[self addGestureRecognizer:pTap];
 }
 
 // MARK: - Input
@@ -100,23 +124,6 @@
 	// But if you can't, override pressesBegan and don't pass to super class
 	//
 	// Since we're requiring tvOS 13.0, we can block pressesBegan and check for Menu in uikit_joypad instead
-
-	/*
-	if (!self.delayGestureRecognizer.overridesRemoteButtons) {
-		return [super pressesEnded:presses withEvent:event];
-	}
-
-	NSArray *tlist = [event.allPresses allObjects];
-
-	for (UIPress *press in tlist) {
-		if ([presses containsObject:press] && press.type == UIPressTypeMenu) {
-			int joy_id = OSAppleTV::get_singleton()->joy_id_for_name("Remote");
-			OSAppleTV::get_singleton()->joy_button(joy_id, JOY_START, true);
-		} else {
-			[super pressesBegan:presses withEvent:event];
-		}
-	}
-	*/
 
 	// SCE: Ask GodotImplement to decide if the Remote Menu button should exit to the home screen
 
@@ -138,23 +145,6 @@
 - (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
 	// SCE 1/27/2023 - see note in pressesBegan
 
-	/*
-	if (!self.delayGestureRecognizer.overridesRemoteButtons) {
-		return [super pressesEnded:presses withEvent:event];
-	}
-
-	NSArray *tlist = [presses allObjects];
-
-	for (UIPress *press in tlist) {
-		if ([presses containsObject:press] && press.type == UIPressTypeMenu) {
-			int joy_id = OSAppleTV::get_singleton()->joy_id_for_name("Remote");
-			OSAppleTV::get_singleton()->joy_button(joy_id, JOY_START, false);
-		} else {
-			[super pressesEnded:presses withEvent:event];
-		}
-	}
-	*/
-
 	// SCE: Ask GodotImplement to decide if the Remote Menu button should exit to the home screen
 
 	for(UIPress *pPress in presses)
@@ -174,22 +164,220 @@
 - (void)pressesCancelled:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
 	// SCE 1/27/2023 - see note in pressesBegan
 
-	/*
-	if (!self.delayGestureRecognizer.overridesRemoteButtons) {
-		return [super pressesEnded:presses withEvent:event];
-	}
-
-	NSArray *tlist = [event.allPresses allObjects];
-
-	for (UIPress *press in tlist) {
-		if ([presses containsObject:press] && press.type == UIPressTypeMenu) {
-			int joy_id = OSAppleTV::get_singleton()->joy_id_for_name("Remote");
-			OSAppleTV::get_singleton()->joy_button(joy_id, JOY_START, false);
-		} else {
-			[super pressesCancelled:presses withEvent:event];
+	for(UIPress *pPress in presses)
+	{
+		if(pPress.type == UIPressTypeMenu)
+		{
+			GodotImplement* pGodotImplement = GetGodotImplement();
+			if(pGodotImplement && pGodotImplement->RemoteMenuShouldExit())
+			{
+				[super pressesCancelled:presses withEvent:event];
+				return;
+			}
 		}
 	}
-	*/
+}
+
+- (void)OnTapUp:(UIGestureRecognizer*)pGestureRecognizer
+{
+	UITapGestureRecognizer* pTapGestureRecognizer = (UITapGestureRecognizer*)pGestureRecognizer;
+	if(pTapGestureRecognizer.state != UIGestureRecognizerStateRecognized)
+		return;
+
+	OutputDebugStringf("[RogueGameControllerMan] OnTapUp\n");
+
+	[self PressAndReleaseKey:KEY_UP];
+
+	[self StopFling];
+}
+
+- (void)OnTapDown:(UIGestureRecognizer*)pGestureRecognizer
+{
+	UITapGestureRecognizer* pTapGestureRecognizer = (UITapGestureRecognizer*)pGestureRecognizer;
+	if(pTapGestureRecognizer.state != UIGestureRecognizerStateRecognized)
+		return;
+
+	OutputDebugStringf("[RogueGameControllerMan] OnTapDown\n");
+
+	[self PressAndReleaseKey:KEY_DOWN];
+
+	[self StopFling];
+}
+
+- (void)OnTapLeft:(UIGestureRecognizer*)pGestureRecognizer
+{
+	UITapGestureRecognizer* pTapGestureRecognizer = (UITapGestureRecognizer*)pGestureRecognizer;
+	if(pTapGestureRecognizer.state != UIGestureRecognizerStateRecognized)
+		return;
+
+	OutputDebugStringf("[RogueGameControllerMan] OnTapLeft\n");
+
+	[self PressAndReleaseKey:KEY_LEFT];
+
+	[self StopFling];
+}
+
+- (void)OnTapRight:(UIGestureRecognizer*)pGestureRecognizer
+{
+	UITapGestureRecognizer* pTapGestureRecognizer = (UITapGestureRecognizer*)pGestureRecognizer;
+	if(pTapGestureRecognizer.state != UIGestureRecognizerStateRecognized)
+		return;
+
+	OutputDebugStringf("[RogueGameControllerMan] OnTapRight\n");
+
+	[self PressAndReleaseKey:KEY_RIGHT];
+
+	[self StopFling];
+}
+
+
+- (void)OnPan:(UIGestureRecognizer*)pGestureRecognizer
+{
+	UIPanGestureRecognizer* pPanGestureRecognizer = (UIPanGestureRecognizer*)pGestureRecognizer;
+
+	CGPoint ptTranslation = [pPanGestureRecognizer translationInView:nil];
+	CGPoint ptVelocity = [pPanGestureRecognizer velocityInView:nil];
+	CGPoint ptTouch = pPanGestureRecognizer.numberOfTouches ? [pPanGestureRecognizer locationOfTouch:0 inView:nil] : CGPointZero;
+
+	if(pPanGestureRecognizer.state == UIGestureRecognizerStateBegan)
+	{
+		OutputDebugStringf("[RogueGameControllerMan OnPan] UIGestureRecognizerStateBegan\n");
+		m_fLastPanX = ptTouch.x;
+		m_fLastPanY = ptTouch.y;
+		m_nKeyPresses = 0;
+	}
+	else if(pPanGestureRecognizer.state == UIGestureRecognizerStateEnded)
+	{
+		OutputDebugStringf("[RogueGameControllerMan OnPan] UIGestureRecognizerStateEnded\n");
+		return;
+	}
+
+	// If it's a fast fling, we want to send a FlingEvent instead of a keypress
+	// SScrollBox, for example, can listen for it
+	// In testing, I got velocity 1420 to 5694 trying to move slow
+	// then 6005 to 14005 trying to move fast
+	// So maybe 6000 or 7000 is a good threshold
+	// Testing on iPad, I got a velocity around 1000 in SScrollBox::Fling
+	// So maybe scaling the threshold to 1000 is reasonable
+	#define FLING_VELOCITY_THRESHOLD (6000.0f)
+	#define FLING_VELOCITY_SCALE_TO (1000.0f)
+
+	bool bSentFling = false;
+	float fVelocityX = ptVelocity.x;
+	float fVelocityY = ptVelocity.y;
+	if(fabs(fVelocityX) > FLING_VELOCITY_THRESHOLD || fabs(fVelocityY) > FLING_VELOCITY_THRESHOLD)
+	{
+		// Scale velocity to something you might see on a touch screen
+		fVelocityX = FLING_VELOCITY_SCALE_TO * fVelocityX / FLING_VELOCITY_THRESHOLD;
+		fVelocityY = FLING_VELOCITY_SCALE_TO * fVelocityY / FLING_VELOCITY_THRESHOLD;
+
+		// We need to invert the Y Fling so that it's moving
+		// in the same direction as the keypresses we're sending
+		fVelocityY = -fVelocityY;
+
+		// Send the event
+		GodotImplement* pGodotImplement = GetGodotImplement();
+		if(pGodotImplement)
+			pGodotImplement->SendFlingEvent(fVelocityX, fVelocityY);
+
+		bSentFling = true;
+	}
+
+	float fThreshold;
+
+	if(m_nKeyPresses == 0)
+	{
+		fThreshold = 100.0f;
+	}
+	else if(m_nKeyPresses == 1)
+	{
+		fThreshold = 500.0f;
+	}
+	else
+	{
+		fThreshold = 300.0f;
+	}
+
+	bool bUp = false;
+	bool bDown = false;
+	bool bLeft = false;
+	bool bRight = false;
+
+	float dx = ptTouch.x - m_fLastPanX;
+	float dy = ptTouch.y - m_fLastPanY;
+
+	if(dx >= fThreshold)
+	{
+		bRight = true;
+		m_fLastPanX += fThreshold;
+		[self PressAndReleaseKey:KEY_RIGHT];
+	}
+
+	if(dx <= -fThreshold)
+	{
+		bLeft = true;
+		m_fLastPanX -= fThreshold;
+		[self PressAndReleaseKey:KEY_LEFT];
+	}
+
+	if(dy >= fThreshold)
+	{
+		bDown = true;
+		m_fLastPanY += fThreshold;
+		[self PressAndReleaseKey:KEY_DOWN];
+	}
+
+	if(dy <= -fThreshold)
+	{
+		bUp = true;
+		m_fLastPanY -= fThreshold;
+		[self PressAndReleaseKey:KEY_UP];
+	}
+
+	if(bRight || bLeft || bDown || bUp)
+	{
+		m_nKeyPresses += 1;
+
+		// Cancel any in progress fling on taps
+		// Unless we just sent a fling event
+		if(!bSentFling)
+			[self StopFling];
+	}
+
+	#if 1
+	OutputDebugStringf("[RogueGameControllerMan OnPan][%i] Touch: %g, %g    Translation: %g, %g    Velocity: %g, %g\n",
+		pPanGestureRecognizer.state,
+		ptTouch.x, ptTouch.y,
+		ptTranslation.x, ptTranslation.y,
+		ptVelocity.x, ptVelocity.y);
+	#endif
+
+	#if 0
+	OutputDebugStringf("[RogueGameControllerMan OnPan] %i %f T:%-7.2f, %-7.2f L:%-7.2f, %-7.2f D:%f, %G, %s%s%s%s\n",
+		m_nKeyPresses,
+		fThreshold,
+		ptTouch.x, ptTouch.y,
+		m_fLastPanX, m_fLastPanY,
+		dx, dy,
+		bRight ? "R" : "",
+		bLeft ? "L" : "",
+		bDown ? "D" : "",
+		bUp ? "U" : ""
+		);
+	#endif
+}
+
+- (void)PressAndReleaseKey:(uint32_t)p_key
+{
+	OS_UIKit::get_singleton()->key(p_key, true);
+	OS_UIKit::get_singleton()->key(p_key, false);
+}
+
+- (void)StopFling
+{
+	GodotImplement* pGodotImplement = GetGodotImplement();
+	if(pGodotImplement)
+		pGodotImplement->StopFling();
 }
 
 @end
