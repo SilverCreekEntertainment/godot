@@ -29,6 +29,7 @@
 /*************************************************************************/
 
 #import "godot_view.h"
+#import "godot_view_controller.h"
 
 #include "core/os/keyboard.h"
 #include "core/project_settings.h"
@@ -43,6 +44,8 @@
 // For tvOS menu button
 #include "rpr/Godot/GodotImplement.h"
 #include "roguec/SUtil.h"
+
+#define LOG_CONTROLLER
 
 
 @interface GodotView ()
@@ -180,11 +183,19 @@
 
 - (void)OnTapUp:(UIGestureRecognizer*)pGestureRecognizer
 {
+	// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
+	if([GodotView isKeyboardVisible]) {
+		OS_UIKit::get_singleton()->release_pressed_events();
+		return;
+	}
+
 	UITapGestureRecognizer* pTapGestureRecognizer = (UITapGestureRecognizer*)pGestureRecognizer;
 	if(pTapGestureRecognizer.state != UIGestureRecognizerStateRecognized)
 		return;
 
-	OutputDebugStringf("[RogueGameControllerMan] OnTapUp\n");
+	#if defined(LOG_CONTROLLER)
+	OutputDebugStringf("[GodotView] OnTapUp\n");
+	#endif
 
 	[self PressAndReleaseKey:KEY_UP];
 
@@ -193,11 +204,19 @@
 
 - (void)OnTapDown:(UIGestureRecognizer*)pGestureRecognizer
 {
+	// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
+	if([GodotView isKeyboardVisible]) {
+		OS_UIKit::get_singleton()->release_pressed_events();
+		return;
+	}
+
 	UITapGestureRecognizer* pTapGestureRecognizer = (UITapGestureRecognizer*)pGestureRecognizer;
 	if(pTapGestureRecognizer.state != UIGestureRecognizerStateRecognized)
 		return;
 
-	OutputDebugStringf("[RogueGameControllerMan] OnTapDown\n");
+	#if defined(LOG_CONTROLLER)
+	OutputDebugStringf("[GodotView] OnTapDown\n");
+	#endif
 
 	[self PressAndReleaseKey:KEY_DOWN];
 
@@ -206,11 +225,19 @@
 
 - (void)OnTapLeft:(UIGestureRecognizer*)pGestureRecognizer
 {
+	// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
+	if([GodotView isKeyboardVisible]) {
+		OS_UIKit::get_singleton()->release_pressed_events();
+		return;
+	}
+
 	UITapGestureRecognizer* pTapGestureRecognizer = (UITapGestureRecognizer*)pGestureRecognizer;
 	if(pTapGestureRecognizer.state != UIGestureRecognizerStateRecognized)
 		return;
 
-	OutputDebugStringf("[RogueGameControllerMan] OnTapLeft\n");
+	#if defined(LOG_CONTROLLER)
+	OutputDebugStringf("[GodotView] OnTapLeft\n");
+	#endif
 
 	[self PressAndReleaseKey:KEY_LEFT];
 
@@ -219,11 +246,19 @@
 
 - (void)OnTapRight:(UIGestureRecognizer*)pGestureRecognizer
 {
+	// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
+	if([GodotView isKeyboardVisible]) {
+		OS_UIKit::get_singleton()->release_pressed_events();
+		return;
+	}
+
 	UITapGestureRecognizer* pTapGestureRecognizer = (UITapGestureRecognizer*)pGestureRecognizer;
 	if(pTapGestureRecognizer.state != UIGestureRecognizerStateRecognized)
 		return;
 
-	OutputDebugStringf("[RogueGameControllerMan] OnTapRight\n");
+	#if defined(LOG_CONTROLLER)
+	OutputDebugStringf("[GodotView] OnTapRight\n");
+	#endif
 
 	[self PressAndReleaseKey:KEY_RIGHT];
 
@@ -233,6 +268,12 @@
 
 - (void)OnPan:(UIGestureRecognizer*)pGestureRecognizer
 {
+	// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
+	if([GodotView isKeyboardVisible]) {
+		OS_UIKit::get_singleton()->release_pressed_events();
+		return;
+	}
+
 	UIPanGestureRecognizer* pPanGestureRecognizer = (UIPanGestureRecognizer*)pGestureRecognizer;
 
 	CGPoint ptTranslation = [pPanGestureRecognizer translationInView:nil];
@@ -241,14 +282,18 @@
 
 	if(pPanGestureRecognizer.state == UIGestureRecognizerStateBegan)
 	{
-		OutputDebugStringf("[RogueGameControllerMan OnPan] UIGestureRecognizerStateBegan\n");
+		#if defined(LOG_CONTROLLER)
+		OutputDebugStringf("[GodotView OnPan] UIGestureRecognizerStateBegan\n");
+		#endif
 		m_fLastPanX = ptTouch.x;
 		m_fLastPanY = ptTouch.y;
 		m_nKeyPresses = 0;
 	}
 	else if(pPanGestureRecognizer.state == UIGestureRecognizerStateEnded)
 	{
-		OutputDebugStringf("[RogueGameControllerMan OnPan] UIGestureRecognizerStateEnded\n");
+		#if defined(LOG_CONTROLLER)
+		OutputDebugStringf("[GodotView OnPan] UIGestureRecognizerStateEnded\n");
+		#endif
 		return;
 	}
 
@@ -344,8 +389,8 @@
 			[self StopFling];
 	}
 
-	#if 1
-	OutputDebugStringf("[RogueGameControllerMan OnPan][%i] Touch: %g, %g    Translation: %g, %g    Velocity: %g, %g\n",
+	#if defined(LOG_CONTROLLER)
+	OutputDebugStringf("[GodotView OnPan][%i] Touch: %g, %g    Translation: %g, %g    Velocity: %g, %g\n",
 		pPanGestureRecognizer.state,
 		ptTouch.x, ptTouch.y,
 		ptTranslation.x, ptTranslation.y,
@@ -353,7 +398,7 @@
 	#endif
 
 	#if 0
-	OutputDebugStringf("[RogueGameControllerMan OnPan] %i %f T:%-7.2f, %-7.2f L:%-7.2f, %-7.2f D:%f, %G, %s%s%s%s\n",
+	OutputDebugStringf("[GodotView OnPan] %i %f T:%-7.2f, %-7.2f L:%-7.2f, %-7.2f D:%f, %G, %s%s%s%s\n",
 		m_nKeyPresses,
 		fThreshold,
 		ptTouch.x, ptTouch.y,
@@ -365,6 +410,31 @@
 		bUp ? "U" : ""
 		);
 	#endif
+}
+
++ (UIViewController*) topMostController
+{
+    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+
+    while (topController.presentedViewController) {
+        topController = topController.presentedViewController;
+    }
+
+    return topController;
+}
+
++ (bool) isKeyboardVisible
+{
+	UIViewController *topController = [GodotView topMostController];
+
+	// If the tvOS keyboard is up, the top controller is "UISystemInputController", which is undocumented.
+	// So we'll check for GodotViewController instead.
+
+	if ([topController isKindOfClass:[GodotViewController class]]) {
+		return false;
+	}
+
+	return true;
 }
 
 - (void)PressAndReleaseKey:(uint32_t)p_key
