@@ -140,6 +140,10 @@
 				[super pressesBegan:presses withEvent:event];
 				return;
 			}
+			else
+			{
+				OS_UIKit::get_singleton()->key(KEY_APPLE_CONTROLLER_MENU, true);
+			}
 		}
 	}
 
@@ -160,6 +164,10 @@
 				[super pressesEnded:presses withEvent:event];
 				return;
 			}
+			else
+			{
+				OS_UIKit::get_singleton()->key(KEY_APPLE_CONTROLLER_MENU, false);
+			}
 		}
 	}
 }
@@ -176,6 +184,10 @@
 			{
 				[super pressesCancelled:presses withEvent:event];
 				return;
+			}
+			else
+			{
+				OS_UIKit::get_singleton()->key(KEY_APPLE_CONTROLLER_MENU, false);
 			}
 		}
 	}

@@ -440,6 +440,8 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
 			}
 
 			// SCE: tvOS remote Menu button
+			// 2/20/2023 - moved handling to GodotView pressesBegan
+			/*
             if (@available(iOS 13.0, tvOS 13.0, *)) {
                 if (element == gamepad.buttonMenu) {
 					// Menu on tvOS is used as a back button in game, so we'll send JOY_BUTTON_1 (B/Circle) instead of JOY_START
@@ -447,6 +449,7 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
                             gamepad.buttonMenu.isPressed);
                 }
             }
+			*/
 		};
 	}
 
