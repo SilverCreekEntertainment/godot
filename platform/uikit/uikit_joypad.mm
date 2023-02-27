@@ -353,7 +353,12 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
 				// SCE - check buttonOptions
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_SELECT,
 						gamepad.buttonOptions.isPressed);
-			} else if (element == gamepad.dpad) {
+			}
+
+			#if !TARGET_OS_TV
+			// On tvOS the dpad is handled by our UITapGestureRecognizer
+			// It would be less hacky to have that filter by device, but I don't see a way to do it
+			else if (element == gamepad.dpad) {
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_DPAD_UP,
 						gamepad.dpad.up.isPressed);
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_DPAD_DOWN,
@@ -363,6 +368,7 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_DPAD_RIGHT,
 						gamepad.dpad.right.isPressed);
 			}
+			#endif
 
 			if (element == gamepad.leftThumbstick) {
 				float value = gamepad.leftThumbstick.xAxis.value;
