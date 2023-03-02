@@ -110,6 +110,11 @@
 	pTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(OnTapRight:)];
 	pTap.allowedPressTypes = @[@(UIPressTypeRightArrow)];
 	[self addGestureRecognizer:pTap];
+
+	// Select on apple remote
+	pTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(OnTapSelect:)];
+	pTap.allowedPressTypes = @[@(UIPressTypeSelect)];
+	[self addGestureRecognizer:pTap];
 }
 
 // MARK: - Input
@@ -277,6 +282,26 @@
 	[self StopFling];
 }
 
+- (void)OnTapSelect:(UIGestureRecognizer*)pGestureRecognizer
+{
+	// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
+	if([GodotView isKeyboardVisible]) {
+		OS_UIKit::get_singleton()->release_pressed_events();
+		return;
+	}
+
+	UITapGestureRecognizer* pTapGestureRecognizer = (UITapGestureRecognizer*)pGestureRecognizer;
+	if(pTapGestureRecognizer.state != UIGestureRecognizerStateRecognized)
+		return;
+
+	#if defined(LOG_CONTROLLER)
+	OutputDebugStringf("[GodotView] OnTapSelect\n");
+	#endif
+
+	[self PressAndReleaseButton:0];
+
+	[self StopFling];
+}
 
 - (void)OnPan:(UIGestureRecognizer*)pGestureRecognizer
 {
@@ -453,6 +478,12 @@
 {
 	OS_UIKit::get_singleton()->key(p_key, true);
 	OS_UIKit::get_singleton()->key(p_key, false);
+}
+
+- (void)PressAndReleaseButton:(uint32_t)p_button
+{
+	OS_UIKit::get_singleton()->joy_button(0, p_button, true);
+	OS_UIKit::get_singleton()->joy_button(0, p_button, false);
 }
 
 - (void)StopFling

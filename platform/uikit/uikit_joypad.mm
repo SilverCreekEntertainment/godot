@@ -421,6 +421,9 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
 
 			int joy_id = [self getJoyIdForController:controller];
 
+			/*
+			// SCE - we replaced this with gesture recognizers in godot_view
+
 			if (element == gamepad.buttonA) {
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_BUTTON_0,
 						gamepad.buttonA.isPressed);
@@ -428,9 +431,6 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_BUTTON_2,
 						gamepad.buttonX.isPressed);
 			} else if (element == gamepad.dpad) {
-				// SCE - we replaced this with gesture recognizers in godot_view
-
-				/*
 				float value = gamepad.dpad.xAxis.value;
 				OS_UIKit::get_singleton()->joy_axis(joy_id, JOY_AXIS_4, value);
 
@@ -442,8 +442,8 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
 
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_DPAD_UP, gamepad.dpad.up.isPressed);
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_DPAD_DOWN, gamepad.dpad.down.isPressed);
-				*/
 			}
+			*/
 
 			// SCE: tvOS remote Menu button
 			// 2/20/2023 - moved handling to GodotView pressesBegan
