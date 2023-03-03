@@ -45,7 +45,7 @@
 #include "rpr/Godot/GodotImplement.h"
 #include "roguec/SUtil.h"
 
-#define LOG_CONTROLLER
+//#define LOG_CONTROLLER
 
 
 @interface GodotView ()
