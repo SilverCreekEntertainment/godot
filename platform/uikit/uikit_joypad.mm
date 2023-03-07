@@ -325,20 +325,22 @@ int UIKitJoypad::joy_id_for_name(const String &p_name) {
 
 			int joy_id = [self getJoyIdForController:controller];
 
+			#if !TARGET_OS_TV
+
 			if (element == gamepad.buttonA) {
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_BUTTON_0,
 						gamepad.buttonA.isPressed);
 			}
 
-			#if !TARGET_OS_TV
 			// On tvOS, buttonB triggers UIPressTypeMenu in pressesBegan
 			else if (element == gamepad.buttonB) {
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_BUTTON_1,
 						gamepad.buttonB.isPressed);
 			}
+			else
 			#endif
 
-			else if (element == gamepad.buttonX) {
+			if (element == gamepad.buttonX) {
 				OS_UIKit::get_singleton()->joy_button(joy_id, JOY_BUTTON_2,
 						gamepad.buttonX.isPressed);
 			} else if (element == gamepad.buttonY) {
