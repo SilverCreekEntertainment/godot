@@ -1686,6 +1686,14 @@ void RichTextLabel::add_text(const String &p_text) {
 }
 
 void RichTextLabel::_add_item(Item *p_item, bool p_enter, bool p_ensure_newline) {
+	// SCE workaround 3/8/2023
+	// Occasionally current_frame->lines is empty, which causes a crash bring to access the last line
+	// I haven't discovered how it gets empty, but it crashes here, so we'll ensure here that the array is not empty
+	if (current_frame->lines.size() == 0) {
+		current_frame->lines.resize(1);
+		current_frame->lines.write[0].from = nullptr;
+	}
+
 	p_item->parent = current;
 	p_item->E = current->subitems.push_back(p_item);
 	p_item->index = current_idx++;
