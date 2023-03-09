@@ -3178,7 +3178,6 @@ void OS_Windows::set_native_icon(const String &p_filename) {
 
 	memdelete(f);
 	memdelete(icon_dir);
-	memdelete(icon_dir_entries);
 }
 
 void OS_Windows::set_icon(const Ref<Image> &p_icon) {
