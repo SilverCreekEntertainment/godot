@@ -353,8 +353,9 @@
 		fVelocityX = FLING_VELOCITY_SCALE_TO * fVelocityX / FLING_VELOCITY_THRESHOLD;
 		fVelocityY = FLING_VELOCITY_SCALE_TO * fVelocityY / FLING_VELOCITY_THRESHOLD;
 
-		// We need to invert the Y Fling so that it's moving
+		// We need to invert the Fling so that it's moving
 		// in the same direction as the keypresses we're sending
+		fVelocityX = -fVelocityX;
 		fVelocityY = -fVelocityY;
 
 		// Send the event
