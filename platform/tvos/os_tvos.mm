@@ -244,7 +244,7 @@ Rect2 OSAppleTV::get_window_safe_area() const {
 }
 
 bool OSAppleTV::has_touchscreen_ui_hint() const {
-	return true;
+	return false;
 }
 
 bool OSAppleTV::_check_internal_feature_support(const String &p_feature) {
