@@ -97,7 +97,7 @@ public class GodotInputHandler implements InputManager.InputDeviceListener {
 			}
 		} else {
 			final int scanCode = event.getScanCode();
-			final int chr = event.getUnicodeChar(0);
+			final int chr = event.getUnicodeChar(event.getMetaState());
 			GodotLib.key(keyCode, scanCode, chr, false);
 		};
 
@@ -132,7 +132,7 @@ public class GodotInputHandler implements InputManager.InputDeviceListener {
 			}
 		} else {
 			final int scanCode = event.getScanCode();
-			final int chr = event.getUnicodeChar(0);
+			final int chr = event.getUnicodeChar(event.getMetaState());
 			GodotLib.key(keyCode, scanCode, chr, true);
 		}
 
