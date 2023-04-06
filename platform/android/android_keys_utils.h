@@ -42,6 +42,7 @@ struct _WinTranslatePair {
 static _WinTranslatePair _ak_to_keycode[] = {
 	{ KEY_TAB, AKEYCODE_TAB },
 	{ KEY_ENTER, AKEYCODE_ENTER },
+	{ KEY_ESCAPE, AKEYCODE_ESCAPE },
 	{ KEY_SHIFT, AKEYCODE_SHIFT_LEFT },
 	{ KEY_SHIFT, AKEYCODE_SHIFT_RIGHT },
 	{ KEY_ALT, AKEYCODE_ALT_LEFT },
