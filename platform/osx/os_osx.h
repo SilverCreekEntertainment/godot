@@ -153,6 +153,11 @@ public:
 
 	CrashHandler crash_handler;
 
+	int locked_screen_dpi;
+	float locked_screen_scale;
+	int locked_screen;
+	bool locked_screen_forced;
+
 	void _update_window();
 
 	int video_driver_index;
@@ -279,6 +284,8 @@ public:
 	virtual float get_screen_scale(int p_screen = -1) const;
 	virtual float get_screen_max_scale() const;
 	virtual float get_screen_refresh_rate(int p_screen = -1) const;
+
+	virtual void lock_screen_dpi(int p_screen = -1); // Locks the screen dpi to the current screen's dpi
 
 	virtual Point2 get_window_position() const;
 	virtual void set_window_position(const Point2 &p_position);

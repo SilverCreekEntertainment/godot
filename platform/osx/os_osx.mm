@@ -333,6 +333,13 @@ static NSCursor *cursorFromSelector(SEL selector, SEL fallback = nil) {
 	[self windowDidResize:notification];
 }
 
+- (void)windowDidChangeScreen:(NSNotification *)notification {
+	// SCE - If the window is moved to a screen with the same backing scale factor
+	// windowDidChangeBackingProperties even though the DPI may be different
+	// So we catch that care here and pass it on to windowDidChangeBackingProperties for handling
+	[self windowDidChangeBackingProperties: notification];
+}
+
 - (void)windowDidChangeBackingProperties:(NSNotification *)notification {
 	if (!OS_OSX::singleton)
 		return;
@@ -2600,6 +2607,31 @@ float OS_OSX::get_screen_refresh_rate(int p_screen) const {
 	return OS::get_singleton()->SCREEN_REFRESH_RATE_FALLBACK;
 }
 
+void OS_OSX::lock_screen_dpi(int p_screen) {
+	// SCE
+	// Called by WindowPrefs load_prefs
+	// This locks in the DPI of the screen the window is initially loaded at
+	// If the window is moved to a screen with a different DPI,
+	// get_screen_max_scale will compute a scale such that the game DPI will remain the same, and elements will appear at the correct size
+	// Note that currently get_screen_dpi does not return the locked DPI
+	// Rather, it happens on Desktop SGameTree will have called SetDisplayDpiOverride to lock the DPI in game
+	// When called with p_screen >=0, get_screen_max_scale will behave as if the window is on p_screen
+	// When called with p_screen -1, the current screen is locked, but not forced
+	// WindowPrefs calls early with p_screen set so the window position and size can be calculated based on the target screen
+	// Then a second call is made after the window is positioned to lock the current screen without forcing
+	locked_screen_dpi = get_screen_dpi(p_screen);
+	locked_screen_scale = get_screen_scale(p_screen);
+
+	if(p_screen >= 0) {
+		locked_screen = p_screen;
+		locked_screen_forced = true;
+	}
+	else {
+		locked_screen = get_current_screen();
+		locked_screen_forced = false;
+	}
+}
+
 Size2 OS_OSX::get_screen_size(int p_screen) const {
 	if (p_screen < 0) {
 		p_screen = get_current_screen();
@@ -2663,6 +2695,33 @@ float OS_OSX::get_screen_scale(int p_screen) const {
 }
 
 float OS_OSX::get_screen_max_scale() const {
+	// SCE
+	// Instead of returning the max scale
+	// return a scale such that graphics loaded at the locked DPI will continue to appear at the same size
+
+	// When called before the dpi is locked, just return the normal scale for the main screen
+	if(!window_object || !locked_screen_dpi)
+		return get_screen_scale();
+
+	// We'll compute a scale for the current screen by default
+	// If loced_screen_forces is true, we'll instead compute a scale as if the window is on the locked screen
+	int window_screen = get_current_screen();
+	if(locked_screen_forced)
+		window_screen = locked_screen;
+
+	// get_screen_dpi is the current dpi * get_screen_scale, so we need to divide out the scale to get the raw DPI value
+	// The DPI difference is current_dpi / locked_dpi
+	// But we're scaling the backbuffer, not the dpi, so we need the inverse: locked_dpi / current_dpi
+	// Finally, we need to include the scale of the locked_screen
+	// Essentially we're modifying the screen scale by the inverse dpi ratio
+	float current_dpi = (float)get_screen_dpi(window_screen) / get_screen_scale(window_screen);
+	float locked_dpi = (float)locked_screen_dpi / locked_screen_scale;
+	float scale = locked_dpi / current_dpi * locked_screen_scale;
+
+	return scale;
+
+	// Original Godot Code
+	/*
 	static float scale = 1.f;
 	if (displays_scale_dirty) {
 		int screen_count = get_screen_count();
@@ -2672,6 +2731,7 @@ float OS_OSX::get_screen_max_scale() const {
 		displays_scale_dirty = false;
 	}
 	return scale;
+	*/
 }
 
 Point2 OS_OSX::get_native_window_position() const {
@@ -3551,6 +3611,8 @@ OS_OSX::OS_OSX() {
 	context = nullptr;
 	context_offscreen = nullptr;
 
+	window_object = nil; // SCE - with the DPI lock changes, window_object was being checked for nil before it was set
+
 	memset(cursors, 0, sizeof(cursors));
 	key_event_pos = 0;
 	mouse_mode = OS::MOUSE_MODE_VISIBLE;
@@ -3560,6 +3622,10 @@ OS_OSX::OS_OSX() {
 	im_position = Point2();
 	layered_window = false;
 	autoreleasePool = [[NSAutoreleasePool alloc] init];
+	locked_screen_dpi = 0;
+	locked_screen_scale = 0;
+	locked_screen = -1;
+	locked_screen_forced = false;
 
 	eventSource = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
 	ERR_FAIL_COND(!eventSource);
