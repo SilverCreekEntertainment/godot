@@ -2493,8 +2493,8 @@ bool VisualServerScene::_light_instance_update_shadow(Instance *p_instance, cons
 						z_max = shadow_z_max;
 					}
 
-					min_distance = MAX(min_distance, shadow_z_min);
-					max_distance = MIN(max_distance, shadow_z_max);
+					min_distance = MAX(min_distance, z_min);
+					max_distance = MIN(max_distance, z_max);
 				}
 			}
 
