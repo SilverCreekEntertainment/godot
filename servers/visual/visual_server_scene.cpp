@@ -2447,7 +2447,7 @@ bool VisualServerScene::_light_instance_update_shadow(Instance *p_instance, cons
 
 			VS::LightDirectionalShadowDepthRangeMode depth_range_mode = VSG::storage->light_directional_get_shadow_depth_range_mode(p_instance->base);
 
-			if (depth_range_mode == VS::LIGHT_DIRECTIONAL_SHADOW_DEPTH_RANGE_OPTIMIZED) {
+			if (depth_range_mode == VS::LIGHT_DIRECTIONAL_SHADOW_DEPTH_RANGE_OPTIMIZED || depth_range_mode == VS::LIGHT_DIRECTIONAL_SHADOW_DEPTH_RANGE_OPTIMIZED_STICKY) {
 				//optimize min/max
 				Vector<Plane> planes = p_cam_projection.get_projection_planes(p_cam_transform);
 				int cull_count = p_scenario->sps->cull_convex(planes, instance_shadow_cull_result, MAX_INSTANCE_CULL, VS::INSTANCE_GEOMETRY_MASK);
@@ -2483,8 +2483,18 @@ bool VisualServerScene::_light_instance_update_shadow(Instance *p_instance, cons
 				}
 
 				if (found_items) {
-					min_distance = MAX(min_distance, z_min);
-					max_distance = MIN(max_distance, z_max);
+					// SCE: z min/max sticky option, we track the min and max over the run, not per frame
+					if(depth_range_mode == VS::LIGHT_DIRECTIONAL_SHADOW_DEPTH_RANGE_OPTIMIZED_STICKY)
+					{
+						shadow_z_min = MIN(z_min, shadow_z_min);
+						shadow_z_max = MAX(z_max, shadow_z_max);
+
+						z_min = shadow_z_min;
+						z_max = shadow_z_max;
+					}
+
+					min_distance = MAX(min_distance, shadow_z_min);
+					max_distance = MIN(max_distance, shadow_z_max);
 				}
 			}
 
@@ -4604,6 +4614,10 @@ VisualServerScene::VisualServerScene() {
 
 	render_pass = 1;
 	singleton = this;
+
+	shadow_z_min = 1e20;
+	shadow_z_max = -1e20;
+
 	_use_bvh = GLOBAL_DEF("rendering/quality/spatial_partitioning/use_bvh", true);
 	GLOBAL_DEF("rendering/quality/spatial_partitioning/bvh_collision_margin", 0.1);
 	ProjectSettings::get_singleton()->set_custom_property_info("rendering/quality/spatial_partitioning/bvh_collision_margin", PropertyInfo(Variant::REAL, "rendering/quality/spatial_partitioning/bvh_collision_margin", PROPERTY_HINT_RANGE, "0.0,2.0,0.01"));

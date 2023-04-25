@@ -393,7 +393,7 @@ void DirectionalLight::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "directional_shadow_blend_splits"), "set_blend_splits", "is_blend_splits_enabled");
 	ADD_PROPERTYI(PropertyInfo(Variant::REAL, "directional_shadow_normal_bias", PROPERTY_HINT_RANGE, "0,10,0.001"), "set_param", "get_param", PARAM_SHADOW_NORMAL_BIAS);
 	ADD_PROPERTYI(PropertyInfo(Variant::REAL, "directional_shadow_bias_split_scale", PROPERTY_HINT_RANGE, "0,1,0.001"), "set_param", "get_param", PARAM_SHADOW_BIAS_SPLIT_SCALE);
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "directional_shadow_depth_range", PROPERTY_HINT_ENUM, "Stable,Optimized"), "set_shadow_depth_range", "get_shadow_depth_range");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "directional_shadow_depth_range", PROPERTY_HINT_ENUM, "Stable,Optimized,Sticky"), "set_shadow_depth_range", "get_shadow_depth_range");
 	ADD_PROPERTYI(PropertyInfo(Variant::REAL, "directional_shadow_max_distance", PROPERTY_HINT_EXP_RANGE, "0,8192,0.1,or_greater"), "set_param", "get_param", PARAM_SHADOW_MAX_DISTANCE);
 
 	BIND_ENUM_CONSTANT(SHADOW_ORTHOGONAL);
@@ -402,6 +402,7 @@ void DirectionalLight::_bind_methods() {
 
 	BIND_ENUM_CONSTANT(SHADOW_DEPTH_RANGE_STABLE);
 	BIND_ENUM_CONSTANT(SHADOW_DEPTH_RANGE_OPTIMIZED);
+	BIND_ENUM_CONSTANT(SHADOW_DEPTH_RANGE_OPTIMIZED_STICKY);
 }
 
 DirectionalLight::DirectionalLight() :

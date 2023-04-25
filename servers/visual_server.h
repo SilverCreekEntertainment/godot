@@ -498,7 +498,7 @@ public:
 	enum LightDirectionalShadowDepthRangeMode {
 		LIGHT_DIRECTIONAL_SHADOW_DEPTH_RANGE_STABLE,
 		LIGHT_DIRECTIONAL_SHADOW_DEPTH_RANGE_OPTIMIZED,
-
+		LIGHT_DIRECTIONAL_SHADOW_DEPTH_RANGE_OPTIMIZED_STICKY,
 	};
 
 	virtual void light_directional_set_shadow_depth_range_mode(RID p_light, LightDirectionalShadowDepthRangeMode p_range_mode) = 0;

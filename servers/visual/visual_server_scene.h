@@ -57,6 +57,9 @@ public:
 	uint64_t render_pass;
 	static VisualServerScene *singleton;
 
+	float shadow_z_min;
+	float shadow_z_max;
+
 	/* EVENT QUEUING */
 
 	void tick();
