@@ -50,6 +50,13 @@ void WindowsTerminalLogger::logv(const char *p_format, va_list p_list, bool p_er
 		len = BUFFER_SIZE; // Output is too big, will be truncated
 	buf[len] = 0;
 
+	/*
+	Godot originally was converting to Wide char first, on Windows this caused output to VS Code Debug console to have a ? every other char, ie:
+	?[?S?S?o?u?n?d?M?a?n?:?:?U?p?d?a?t?e?M?u?t?e?]?
+	This only happened after we called _Py_InitializeMain
+
+	Simply not converting it and using  fprintf/printf instead of fwprintf/wprintf fixed it.
+
 	int wlen = MultiByteToWideChar(CP_UTF8, 0, buf, len, NULL, 0);
 	if (wlen < 0)
 		return;
@@ -63,8 +70,13 @@ void WindowsTerminalLogger::logv(const char *p_format, va_list p_list, bool p_er
 		fwprintf(stderr, L"%ls", wbuf);
 	else
 		wprintf(L"%ls", wbuf);
-
 	memfree(wbuf);
+	*/
+
+	if (p_err)
+		fprintf(stderr, "%s", buf);
+	else
+		printf("%s", buf);
 
 #ifdef DEBUG_ENABLED
 	fflush(stdout);
