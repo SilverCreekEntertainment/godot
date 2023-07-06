@@ -1349,14 +1349,14 @@ Error EditorExportPlatformTVOS::export_project(const Ref<EditorExportPreset> &p_
 	if (icon_path != "") {
 		String real_icon_path = ProjectSettings::get_singleton()->globalize_path(icon_path);
 		// Copy brandassets folder to export dir
-		DirAccess *da = DirAccess::create(DirAccess::ACCESS_FILESYSTEM);
-		if (da) {
-			String current_dir = da->get_current_dir();
-			if (da->change_dir(real_icon_path) == OK) {
-				da->copy_dir(real_icon_path, dest_dir + binary_name + "/Assets.xcassets/App Icon & Top Shelf Image.brandassets");
+		DirAccess *da_icons = DirAccess::create(DirAccess::ACCESS_FILESYSTEM);
+		if (da_icons) {
+			String current_dir = da_icons->get_current_dir();
+			if (da_icons->change_dir(real_icon_path) == OK) {
+				da_icons->copy_dir(real_icon_path, dest_dir + binary_name + "/Assets.xcassets/App Icon & Top Shelf Image.brandassets");
 			}
-			da->change_dir(current_dir);
-			memdelete(da);
+			da_icons->change_dir(current_dir);
+			memdelete(da_icons);
 		}
 	}
 
