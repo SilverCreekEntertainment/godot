@@ -318,9 +318,9 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = (
+					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
 					"$(PROJECT_DIR)/**",
-					"$(SDKROOT)/usr/lib/swift",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = $identifier;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -352,9 +352,9 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = (
+					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
 					"$(PROJECT_DIR)/**",
-					"$(SDKROOT)/usr/lib/swift",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = $identifier;
 				PRODUCT_NAME = "$(TARGET_NAME)";
