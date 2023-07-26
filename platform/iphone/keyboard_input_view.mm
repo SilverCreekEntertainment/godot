@@ -137,13 +137,6 @@
 				break;
 		}
 
-		if(character == KEY_ENTER)
-		{
-			// Suppress the enter key if we've set certain done lables
-			if(self.returnKeyType == UIReturnKeyDone || self.returnKeyType == UIReturnKeyNext)
-				break;
-		}
-
 		OSIPhone::get_singleton()->key(character, true);
 		OSIPhone::get_singleton()->key(character, false);
 	}

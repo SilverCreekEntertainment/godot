@@ -215,10 +215,6 @@
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-	// Suppress the enter key if we've set certain done lables
-	if(self.returnKeyType == UIReturnKeyDone || self.returnKeyType == UIReturnKeyNext)
-		return YES;
-
 	OSAppleTV::get_singleton()->key(KEY_ENTER, true);
 	OSAppleTV::get_singleton()->key(KEY_ENTER, false);
 	return YES;
