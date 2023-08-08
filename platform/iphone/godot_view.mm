@@ -32,6 +32,7 @@
 
 #include "core/project_settings.h"
 #include "os_iphone.h"
+#include "scene/main/scene_tree.h"
 #include "servers/audio_server.h"
 
 #import <OpenGLES/EAGLDrawable.h>
@@ -162,6 +163,10 @@ static const int max_touches = 32;
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+	// Watch out for getting called to early
+	if(!SceneTree::get_singleton())
+		return;
+
 	for (UITouch *touch in touches) {
 		int tid = [self getTouchIDForTouch:touch];
 		ERR_FAIL_COND(tid == -1);
@@ -176,6 +181,10 @@ static const int max_touches = 32;
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+	// Watch out for getting called to early
+	if(!SceneTree::get_singleton())
+		return;
+
 	for (UITouch *touch in touches) {
 		int tid = [self getTouchIDForTouch:touch];
 		ERR_FAIL_COND(tid == -1);
@@ -192,6 +201,10 @@ static const int max_touches = 32;
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+	// Watch out for getting called to early
+	if(!SceneTree::get_singleton())
+		return;
+
 	for (UITouch *touch in touches) {
 		int tid = [self getTouchIDForTouch:touch];
 		ERR_FAIL_COND(tid == -1);
@@ -208,6 +221,10 @@ static const int max_touches = 32;
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+	// Watch out for getting called to early
+	if(!SceneTree::get_singleton())
+		return;
+
 	for (UITouch *touch in touches) {
 		int tid = [self getTouchIDForTouch:touch];
 		ERR_FAIL_COND(tid == -1);
