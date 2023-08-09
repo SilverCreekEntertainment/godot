@@ -34,6 +34,7 @@
 #include "core/os/keyboard.h"
 #include "core/project_settings.h"
 #include "os_tvos.h"
+#include "scene/main/scene_tree.h"
 #include "servers/audio_server.h"
 
 #import <OpenGLES/EAGLDrawable.h>
@@ -122,6 +123,10 @@
 // MARK: Menu Button
 
 - (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
+	// Watch out for getting called to early
+	if(!SceneTree::get_singleton())
+		return;
+
 	// SCE 1/27/2023
 	// The problem here is that pressing circle on the DS4 controller (B on an xbox controller)
 	// shows up here as a menu button press indistinguishable from the remote menu button
@@ -155,6 +160,10 @@
 }
 
 - (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
+	// Watch out for getting called to early
+	if(!SceneTree::get_singleton())
+		return;
+
 	// SCE 1/27/2023 - see note in pressesBegan
 
 	// SCE: Ask GodotImplement to decide if the Remote Menu button should exit to the home screen
@@ -178,6 +187,10 @@
 }
 
 - (void)pressesCancelled:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
+	// Watch out for getting called to early
+	if(!SceneTree::get_singleton())
+		return;
+
 	// SCE 1/27/2023 - see note in pressesBegan
 
 	for(UIPress *pPress in presses)
@@ -200,6 +213,10 @@
 
 - (void)OnTapUp:(UIGestureRecognizer*)pGestureRecognizer
 {
+	// Watch out for getting called to early
+	if(!SceneTree::get_singleton())
+		return;
+
 	// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
 	if([GodotView isKeyboardVisible]) {
 		OS_UIKit::get_singleton()->release_pressed_events();
@@ -221,6 +238,10 @@
 
 - (void)OnTapDown:(UIGestureRecognizer*)pGestureRecognizer
 {
+	// Watch out for getting called to early
+	if(!SceneTree::get_singleton())
+		return;
+
 	// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
 	if([GodotView isKeyboardVisible]) {
 		OS_UIKit::get_singleton()->release_pressed_events();
@@ -242,6 +263,10 @@
 
 - (void)OnTapLeft:(UIGestureRecognizer*)pGestureRecognizer
 {
+	// Watch out for getting called to early
+	if(!SceneTree::get_singleton())
+		return;
+
 	// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
 	if([GodotView isKeyboardVisible]) {
 		OS_UIKit::get_singleton()->release_pressed_events();
@@ -263,6 +288,10 @@
 
 - (void)OnTapRight:(UIGestureRecognizer*)pGestureRecognizer
 {
+	// Watch out for getting called to early
+	if(!SceneTree::get_singleton())
+		return;
+
 	// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
 	if([GodotView isKeyboardVisible]) {
 		OS_UIKit::get_singleton()->release_pressed_events();
@@ -284,6 +313,10 @@
 
 - (void)OnTapSelect:(UIGestureRecognizer*)pGestureRecognizer
 {
+	// Watch out for getting called to early
+	if(!SceneTree::get_singleton())
+		return;
+
 	// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
 	if([GodotView isKeyboardVisible]) {
 		OS_UIKit::get_singleton()->release_pressed_events();
@@ -305,6 +338,10 @@
 
 - (void)OnPan:(UIGestureRecognizer*)pGestureRecognizer
 {
+	// Watch out for getting called to early
+	if(!SceneTree::get_singleton())
+		return;
+
 	// If the keyboardView isFirstResponder, ignore controller input and clear any buttons that were down
 	if([GodotView isKeyboardVisible]) {
 		OS_UIKit::get_singleton()->release_pressed_events();
