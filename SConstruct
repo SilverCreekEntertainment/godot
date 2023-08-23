@@ -461,7 +461,7 @@ if selected_platform in platform_list:
     else:
         # MSVC doesn't have clear C standard support, /std only covers C++.
         # We apply it to CCFLAGS (both C and C++ code) in case it impacts C features.
-        env.Prepend(CCFLAGS=["/std:c++14"])
+        env.Prepend(CCFLAGS=["/std:c++17"])
 
     # Configure compiler warnings
     if env.msvc:  # MSVC
