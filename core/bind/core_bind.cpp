@@ -303,8 +303,8 @@ int _OS::get_screen_dpi(int p_screen) const {
 	return OS::get_singleton()->get_screen_dpi(p_screen);
 }
 
-void _OS::lock_screen_dpi(int p_screen) {
-	OS::get_singleton()->lock_screen_dpi(p_screen);
+void _OS::lock_screen_dpi(int p_screen, bool p_reset_window) {
+	OS::get_singleton()->lock_screen_dpi(p_screen, p_reset_window);
 }
 
 float _OS::get_screen_scale(int p_screen) const {
@@ -1293,7 +1293,7 @@ void _OS::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_screen_position", "screen"), &_OS::get_screen_position, DEFVAL(-1));
 	ClassDB::bind_method(D_METHOD("get_screen_size", "screen"), &_OS::get_screen_size, DEFVAL(-1));
 	ClassDB::bind_method(D_METHOD("get_screen_dpi", "screen"), &_OS::get_screen_dpi, DEFVAL(-1));
-	ClassDB::bind_method(D_METHOD("lock_screen_dpi", "screen"), &_OS::lock_screen_dpi, DEFVAL(-1));
+	ClassDB::bind_method(D_METHOD("lock_screen_dpi", "screen", "reset_window"), &_OS::lock_screen_dpi, DEFVAL(-1), DEFVAL(false));
 	ClassDB::bind_method(D_METHOD("get_screen_scale", "screen"), &_OS::get_screen_scale, DEFVAL(-1));
 	ClassDB::bind_method(D_METHOD("get_screen_max_scale"), &_OS::get_screen_max_scale);
 	ClassDB::bind_method(D_METHOD("get_screen_refresh_rate", "screen"), &_OS::get_screen_refresh_rate, DEFVAL(-1));

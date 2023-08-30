@@ -285,7 +285,7 @@ public:
 	virtual float get_screen_max_scale() const;
 	virtual float get_screen_refresh_rate(int p_screen = -1) const;
 
-	virtual void lock_screen_dpi(int p_screen = -1); // Locks the screen dpi to the current screen's dpi
+	virtual void lock_screen_dpi(int p_screen = -1, bool p_reset_window = false); // Locks the screen dpi to the current screen's dpi
 
 	virtual Point2 get_window_position() const;
 	virtual void set_window_position(const Point2 &p_position);

@@ -2607,7 +2607,7 @@ float OS_OSX::get_screen_refresh_rate(int p_screen) const {
 	return OS::get_singleton()->SCREEN_REFRESH_RATE_FALLBACK;
 }
 
-void OS_OSX::lock_screen_dpi(int p_screen) {
+void OS_OSX::lock_screen_dpi(int p_screen, bool p_reset_window) {
 	// SCE
 	// Called by WindowPrefs load_prefs
 	// This locks in the DPI of the screen the window is initially loaded at
@@ -2629,6 +2629,12 @@ void OS_OSX::lock_screen_dpi(int p_screen) {
 	else {
 		locked_screen = get_current_screen();
 		locked_screen_forced = false;
+	}
+
+	if(p_reset_window)
+	{
+		// Trigger a call to windowDidChangeBackingProperties
+		[[NSNotificationCenter defaultCenter] postNotificationName:NSWindowDidChangeBackingPropertiesNotification object:window_object];
 	}
 }
 

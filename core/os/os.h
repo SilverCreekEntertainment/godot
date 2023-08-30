@@ -256,7 +256,7 @@ public:
 	// Locks the screen dpi to the given screen's dpi
 	// if p_screen is >= 0, the lock is forced and get_screen_max_scale will behave as if the window was on the locked screen
 	// if p_screen is -1, the dpi is locked to the current screen and not forced
-	virtual void lock_screen_dpi(int p_screen = -1) {};
+	virtual void lock_screen_dpi(int p_screen = -1, bool p_reset_window = false) {};
 
 	// Returns internal pointers and handles.
 	// While exposed to GDScript this is mostly to give GDNative plugins access to this information.
