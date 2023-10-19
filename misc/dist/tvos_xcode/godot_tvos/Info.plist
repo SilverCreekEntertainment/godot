@@ -32,5 +32,6 @@
 	</array>
 	<key>UIUserInterfaceStyle</key>
 	<string>Automatic</string>
+	$additional_plist_content
 </dict>
 </plist>
