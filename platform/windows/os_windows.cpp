@@ -1314,13 +1314,33 @@ Error OS_Windows::initialize(const VideoMode &p_desired, int p_video_driver, int
 		class_name = L"Engine";
 
 #ifndef DEBUG_ENABLED
+	#define COPYDATA_COMMAND_LINE 828934  // be sure this matches RogueWndProc.cpp
 	HWND wnd = FindWindowW(class_name.ptrw(), NULL);
 	if (!wnd)
 		wnd = FindWindowW(L"RprWindowClass", class_name.ptrw()); // Old games with buggy RPR
 	if (wnd) {
+
 		ShowWindow(wnd, SW_SHOWNORMAL);
 		BringWindowToTop(wnd);
 		SetForegroundWindow(wnd);
+
+		// Convert command line arguments to a single string
+		List<String> cmdline_args = OS::get_singleton()->get_cmdline_args();
+		String cmdline_args_str;
+		for (int i = 0; i < cmdline_args.size(); i++) {
+			cmdline_args_str += cmdline_args[i];
+			if (i < cmdline_args.size() - 1) {
+				cmdline_args_str += " ";
+			}
+		}
+
+		// Send command line arguments to original wnd via WM_COPYDATA
+		COPYDATASTRUCT cds;
+		cds.dwData = COPYDATA_COMMAND_LINE;
+		cds.cbData = (cmdline_args_str.length() + 1) * sizeof(wchar_t);
+		cds.lpData = (LPVOID)cmdline_args_str.c_str();
+		SendMessage(wnd, WM_COPYDATA, (WPARAM)NULL, (LPARAM)&cds);
+
 		return ERR_UNAVAILABLE;
 	}
 #endif
