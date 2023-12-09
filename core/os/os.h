@@ -258,6 +258,8 @@ public:
 	// if p_screen is -1, the dpi is locked to the current screen and not forced
 	virtual void lock_screen_dpi(int p_screen = -1, bool p_reset_window = false) {};
 
+	virtual void onGameTreeReady() {};
+
 	// Returns internal pointers and handles.
 	// While exposed to GDScript this is mostly to give GDNative plugins access to this information.
 	// Note that whether a valid handle is returned depends on whether it applies to the given
