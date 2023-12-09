@@ -284,6 +284,32 @@ static NSCursor *cursorFromSelector(SEL selector, SEL fallback = nil) {
 		OS_OSX::singleton->get_main_loop()->notification(MainLoop::NOTIFICATION_WM_ABOUT);
 }
 
+- (BOOL)application:(NSApplication *)application
+	continueUserActivity:(NSUserActivity *)userActivity
+ 	restorationHandler:(void (^)(NSArray<id<NSUserActivityRestoring>> *restorableObjects))restorationHandler
+ {
+	if([userActivity.activityType isEqualToString: NSUserActivityTypeBrowsingWeb]) {
+		NSURL *url = userActivity.webpageURL;
+		if (url) {
+			const char *sUrl = [url.absoluteString UTF8String];
+			Node* rogue = SceneTree::get_singleton()->get_root()->get_node(String("/root/Main/RogueNode"));
+			if(rogue)
+			{
+				rogue->call("OnDeepLink", sUrl, false);
+			}
+			else
+			{
+				// This happens when we're launched with the URL (instead of getting it while running)
+				// Save the deep link to be sent in onGameTreeReady
+				OS_OSX::singleton->set_deep_link(String::utf8(sUrl));
+			}
+		}
+		return YES;
+	}
+
+	return NO; // YES if handled
+ }
+
 @end
 
 @interface GodotWindowDelegate : NSObject {
@@ -3747,4 +3773,28 @@ void OS_OSX::disable_crash_handler() {
 
 bool OS_OSX::is_disable_crash_handler() const {
 	return crash_handler.is_disabled();
+}
+
+void OS_OSX::set_deep_link(const String &p_deep_link)
+{
+	deep_link = p_deep_link;
+}
+
+String OS_OSX::get_deep_link() const
+{
+	return deep_link;
+}
+
+void OS_OSX::onGameTreeReady()
+{
+	if(deep_link.length() > 0)
+	{
+		Node* rogue = SceneTree::get_singleton()->get_root()->get_node(String("/root/Main/RogueNode"));
+		if(rogue)
+		{
+			rogue->call("OnDeepLink", deep_link, false);
+		}
+
+		deep_link = "";
+	}
 }

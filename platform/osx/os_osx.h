@@ -158,6 +158,8 @@ public:
 	int locked_screen;
 	bool locked_screen_forced;
 
+	String deep_link;
+
 	void _update_window();
 
 	int video_driver_index;
@@ -346,6 +348,10 @@ public:
 	virtual Error move_to_trash(const String &p_path);
 
 	void force_process_input();
+
+	void set_deep_link(const String &p_deep_link);
+	String get_deep_link() const;
+	virtual void onGameTreeReady();
 
 	OS_OSX();
 
