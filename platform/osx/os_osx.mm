@@ -300,8 +300,7 @@ static NSCursor *cursorFromSelector(SEL selector, SEL fallback = nil) {
 			else
 			{
 				// This happens when we're launched with the URL (instead of getting it while running)
-				// Save the deep link to be sent in onGameTreeReady
-				OS_OSX::singleton->set_deep_link(String::utf8(sUrl));
+				OS::get_singleton()->set_deep_link(String::utf8(sUrl));
 			}
 		}
 		return YES;
@@ -3773,28 +3772,4 @@ void OS_OSX::disable_crash_handler() {
 
 bool OS_OSX::is_disable_crash_handler() const {
 	return crash_handler.is_disabled();
-}
-
-void OS_OSX::set_deep_link(const String &p_deep_link)
-{
-	deep_link = p_deep_link;
-}
-
-String OS_OSX::get_deep_link() const
-{
-	return deep_link;
-}
-
-void OS_OSX::onGameTreeReady()
-{
-	if(deep_link.length() > 0)
-	{
-		Node* rogue = SceneTree::get_singleton()->get_root()->get_node(String("/root/Main/RogueNode"));
-		if(rogue)
-		{
-			rogue->call("OnDeepLink", deep_link, false);
-		}
-
-		deep_link = "";
-	}
 }

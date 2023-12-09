@@ -905,3 +905,13 @@ OS::~OS() {
 	memdelete(_logger);
 	singleton = nullptr;
 }
+
+void OS::set_deep_link(const String &p_deep_link)
+{
+	deep_link = p_deep_link;
+}
+
+String OS::get_deep_link() const
+{
+	return deep_link;
+}

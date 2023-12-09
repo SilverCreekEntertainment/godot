@@ -75,6 +75,8 @@ class OS {
 	bool restart_on_exit;
 	List<String> restart_commandline;
 
+	String deep_link;
+
 protected:
 	bool _update_pending;
 
@@ -258,7 +260,9 @@ public:
 	// if p_screen is -1, the dpi is locked to the current screen and not forced
 	virtual void lock_screen_dpi(int p_screen = -1, bool p_reset_window = false) {};
 
-	virtual void onGameTreeReady() {};
+	// Stores a deep link received while launching
+	void set_deep_link(const String &p_deep_link);
+	String get_deep_link() const;
 
 	// Returns internal pointers and handles.
 	// While exposed to GDScript this is mostly to give GDNative plugins access to this information.
