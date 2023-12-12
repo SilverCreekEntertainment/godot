@@ -93,6 +93,9 @@
 <!--CHUNK_INTENT_FILTER_BEGIN-->
 <!--CHUNK_INTENT_FILTER_END-->
             </intent-filter>
+
+<!--CHUNK_ACTIVITY_BEGIN-->
+<!--CHUNK_ACTIVITY_END-->            
         </activity>
 
 <!-- Custom application XML added by add-ons. -->
