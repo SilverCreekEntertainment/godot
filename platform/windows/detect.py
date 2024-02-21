@@ -1,5 +1,6 @@
 import methods
 import os
+from SCons.Script import ARGUMENTS
 
 # To match other platforms
 STACK_SIZE = 8388608
@@ -211,8 +212,12 @@ def configure_msvc(env, manual_msvc_config):
         env.AppendUnique(LINKFLAGS=["/DEBUG"])
 
     ## Compile/link flags
-
-    if env["use_static_cpp"]:
+        
+    python = ARGUMENTS.get("python", "embedded")
+    if python == "external":
+        # Linking to external python needs /MDd (XXX couldn't find a way to do this in SCsub)
+        env.AppendUnique(CCFLAGS=["/MDd"])
+    elif env["use_static_cpp"]:
         env.AppendUnique(CCFLAGS=["/MT"])
     else:
         env.AppendUnique(CCFLAGS=["/MD"])
