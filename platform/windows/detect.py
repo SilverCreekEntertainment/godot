@@ -213,7 +213,7 @@ def configure_msvc(env, manual_msvc_config):
 
     ## Compile/link flags
         
-    python = ARGUMENTS.get("python", "embedded")
+    python = ARGUMENTS.get("python", "internal")
     if python == "external":
         # Linking to external python needs /MDd (XXX couldn't find a way to do this in SCsub)
         env.AppendUnique(CCFLAGS=["/MDd"])
