@@ -42,6 +42,9 @@
 #include "core/os/memory.h"
 #include "core/sort_array.h"
 
+#include <initializer_list>
+
+
 template <class T>
 class VectorWriteProxy {
 public:
@@ -123,6 +126,17 @@ public:
 		_cowdata._ref(p_from._cowdata);
 		return *this;
 	}
+
+	_FORCE_INLINE_ Vector(std::initializer_list<T> p_init) {
+		Error err = _cowdata.resize(p_init.size());
+		ERR_FAIL_COND(err);
+
+		size_t i = 0;
+		for (const T &element : p_init) {
+			_cowdata.set(i++, element);
+		}
+	}
+
 
 	Vector<uint8_t> to_byte_array() const {
 		Vector<uint8_t> ret;

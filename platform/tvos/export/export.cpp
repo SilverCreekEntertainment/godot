@@ -296,6 +296,94 @@ struct CodesignData {
 	}
 };
 
+struct APIAccessInfo {
+	String prop_name;
+	String type_name;
+	Vector<String> prop_flag_value;
+	Vector<String> prop_flag_name;
+	int default_value;
+};
+
+static const APIAccessInfo api_info[] = {
+	{ "file_timestamp",
+			"NSPrivacyAccessedAPICategoryFileTimestamp",
+			{ "DDA9.1", "C617.1", "3B52.1" },
+			{ "Display to user on-device:", "Inside app or group container", "Files provided to app by user" },
+			3 },
+	{ "system_boot_time",
+			"NSPrivacyAccessedAPICategorySystemBootTime",
+			{ "35F9.1", "8FFB.1", "3D61.1" },
+			{ "Measure time on-device", "Calculate absolute event timestamps", "User-initiated bug report" },
+			1 },
+	{ "disk_space",
+			"NSPrivacyAccessedAPICategoryDiskSpace",
+			{ "E174.1", "85F4.1", "7D9E.1", "B728.1" },
+			{ "Write or delete file on-device", "Display to user on-device", "User-initiated bug report", "Health research app" },
+			3 },
+	{ "active_keyboard",
+			"NSPrivacyAccessedAPICategoryActiveKeyboards",
+			{ "3EC4.1", "54BD.1" },
+			{ "Custom keyboard app on-device", "Customize UI on-device:2" },
+			0 },
+	{ "user_defaults",
+			"NSPrivacyAccessedAPICategoryUserDefaults",
+			{ "1C8F.1", "AC6B.1", "CA92.1" },
+			{ "Access info from same App Group", "Access managed app configuration", "Access info from same app" },
+			0 }
+};
+
+struct DataCollectionInfo {
+	String prop_name;
+	String type_name;
+};
+
+static const DataCollectionInfo data_collect_type_info[] = {
+	{ "name", "NSPrivacyCollectedDataTypeName" },
+	{ "email_address", "NSPrivacyCollectedDataTypeEmailAddress" },
+	{ "phone_number", "NSPrivacyCollectedDataTypePhoneNumber" },
+	{ "physical_address", "NSPrivacyCollectedDataTypePhysicalAddress" },
+	{ "other_contact_info", "NSPrivacyCollectedDataTypeOtherUserContactInfo" },
+	{ "health", "NSPrivacyCollectedDataTypeHealth" },
+	{ "fitness", "NSPrivacyCollectedDataTypeFitness" },
+	{ "payment_info", "NSPrivacyCollectedDataTypePaymentInfo" },
+	{ "credit_info", "NSPrivacyCollectedDataTypeCreditInfo" },
+	{ "other_financial_info", "NSPrivacyCollectedDataTypeOtherFinancialInfo" },
+	{ "precise_location", "NSPrivacyCollectedDataTypePreciseLocation" },
+	{ "coarse_location", "NSPrivacyCollectedDataTypeCoarseLocation" },
+	{ "sensitive_info", "NSPrivacyCollectedDataTypeSensitiveInfo" },
+	{ "contacts", "NSPrivacyCollectedDataTypeContacts" },
+	{ "emails_or_text_messages", "NSPrivacyCollectedDataTypeEmailsOrTextMessages" },
+	{ "photos_or_videos", "NSPrivacyCollectedDataTypePhotosorVideos" },
+	{ "audio_data", "NSPrivacyCollectedDataTypeAudioData" },
+	{ "gameplay_content", "NSPrivacyCollectedDataTypeGameplayContent" },
+	{ "customer_support", "NSPrivacyCollectedDataTypeCustomerSupport" },
+	{ "other_user_content", "NSPrivacyCollectedDataTypeOtherUserContent" },
+	{ "browsing_history", "NSPrivacyCollectedDataTypeBrowsingHistory" },
+	{ "search_hhistory", "NSPrivacyCollectedDataTypeSearchHistory" },
+	{ "user_id", "NSPrivacyCollectedDataTypeUserID" },
+	{ "device_id", "NSPrivacyCollectedDataTypeDeviceID" },
+	{ "purchase_history", "NSPrivacyCollectedDataTypePurchaseHistory" },
+	{ "product_interaction", "NSPrivacyCollectedDataTypeProductInteraction" },
+	{ "advertising_data", "NSPrivacyCollectedDataTypeAdvertisingData" },
+	{ "other_usage_data", "NSPrivacyCollectedDataTypeOtherUsageData" },
+	{ "crash_data", "NSPrivacyCollectedDataTypeCrashData" },
+	{ "performance_data", "NSPrivacyCollectedDataTypePerformanceData" },
+	{ "other_diagnostic_data", "NSPrivacyCollectedDataTypeOtherDiagnosticData" },
+	{ "environment_scanning", "NSPrivacyCollectedDataTypeEnvironmentScanning" },
+	{ "hands", "NSPrivacyCollectedDataTypeHands" },
+	{ "head", "NSPrivacyCollectedDataTypeHead" },
+	{ "other_data_types", "NSPrivacyCollectedDataTypeOtherDataTypes" },
+};
+
+static const DataCollectionInfo data_collect_purpose_info[] = {
+	{ "Analytics", "NSPrivacyCollectedDataTypePurposeAnalytics" },
+	{ "App Functionality", "NSPrivacyCollectedDataTypePurposeAppFunctionality" },
+	{ "Developer Advertising", "NSPrivacyCollectedDataTypePurposeDeveloperAdvertising" },
+	{ "Third-party Advertising", "NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising" },
+	{ "Product Personalization", "NSPrivacyCollectedDataTypePurposeProductPersonalization" },
+	{ "Other", "NSPrivacyCollectedDataTypePurposeOther" },
+};
+
 void EditorExportPlatformTVOS::get_preset_features(const Ref<EditorExportPreset> &p_preset, List<String> *r_features) {
 	String driver = ProjectSettings::get_singleton()->get("rendering/quality/driver/driver_name");
 	r_features->push_back("pvrtc");
@@ -358,6 +446,37 @@ void EditorExportPlatformTVOS::get_export_options(List<ExportOption> *r_options)
 	plugins = found_plugins;
 
 	r_options->push_back(ExportOption(PropertyInfo(Variant::STRING, "icons/brandassets", PROPERTY_HINT_DIR, "*.brandassets"), ""));
+
+	for (uint64_t i = 0; i < sizeof(api_info) / sizeof(api_info[0]); ++i) {
+		String prop_name = vformat("privacy/%s_access_reasons", api_info[i].prop_name);
+		String hint;
+		for (int j = 0; j < api_info[i].prop_flag_value.size(); j++) {
+			if (j != 0) {
+				hint += ",";
+			}
+			hint += vformat("%s - %s:%d", api_info[i].prop_flag_value[j], api_info[i].prop_flag_name[j], (1 << j));
+		}
+		r_options->push_back(ExportOption(PropertyInfo(Variant::INT, prop_name, PROPERTY_HINT_FLAGS, hint), api_info[i].default_value));
+	}
+
+	r_options->push_back(ExportOption(PropertyInfo(Variant::BOOL, "privacy/tracking_enabled"), false));
+	r_options->push_back(ExportOption(PropertyInfo(Variant::ARRAY, "privacy/tracking_domains"), Vector<String>()));
+
+	{
+		String hint;
+		for (uint64_t i = 0; i < sizeof(data_collect_purpose_info) / sizeof(data_collect_purpose_info[0]); ++i) {
+			if (i != 0) {
+				hint += ",";
+			}
+			hint += vformat("%s:%d", data_collect_purpose_info[i].prop_name, (1 << i));
+		}
+		for (uint64_t i = 0; i < sizeof(data_collect_type_info) / sizeof(data_collect_type_info[0]); ++i) {
+			r_options->push_back(ExportOption(PropertyInfo(Variant::BOOL, vformat("privacy/collected_data/%s/collected", data_collect_type_info[i].prop_name)), false));
+			r_options->push_back(ExportOption(PropertyInfo(Variant::BOOL, vformat("privacy/collected_data/%s/linked_to_user", data_collect_type_info[i].prop_name)), false));
+			r_options->push_back(ExportOption(PropertyInfo(Variant::BOOL, vformat("privacy/collected_data/%s/used_for_tracking", data_collect_type_info[i].prop_name)), false));
+			r_options->push_back(ExportOption(PropertyInfo(Variant::INT, vformat("privacy/collected_data/%s/collection_purposes", data_collect_type_info[i].prop_name), PROPERTY_HINT_FLAGS, hint), 0));
+		}
+	}
 }
 
 void EditorExportPlatformTVOS::_fix_config_file(const Ref<EditorExportPreset> &p_preset, Vector<uint8_t> &pfile, const TVOSConfigData &p_config, bool p_debug) {
@@ -434,6 +553,87 @@ void EditorExportPlatformTVOS::_fix_config_file(const Ref<EditorExportPreset> &p
 			strnew += lines[i].replace("$linker_flags", p_config.linker_flags) + "\n";
 		} else if (lines[i].find("$cpp_code") != -1) {
 			strnew += lines[i].replace("$cpp_code", p_config.cpp_code) + "\n";
+		} else if (lines[i].find("$priv_collection") != -1) {
+			bool section_opened = false;
+			for (uint64_t j = 0; j < sizeof(data_collect_type_info) / sizeof(data_collect_type_info[0]); ++j) {
+				bool data_collected = p_preset->get(vformat("privacy/collected_data/%s/collected", data_collect_type_info[j].prop_name));
+				bool linked = p_preset->get(vformat("privacy/collected_data/%s/linked_to_user", data_collect_type_info[j].prop_name));
+				bool tracking = p_preset->get(vformat("privacy/collected_data/%s/used_for_tracking", data_collect_type_info[j].prop_name));
+				int purposes = p_preset->get(vformat("privacy/collected_data/%s/collection_purposes", data_collect_type_info[j].prop_name));
+				if (data_collected) {
+					if (!section_opened) {
+						section_opened = true;
+						strnew += "\t<key>NSPrivacyCollectedDataTypes</key>\n";
+						strnew += "\t<array>\n";
+					}
+					strnew += "\t\t<dict>\n";
+					strnew += "\t\t\t<key>NSPrivacyCollectedDataType</key>\n";
+					strnew += vformat("\t\t\t<string>%s</string>\n", data_collect_type_info[j].type_name);
+					strnew += "\t\t\t\t<key>NSPrivacyCollectedDataTypeLinked</key>\n";
+					if (linked) {
+						strnew += "\t\t\t\t<true/>\n";
+					} else {
+						strnew += "\t\t\t\t<false/>\n";
+					}
+					strnew += "\t\t\t\t<key>NSPrivacyCollectedDataTypeTracking</key>\n";
+					if (tracking) {
+						strnew += "\t\t\t\t<true/>\n";
+					} else {
+						strnew += "\t\t\t\t<false/>\n";
+					}
+					if (purposes != 0) {
+						strnew += "\t\t\t\t<key>NSPrivacyCollectedDataTypePurposes</key>\n";
+						strnew += "\t\t\t\t<array>\n";
+						for (uint64_t k = 0; k < sizeof(data_collect_purpose_info) / sizeof(data_collect_purpose_info[0]); ++k) {
+							if (purposes & (1 << k)) {
+								strnew += vformat("\t\t\t\t\t<string>%s</string>\n", data_collect_purpose_info[k].type_name);
+							}
+						}
+						strnew += "\t\t\t\t</array>\n";
+					}
+					strnew += "\t\t\t</dict>\n";
+				}
+			}
+			if (section_opened) {
+				strnew += "\t</array>\n";
+			}
+		} else if (lines[i].find("$priv_tracking") != -1) {
+			bool tracking = p_preset->get("privacy/tracking_enabled");
+			strnew += "\t<key>NSPrivacyTracking</key>\n";
+			if (tracking) {
+				strnew += "\t<true/>\n";
+			} else {
+				strnew += "\t<false/>\n";
+			}
+			Vector<String> tracking_domains = p_preset->get("privacy/tracking_domains");
+			if (!tracking_domains.empty()) {
+				strnew += "\t<key>NSPrivacyTrackingDomains</key>\n";
+				strnew += "\t<array>\n";
+				for (int tracking_domain_index = 0; i < tracking_domains.size(); tracking_domain_index++) {
+					strnew += "\t\t<string>" + tracking_domains[tracking_domain_index] + "</string>\n";
+				}
+				strnew += "\t</array>\n";
+			}
+		} else if (lines[i].find("$priv_api_types") != -1) {
+			strnew += "\t<array>\n";
+			for (uint64_t j = 0; j < sizeof(api_info) / sizeof(api_info[0]); ++j) {
+				int api_access = p_preset->get(vformat("privacy/%s_access_reasons", api_info[j].prop_name));
+				if (api_access != 0) {
+					strnew += "\t\t<dict>\n";
+					strnew += "\t\t\t<key>NSPrivacyAccessedAPITypeReasons</key>\n";
+					strnew += "\t\t\t<array>\n";
+					for (int k = 0; k < api_info[j].prop_flag_value.size(); k++) {
+						if (api_access & (1 << k)) {
+							strnew += vformat("\t\t\t\t<string>%s</string>\n", api_info[j].prop_flag_value[k]);
+						}
+					}
+					strnew += "\t\t\t</array>\n";
+					strnew += "\t\t\t<key>NSPrivacyAccessedAPIType</key>\n";
+					strnew += vformat("\t\t\t<string>%s</string>\n", api_info[j].type_name);
+					strnew += "\t\t</dict>\n";
+				}
+			}
+			strnew += "\t</array>\n";
 		} else {
 			strnew += lines[i] + "\n";
 		}
@@ -1182,6 +1382,7 @@ Error EditorExportPlatformTVOS::export_project(const Ref<EditorExportPreset> &p_
 	files_to_parse.insert("godot_tvos.xcodeproj/xcshareddata/xcschemes/godot_tvos.xcscheme");
 	files_to_parse.insert("godot_tvos/godot_tvos.entitlements");
 	files_to_parse.insert("godot_tvos/Launch Screen.storyboard");
+	files_to_parse.insert("godot_tvos/PrivacyInfo.xcprivacy");
 
 	TVOSConfigData config_data = {
 		pkg_name,
