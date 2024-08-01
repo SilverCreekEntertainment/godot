@@ -136,6 +136,8 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 	UITextAutocorrectionType autocorrectionType = UITextAutocorrectionTypeNo;
 	UITextSpellCheckingType spellCheckingType = UITextSpellCheckingTypeYes;
 
+	UITextAutocapitalizationType autocapitalizationType = UITextAutocapitalizationTypeSentences;
+
 	if (p_input_type == "Username") {
 		// Added Username for completeness for iOS Password Auto Fill
 		// But as of 2/21/2022, Rogue is not using it
@@ -143,11 +145,15 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 	} else if (p_input_type == "Password") {
 		// iOS also has UITextContentTypeNewPassword
 		textContentType = UITextContentTypePassword;
+		autocorrectionType = UITextAutocorrectionTypeNo;
+		spellCheckingType = UITextSpellCheckingTypeNo;
+		autocapitalizationType = UITextAutocapitalizationTypeNone;
 	} else if (p_input_type == "Email") {
 		textContentType = UITextContentTypeEmailAddress;
 	} else if (p_input_type == "NoSuggestions") {
 		autocorrectionType = UITextAutocorrectionTypeNo;
 		spellCheckingType = UITextSpellCheckingTypeNo;
+		autocapitalizationType = UITextAutocapitalizationTypeNone;
 	}
 
 	// textContentType seems to be sticky
@@ -199,6 +205,11 @@ void OSIPhone::show_virtual_keyboard(const String &p_existing_text, const Rect2 
 
 	if (AppDelegate.viewController.keyboardView.spellCheckingType != spellCheckingType) {
 		AppDelegate.viewController.keyboardView.spellCheckingType = spellCheckingType;
+		bChanged = true;
+	}
+
+	if (AppDelegate.viewController.keyboardView.autocapitalizationType != autocapitalizationType) {
+		AppDelegate.viewController.keyboardView.autocapitalizationType = autocapitalizationType;
 		bChanged = true;
 	}
 
