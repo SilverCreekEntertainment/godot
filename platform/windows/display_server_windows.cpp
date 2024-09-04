@@ -1736,8 +1736,9 @@ void DisplayServerWindows::window_set_position(const Point2i &p_position, Window
 	const DWORD style = GetWindowLongPtr(wd.hWnd, GWL_STYLE);
 	const DWORD exStyle = GetWindowLongPtr(wd.hWnd, GWL_EXSTYLE);
 
-	//SCE Commented out AdjustWindowRectEx to allow drawing overtop of windows titlebar
-	//AdjustWindowRectEx(&rc, style, false, exStyle);
+	//SCE Don't call AdjustWindowRectEx to allow drawing overtop of windows titlebar. We also override WM_NCCALCSIZE in RogueWndProc.cpp to accomplish this
+	if(!ProjectSettings::get_singleton()->get_setting_with_override("display/window/size/extend_to_title"))
+		AdjustWindowRectEx(&rc, style, false, exStyle);
 	MoveWindow(wd.hWnd, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
 
 	wd.last_pos = p_position;
