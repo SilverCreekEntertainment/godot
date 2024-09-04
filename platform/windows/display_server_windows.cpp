@@ -1736,7 +1736,8 @@ void DisplayServerWindows::window_set_position(const Point2i &p_position, Window
 	const DWORD style = GetWindowLongPtr(wd.hWnd, GWL_STYLE);
 	const DWORD exStyle = GetWindowLongPtr(wd.hWnd, GWL_EXSTYLE);
 
-	AdjustWindowRectEx(&rc, style, false, exStyle);
+	//SCE Commented out AdjustWindowRectEx to allow drawing overtop of windows titlebar
+	//AdjustWindowRectEx(&rc, style, false, exStyle);
 	MoveWindow(wd.hWnd, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
 
 	wd.last_pos = p_position;
