@@ -5949,7 +5949,7 @@ DisplayServerWindows::DisplayServerWindows(const String &p_rendering_driver, Win
 	}
 
 #ifndef DEBUG_ENABLED
-#define COPYDATA_COMMAND_LINE 828934  // be sure this matches RogueWndProc.cpp
+#define COPYDATA_COMMAND_LINE 828934 // be sure this matches RogueWndProc.cpp
 
 	// Check if another instance is already running, if it is then send the command line arguments to it and exit.
 	HWND wnd = FindWindowW(class_name_w, NULL);
