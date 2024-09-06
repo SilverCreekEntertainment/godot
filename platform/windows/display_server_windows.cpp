@@ -5951,8 +5951,10 @@ DisplayServerWindows::DisplayServerWindows(const String &p_rendering_driver, Win
 	// Check if another instance is already running, if it is then send the command line arguments to it and exit.
 	#define COPYDATA_COMMAND_LINE 828934  // be sure this matches RogueWndProc.cpp
 	HWND wnd = FindWindowW(class_name_w, NULL);
-	if (!wnd)
+	if (!wnd) {
 		wnd = FindWindowW(L"RprWindowClass", class_name_w); // Old games with buggy RPR
+	}
+
 	if (wnd) {
 		ShowWindow(wnd, SW_SHOWNORMAL);
 		BringWindowToTop(wnd);
