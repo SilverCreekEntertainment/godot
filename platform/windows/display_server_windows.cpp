@@ -5410,8 +5410,9 @@ DisplayServer::WindowID DisplayServerWindows::_create_window(WindowMode p_mode, 
 		String class_name = ProjectSettings::get_singleton()->get("application/config/windows_class_name", &valid);
 		Char16String class_name_16 = class_name.utf16();
 		LPCWSTR class_name_w = (LPCWSTR)(class_name_16.get_data());
-		if(!valid)
+		if (!valid) {
 			class_name_w = L"Engine";
+		}
 
 		WindowData &wd = windows[id];
 
@@ -5943,13 +5944,14 @@ DisplayServerWindows::DisplayServerWindows(const String &p_rendering_driver, Win
 	String class_name = ProjectSettings::get_singleton()->get("application/config/windows_class_name", &valid);
 	Char16String class_name_16 = class_name.utf16();
 	LPCWSTR class_name_w = (LPCWSTR)(class_name_16.get_data());
-	if(!valid)
+	if (!valid) {
 		class_name_w = L"Engine";
+	}
 
 #ifndef DEBUG_ENABLED
+#define COPYDATA_COMMAND_LINE 828934  // be sure this matches RogueWndProc.cpp
 
 	// Check if another instance is already running, if it is then send the command line arguments to it and exit.
-	#define COPYDATA_COMMAND_LINE 828934  // be sure this matches RogueWndProc.cpp
 	HWND wnd = FindWindowW(class_name_w, NULL);
 	if (!wnd) {
 		wnd = FindWindowW(L"RprWindowClass", class_name_w); // Old games with buggy RPR
