@@ -6289,7 +6289,9 @@ DisplayServer *DisplayServerWindows::create_func(const String &p_rendering_drive
 			OS::get_singleton()->alert(
 					"Your video card drivers seem not to support the required OpenGL 3.3 version.\n\n"
 					"If possible, consider updating your video card drivers.\n\n"
-					"If you have recently updated your video card drivers, try rebooting.",
+					"If you have recently updated your video card drivers, try rebooting.\n\n"
+					"Or try installing an older version of the game:\n\n"
+					"https://www.hardwoodgames.com/download/",
 					"Unable to initialize OpenGL video driver");
 		}
 	}
