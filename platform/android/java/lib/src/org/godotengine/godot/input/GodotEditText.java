@@ -256,7 +256,7 @@ public class GodotEditText extends EditText {
 			if (keyCode == KeyEvent.KEYCODE_BUTTON_B) {
 				mRenderView.getView().requestFocus();
 			}
-			
+
 			return super.onKeyUp(keyCode, keyEvent);
 		}
 	}
