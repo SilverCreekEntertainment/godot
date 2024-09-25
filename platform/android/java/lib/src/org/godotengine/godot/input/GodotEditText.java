@@ -253,8 +253,9 @@ public class GodotEditText extends EditText {
 		} else {
 			// If user closes keyboard by pressing B on a controller, then we need to give focus
 			// back to GodotView here
-			if(keyCode == KeyEvent.KEYCODE_BUTTON_B)
+			if (keyCode == KeyEvent.KEYCODE_BUTTON_B) {
 				mRenderView.getView().requestFocus();
+			}
 			
 			return super.onKeyUp(keyCode, keyEvent);
 		}
