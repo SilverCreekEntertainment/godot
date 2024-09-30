@@ -320,7 +320,11 @@ layout(std140) uniform MaterialUniforms { // ubo:3
 #GLOBALS
 
 /* clang-format on */
+/*
+commenting this line out fixes shader compiler error on some chromebooks:
+error: declarations for uniform `world_transform' have mismatching invariant qualifiers
 invariant gl_Position;
+*/
 
 void main() {
 	highp vec3 vertex = vertex_angle_attrib.xyz * compressed_aabb_size + compressed_aabb_position;
