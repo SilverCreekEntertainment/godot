@@ -480,7 +480,12 @@ int DisplayServerIOS::screen_get_dpi(int p_screen) const {
 		case UIUserInterfaceIdiomPhone: {
 			if (scale == 3) {
 				CGFloat nativeScale = [UIScreen mainScreen].nativeScale;
-				return nativeScale == 3 ? 458 : 401;
+
+				// SCE: changed == 3 to >= 3
+				// iPhone Max in Zoom mode has a scale of 3.4239999
+				// So on a newer iPhone Max (as of Godot 4.3, device_metrics.m is missing iPhone 15 & 16)
+				// This would previously return too small a DPI
+				return nativeScale >= 3 ? 458 : 401;
 			}
 
 			return 326;
