@@ -2071,6 +2071,18 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 		BLOCK_DEVICE("Intel", "Intel(R) HD Graphics 5300");
 		BLOCK_DEVICE("0x8086", "0x161E"); // HD Graphics 5300, Gen8, Broadwell
 
+		// Radeon 3000 got opengl shader compiler error then exits, forcing to angle shows users message to
+		// update drivers or download older version of game.
+		// Added other similar cards to blocklist.
+		BLOCK_DEVICE("ATI", "Radeon 2100");
+		BLOCK_DEVICE("ATI", "Radeon 3000");
+		BLOCK_DEVICE("ATI", "Radeon 3100");
+		BLOCK_DEVICE("ATI", "Radeon 7000");
+		BLOCK_DEVICE("ATI", "Radeon 9000");
+		BLOCK_DEVICE("ATI", "Radeon 9100");
+		BLOCK_DEVICE("ATI", "Radeon IGP");
+
+
 #undef BLOCK_DEVICE
 
 		GLOBAL_DEF_RST_NOVAL(PropertyInfo(Variant::ARRAY, "rendering/gl_compatibility/force_angle_on_devices", PROPERTY_HINT_ARRAY_TYPE, vformat("%s/%s:%s", Variant::DICTIONARY, PROPERTY_HINT_NONE, String())), device_blocklist);
