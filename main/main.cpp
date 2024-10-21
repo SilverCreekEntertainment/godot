@@ -2067,9 +2067,26 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 		BLOCK_DEVICE("0x8086", "0x016A"); // HD Graphics P4000, Gen7, Ivy Bridge
 
 		// Added by SCE, works, but blackbar at top
+		// https://www.techpowerup.com/gpu-specs/   to find similar GPUs
+		BLOCK_DEVICE("Intel", "Intel HD Graphics 4400");
+		BLOCK_DEVICE("Intel", "Intel HD Graphics 4600");
+
 		BLOCK_DEVICE("Intel", "Intel HD Graphics 5300");
 		BLOCK_DEVICE("Intel", "Intel(R) HD Graphics 5300");
 		BLOCK_DEVICE("0x8086", "0x161E"); // HD Graphics 5300, Gen8, Broadwell
+
+		// Adding similar models, but unknown if they have blackbar problem
+		BLOCK_DEVICE("Intel", "Intel HD Graphics 4000");
+		BLOCK_DEVICE("Intel", "Intel HD Graphics P4000");
+		BLOCK_DEVICE("Intel", "Intel HD Graphics 4200");
+		BLOCK_DEVICE("Intel", "Intel HD Graphics P4600");
+		BLOCK_DEVICE("Intel", "Intel HD Graphics P4700");
+		BLOCK_DEVICE("Intel", "Intel HD Graphics 5000");
+		BLOCK_DEVICE("Intel", "Intel HD Graphics 5300");
+		BLOCK_DEVICE("Intel", "Intel HD Graphics 5500");
+		BLOCK_DEVICE("Intel", "Intel HD Graphics 5600");
+		BLOCK_DEVICE("Intel", "Intel HD Graphics P5700");
+		BLOCK_DEVICE("Intel", "Intel HD Graphics 6000");
 
 		// Radeon 3000 got opengl shader compiler error then exits, forcing to angle shows users message to
 		// update drivers or download older version of game.
