@@ -674,6 +674,8 @@ _FORCE_INLINE_ int _convert_utf32_offset_to_utf16(const String &p_existing_text,
 void DisplayServerIOS::virtual_keyboard_show(const String &p_existing_text, const Rect2 &p_screen_rect, VirtualKeyboardType p_type, int p_max_length, int p_cursor_start, int p_cursor_end) {
 	NSString *existingString = [[NSString alloc] initWithUTF8String:p_existing_text.utf8().get_data()];
 
+	[AppDelegate.viewController selectKeyboardView:(p_type == KEYBOARD_TYPE_PASSWORD)];
+
 	AppDelegate.viewController.keyboardView.keyboardType = UIKeyboardTypeDefault;
 	AppDelegate.viewController.keyboardView.textContentType = nil;
 	switch (p_type) {

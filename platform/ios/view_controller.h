@@ -39,4 +39,6 @@
 @property(nonatomic, readonly, strong) GodotView *godotView;
 @property(nonatomic, readonly, strong) GodotKeyboardInputView *keyboardView;
 
+- (void)selectKeyboardView:(bool)password;
+
 @end

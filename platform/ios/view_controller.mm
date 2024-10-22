@@ -47,6 +47,9 @@
 @property(strong, nonatomic) GodotViewRenderer *renderer;
 @property(strong, nonatomic) GodotKeyboardInputView *keyboardView;
 
+@property(strong, nonatomic) GodotKeyboardInputView *mainKeyboardView;
+@property(strong, nonatomic) GodotKeyboardInputView *passwordKeyboardView;
+
 @property(strong, nonatomic) UIView *godotLoadingOverlay;
 
 @end
@@ -170,8 +173,14 @@
 
 - (void)observeKeyboard {
 	print_verbose("Setting up keyboard input view.");
-	self.keyboardView = [GodotKeyboardInputView new];
-	[self.view addSubview:self.keyboardView];
+
+	self.mainKeyboardView = [GodotKeyboardInputView new];
+	[self.view addSubview:self.mainKeyboardView];
+
+	self.passwordKeyboardView = [GodotKeyboardInputView new];
+	[self.view addSubview:self.passwordKeyboardView];
+
+	self.keyboardView = self.mainKeyboardView;
 
 	print_verbose("Adding observer for keyboard show/hide.");
 	[[NSNotificationCenter defaultCenter]
@@ -184,6 +193,14 @@
 			   selector:@selector(keyboardHidden:)
 				   name:UIKeyboardDidHideNotification
 				 object:nil];
+}
+
+- (void)selectKeyboardView:(bool)password {
+	if (password) {
+		self.keyboardView = self.passwordKeyboardView;
+	} else {
+		self.keyboardView = self.mainKeyboardView;
+	}
 }
 
 - (void)displayLoadingOverlay {
