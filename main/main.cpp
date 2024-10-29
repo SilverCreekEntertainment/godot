@@ -2139,7 +2139,7 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 
 		// Added by SCE, works, but blackbar at top
 		// https://www.techpowerup.com/gpu-specs/   to find similar GPUs
-		BLOCK_DEVICE("Intel", "Intel(R) HD Graphics");  // user reported this model with no number, so this will match all models with this string in it
+		BLOCK_DEVICE("Intel", "Intel(R) HD Graphics"); // user reported this model with no number, so this will match all models with this string in it
 		BLOCK_DEVICE("Intel", "Intel HD Graphics");
 		BLOCK_DEVICE("Intel", "Intel(R) Iris");
 		BLOCK_DEVICE("Intel", "Intel Iris");
