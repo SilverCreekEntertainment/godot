@@ -69,13 +69,13 @@ void AndroidInputHandler::process_key_event(int p_physical_keycode, int p_unicod
 	char32_t unicode = p_unicode;
 	if ((p_unicode & 0xfffffc00) == 0xd800) {
 		if (prev_wc != 0) {
-			ERR_PRINT("invalid utf16 surrogate input");
+			ERR_PRINT(vformat("invalid utf16 surrogate input. p_physical_keycode: %d  p_unicode: %d", p_physical_keycode, p_unicode));
 		}
 		prev_wc = unicode;
 		return; // Skip surrogate.
 	} else if ((unicode & 0xfffffc00) == 0xdc00) {
 		if (prev_wc == 0) {
-			ERR_PRINT("invalid utf16 surrogate input");
+			ERR_PRINT(vformat("invalid utf16 surrogate input. p_physical_keycode: %d  p_unicode: %d", p_physical_keycode, p_unicode));
 			return; // Skip invalid surrogate.
 		}
 		unicode = (prev_wc << 10UL) + unicode - ((0xd800 << 10UL) + 0xdc00 - 0x10000);
