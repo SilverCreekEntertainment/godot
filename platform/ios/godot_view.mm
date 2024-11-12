@@ -354,6 +354,10 @@ static const float earth_gravity = 9.80665;
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+	if (!DisplayServerIOS::get_singleton()) {
+		return;
+	}
+
 	for (UITouch *touch in touches) {
 		int tid = [self getTouchIDForTouch:touch];
 		ERR_FAIL_COND(tid == -1);
@@ -363,6 +367,10 @@ static const float earth_gravity = 9.80665;
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+	if (!DisplayServerIOS::get_singleton()) {
+		return;
+	}
+
 	for (UITouch *touch in touches) {
 		int tid = [self getTouchIDForTouch:touch];
 		ERR_FAIL_COND(tid == -1);
@@ -375,6 +383,10 @@ static const float earth_gravity = 9.80665;
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+	if (!DisplayServerIOS::get_singleton()) {
+		return;
+	}
+
 	for (UITouch *touch in touches) {
 		int tid = [self getTouchIDForTouch:touch];
 		ERR_FAIL_COND(tid == -1);
@@ -385,6 +397,10 @@ static const float earth_gravity = 9.80665;
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+	if (!DisplayServerIOS::get_singleton()) {
+		return;
+	}
+
 	for (UITouch *touch in touches) {
 		int tid = [self getTouchIDForTouch:touch];
 		ERR_FAIL_COND(tid == -1);
@@ -396,6 +412,10 @@ static const float earth_gravity = 9.80665;
 // MARK: Motion
 
 - (void)handleMotion {
+	if (!DisplayServerIOS::get_singleton()) {
+		return;
+	}
+
 	if (!self.motionManager) {
 		return;
 	}
