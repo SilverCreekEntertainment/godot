@@ -31,6 +31,8 @@
 #ifndef PLATFORM_GL_H
 #define PLATFORM_GL_H
 
+#pragma clang diagnostic ignored "-Wmodule-import-in-extern-c"
+
 #ifndef GLES_API_ENABLED
 #define GLES_API_ENABLED // Allow using GLES.
 #endif
