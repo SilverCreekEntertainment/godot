@@ -2174,6 +2174,10 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 		BLOCK_DEVICE("Intel", "HD Graphics 655");
 		BLOCK_DEVICE("Intel", "HD Graphics 24EU");
 
+		// Adding Intel with crashes in drivers (igxelpicd64.dll)
+		BLOCK_DEVICE("Intel", "Intel(R) UHD Graphics");
+		BLOCK_DEVICE("Intel", "Intel(R) Graphics");
+
 		// Radeon 3000 got opengl shader compiler error then exits, forcing to angle shows users message to
 		// update drivers or download older version of game.
 		// Added other similar cards to blocklist.
