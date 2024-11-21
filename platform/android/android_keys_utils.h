@@ -124,6 +124,8 @@ static AndroidGodotCodePair android_godot_code_pairs[] = {
 	{ AKEYCODE_MEDIA_STOP, Key::MEDIASTOP }, // (86) Stop media key.
 	{ AKEYCODE_MEDIA_NEXT, Key::MEDIANEXT }, // (87) Play Next media key.
 	{ AKEYCODE_MEDIA_PREVIOUS, Key::MEDIAPREVIOUS }, // (88) Play Previous media key.
+	{ AKEYCODE_MEDIA_REWIND, Key::MEDIAREWIND }, // (89) Rewind media key.
+	{ AKEYCODE_MEDIA_FAST_FORWARD, Key::MEDIAFASTFORWARD }, // (90) Fast Forward media key.
 	{ AKEYCODE_PAGE_UP, Key::PAGEUP }, // (92) Page Up key.
 	{ AKEYCODE_PAGE_DOWN, Key::PAGEDOWN }, // (93) Page Down key.
 	{ AKEYCODE_ESCAPE, Key::ESCAPE }, // (111) Escape key.
