@@ -42,7 +42,7 @@
             android:excludeFromRecents="false"
             android:exported="true"
             android:screenOrientation="landscape"
-            android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize|density|keyboard|navigation|screenLayout|uiMode"
+            android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize|density|keyboard|navigation|screenLayout|uiMode|fontScale|fontWeightAdjustment|colorMode|grammaticalGender|layoutDirection|locale|mcc|mnc|touchscreen"
             android:resizeableActivity="false"
             tools:ignore="UnusedAttribute" >
 

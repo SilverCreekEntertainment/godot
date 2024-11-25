@@ -40,7 +40,7 @@
 
         <activity
             android:name=".GodotEditor"
-            android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize|density|keyboard|navigation|screenLayout|uiMode"
+            android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize|density|keyboard|navigation|screenLayout|uiMode|fontScale|fontWeightAdjustment|colorMode|grammaticalGender|layoutDirection|locale|mcc|mnc|touchscreen"
             android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="userLandscape">
@@ -57,7 +57,7 @@
         </activity>
         <activity
             android:name=".GodotGame"
-            android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize|density|keyboard|navigation|screenLayout|uiMode"
+            android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize|density|keyboard|navigation|screenLayout|uiMode|fontScale|fontWeightAdjustment|colorMode|grammaticalGender|layoutDirection|locale|mcc|mnc|touchscreen"
             android:exported="false"
             android:label="@string/godot_project_name_string"
             android:launchMode="singleTask"
