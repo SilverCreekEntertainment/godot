@@ -92,13 +92,14 @@ class Godot(private val context: Context) : SensorEventListener {
 	}
 
 	private val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-	private val mSensorManager: SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+	//private val mSensorManager: SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 	private val mClipboard: ClipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 	private val vibratorService: Vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
 	private val pluginRegistry: GodotPluginRegistry by lazy {
 		GodotPluginRegistry.getPluginRegistry()
 	}
+	/*
 	private val mAccelerometer: Sensor? by lazy {
 		mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 	}
@@ -111,6 +112,7 @@ class Godot(private val context: Context) : SensorEventListener {
 	private val mGyroscope: Sensor? by lazy {
 		mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
 	}
+	*/
 
 	private val uiChangeListener = View.OnSystemUiVisibilityChangeListener { visibility: Int ->
 		if (visibility and View.SYSTEM_UI_FLAG_FULLSCREEN == 0) {
@@ -525,6 +527,7 @@ class Godot(private val context: Context) : SensorEventListener {
 		}
 
 		renderView?.onActivityResumed()
+		/*
 		if (mAccelerometer != null) {
 			mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME)
 		}
@@ -537,6 +540,7 @@ class Godot(private val context: Context) : SensorEventListener {
 		if (mGyroscope != null) {
 			mSensorManager.registerListener(this, mGyroscope, SensorManager.SENSOR_DELAY_GAME)
 		}
+		*/
 		if (useImmersive) {
 			val window = requireActivity().window
 			window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
@@ -558,7 +562,7 @@ class Godot(private val context: Context) : SensorEventListener {
 		}
 
 		renderView?.onActivityPaused()
-		mSensorManager.unregisterListener(this)
+		//mSensorManager.unregisterListener(this)
 		for (plugin in pluginRegistry.allPlugins) {
 			plugin.onMainPause()
 		}
@@ -892,7 +896,7 @@ class Godot(private val context: Context) : SensorEventListener {
 		if (renderView == null) {
 			return
 		}
-
+		/*
 		val rotatedValues = getRotatedValues(event.values)
 
 		when (event.sensor.type) {
@@ -925,6 +929,7 @@ class Godot(private val context: Context) : SensorEventListener {
 				}
 			}
 		}
+		*/
 	}
 
 	override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
