@@ -185,8 +185,8 @@ public class GodotIO {
 		int[] result = { rect.left, rect.top, rect.right, rect.bottom };
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
 			View decorView = activity.getWindow().getDecorView();
-			result[0] = (int) decorView.getX();
-			result[1] = (int) decorView.getY();
+			result[0] = (int)decorView.getX();
+			result[1] = (int)decorView.getY();
 			result[2] = decorView.getWidth();
 			result[3] = decorView.getHeight();
 			WindowInsets insets = activity.getWindow().getDecorView().getRootWindowInsets();
