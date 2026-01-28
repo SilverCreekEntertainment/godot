@@ -2402,6 +2402,63 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 		FORCE_ANGLE("Intel", "Intel(R) Iris Pro Graphics 580");
 		FORCE_ANGLE("Intel", "Intel(R) Iris Pro Graphics P580");
 
+		// Added by SCE, works, fixes blackbar at top of window
+		// https://www.techpowerup.com/gpu-specs/   to find similar GPUs
+		FORCE_ANGLE("Intel", "Intel(R) HD Graphics"); // user reported this model with no number, so this will match all models with this string in it
+		FORCE_ANGLE("Intel", "Intel HD Graphics");
+		FORCE_ANGLE("Intel", "Intel(R) Iris");
+		FORCE_ANGLE("Intel", "Intel Iris");
+		FORCE_ANGLE("Intel", "Intel HD Graphics 4400");
+		FORCE_ANGLE("Intel", "Intel HD Graphics 4600");
+		FORCE_ANGLE("Intel", "Intel HD Graphics 5300");
+		FORCE_ANGLE("Intel", "Intel(R) HD Graphics 5300");
+		FORCE_ANGLE("0x8086", "0x161E"); // HD Graphics 5300, Gen8, Broadwell
+
+		// Adding similar models, but unknown if they have blackbar problem
+		FORCE_ANGLE("Intel", "Intel HD Graphics 4000");
+		FORCE_ANGLE("Intel", "Intel HD Graphics P4000");
+		FORCE_ANGLE("Intel", "Intel HD Graphics 4200");
+		FORCE_ANGLE("Intel", "Intel HD Graphics P4600");
+		FORCE_ANGLE("Intel", "Intel HD Graphics P4700");
+		FORCE_ANGLE("Intel", "Intel HD Graphics 5000");
+		FORCE_ANGLE("Intel", "Intel HD Graphics 5300");
+		FORCE_ANGLE("Intel", "Intel HD Graphics 5500");
+		FORCE_ANGLE("Intel", "Intel HD Graphics 5600");
+		FORCE_ANGLE("Intel", "Intel HD Graphics P5700");
+		FORCE_ANGLE("Intel", "Intel HD Graphics 6000");
+
+		// Adding 9.5 gen to hopefully avoid this problem: https://github.com/godotengine/godot/issues/79955
+		// a user with a Intel(R) HD Graphics 620   sent a screenshot that looked like that
+		// shortened to match variants like: Intel(R) HD Graphics 610, Intel HD Graphics 610, Intel UHD Graphics 610
+		FORCE_ANGLE("Intel", "HD Graphics 600");
+		FORCE_ANGLE("Intel", "HD Graphics 605");
+		FORCE_ANGLE("Intel", "HD Graphics 610");
+		FORCE_ANGLE("Intel", "HD Graphics 615");
+		FORCE_ANGLE("Intel", "HD Graphics 617");
+		FORCE_ANGLE("Intel", "HD Graphics 620");
+		FORCE_ANGLE("Intel", "HD Graphics 630");
+		FORCE_ANGLE("Intel", "HD Graphics P630");
+		FORCE_ANGLE("Intel", "HD Graphics 640");
+		FORCE_ANGLE("Intel", "HD Graphics 645");
+		FORCE_ANGLE("Intel", "HD Graphics 650");
+		FORCE_ANGLE("Intel", "HD Graphics 655");
+		FORCE_ANGLE("Intel", "HD Graphics 24EU");
+
+		// Adding Intel with crashes in drivers (igxelpicd64.dll)
+		FORCE_ANGLE("Intel", "Intel(R) UHD Graphics");
+		FORCE_ANGLE("Intel", "Intel(R) Graphics");
+
+		// Radeon 3000 got opengl shader compiler error then exits, forcing to angle shows users message to
+		// update drivers or download older version of game.
+		// Added other similar cards to blocklist.
+		FORCE_ANGLE("ATI", "Radeon 2100");
+		FORCE_ANGLE("ATI", "Radeon 3000");
+		FORCE_ANGLE("ATI", "Radeon 3100");
+		FORCE_ANGLE("ATI", "Radeon 7000");
+		FORCE_ANGLE("ATI", "Radeon 9000");
+		FORCE_ANGLE("ATI", "Radeon 9100");
+		FORCE_ANGLE("ATI", "Radeon IGP");
+
 #undef FORCE_ANGLE
 
 		GLOBAL_DEF_RST_NOVAL(PropertyInfo(Variant::ARRAY, "rendering/gl_compatibility/force_angle_on_devices", PROPERTY_HINT_ARRAY_TYPE, vformat("%s/%s:%s", Variant::DICTIONARY, PROPERTY_HINT_NONE, String())), force_angle_list);
