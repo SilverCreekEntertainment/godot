@@ -6470,12 +6470,21 @@ Error DisplayServerWindows::_create_window(WindowID p_window_id, WindowMode p_mo
 			}
 		}
 
+		// Check for custom class name, this must match code in DisplayServerWindows::DisplayServerWindows
+		bool valid = false;
+		String class_name = ProjectSettings::get_singleton()->get("application/config/windows_class_name", &valid);
+		Char16String class_name_16 = class_name.utf16();
+		LPCWSTR class_name_w = (LPCWSTR)(class_name_16.get_data());
+		if(!valid) {
+			class_name_w = L"Engine";
+		}
+
 		WindowData &wd = windows[id];
 
 		wd.id = id;
 		wd.hWnd = CreateWindowExW(
 				dwExStyle,
-				L"Engine", L"",
+				class_name_w, L"",
 				dwStyle,
 				WindowRect.left,
 				WindowRect.top,
@@ -7153,6 +7162,54 @@ DisplayServerWindows::DisplayServerWindows(const String &p_rendering_driver, Win
 
 	OleInitialize(nullptr);
 
+	// Check for custom class name, this must match code in DisplayServerWindows::_create_window
+	bool valid = false;
+	String class_name = ProjectSettings::get_singleton()->get("application/config/windows_class_name", &valid);
+	Char16String class_name_16 = class_name.utf16();
+	LPCWSTR class_name_w = (LPCWSTR)(class_name_16.get_data());
+	if(!valid)
+		class_name_w = L"Engine";
+
+#ifndef DEBUG_ENABLED
+#define COPYDATA_COMMAND_LINE 828934 // be sure this matches RogueWndProc.cpp
+
+	// Check if another instance is already running, if it is then send the command line arguments to it and exit.
+	HWND wnd = FindWindowW(class_name_w, NULL);
+	if (!wnd) {
+		wnd = FindWindowW(L"RprWindowClass", class_name_w); // Old games with buggy RPR
+	}
+
+	if (wnd) {
+		ShowWindow(wnd, SW_SHOWNORMAL);
+		BringWindowToTop(wnd);
+		SetForegroundWindow(wnd);
+
+		// Convert command line arguments to a single string
+		List<String> cmdline_args = OS::get_singleton()->get_cmdline_args();
+		String cmdline_args_str;
+		for (int i = 0; i < cmdline_args.size(); i++) {
+			cmdline_args_str += cmdline_args.get(i);
+			if (i < cmdline_args.size() - 1) {
+				cmdline_args_str += " ";
+			}
+		}
+
+		// Send command line arguments to original wnd via WM_COPYDATA
+		Char16String cmdline_args_16 = cmdline_args_str.utf16();
+		LPCWSTR cmdline_args_w = (LPCWSTR)(cmdline_args_16.get_data());
+		COPYDATASTRUCT cds;
+		cds.dwData = COPYDATA_COMMAND_LINE;
+		cds.cbData = (cmdline_args_str.length() + 1) * sizeof(wchar_t);
+		cds.lpData = (LPVOID)cmdline_args_w;
+		SendMessage(wnd, WM_COPYDATA, (WPARAM)NULL, (LPARAM)&cds);
+
+		// use a different error code to signal to DisplayServerWindows::create_func to not show an error message
+		// Note returning here causes a crash in debug
+		r_error = ERR_ALREADY_IN_USE;
+		return;
+	}
+#endif
+
 	memset(&wc, 0, sizeof(WNDCLASSEXW));
 	wc.cbSize = sizeof(WNDCLASSEXW);
 	wc.style = CS_OWNDC | CS_DBLCLKS;
@@ -7164,7 +7221,7 @@ DisplayServerWindows::DisplayServerWindows(const String &p_rendering_driver, Win
 	wc.hCursor = nullptr;
 	wc.hbrBackground = nullptr;
 	wc.lpszMenuName = nullptr;
-	wc.lpszClassName = L"Engine";
+	wc.lpszClassName = class_name_w;
 
 	if (!RegisterClassExW(&wc)) {
 		r_error = ERR_UNAVAILABLE;
@@ -7603,7 +7660,7 @@ Vector<String> DisplayServerWindows::get_rendering_drivers_func() {
 
 DisplayServer *DisplayServerWindows::create_func(const String &p_rendering_driver, WindowMode p_mode, VSyncMode p_vsync_mode, uint32_t p_flags, const Vector2i *p_position, const Vector2i &p_resolution, int p_screen, Context p_context, int64_t p_parent_window, Error &r_error) {
 	DisplayServer *ds = memnew(DisplayServerWindows(p_rendering_driver, p_mode, p_vsync_mode, p_flags, p_position, p_resolution, p_screen, p_context, p_parent_window, r_error));
-	if (r_error != OK) {
+	if (r_error != OK && r_error != ERR_ALREADY_IN_USE) {
 		if (tested_drivers == 0) {
 			OS::get_singleton()->alert("Failed to register the window class.", "Unable to initialize DisplayServer");
 		} else if (tested_drivers.has_flag(DRIVER_ID_RD_VULKAN) || tested_drivers.has_flag(DRIVER_ID_RD_D3D12)) {
