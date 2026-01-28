@@ -7618,9 +7618,11 @@ DisplayServer *DisplayServerWindows::create_func(const String &p_rendering_drive
 			OS::get_singleton()->alert(
 					vformat("Your video card drivers seem not to support the required %s version.\n\n"
 							"If possible, consider updating your video card drivers or using the OpenGL 3 driver.\n\n"
-							"You can enable the OpenGL 3 driver by starting the engine from the\n"
-							"command line with the command:\n\n    \"%s\" --rendering-driver opengl3\n\n"
-							"If you have recently updated your video card drivers, try rebooting.",
+							//"You can enable the OpenGL 3 driver by starting the engine from the\n"
+							//"command line with the command:\n\n    \"%s\" --rendering-driver opengl3\n\n"
+							"If you have recently updated your video card drivers, try rebooting."
+							"Or try installing an older version of the game:\n\n"
+							"https://www.hardwoodgames.com/download/",
 							String(" or ").join(drivers),
 							executable_name),
 					"Unable to initialize video driver");
@@ -7636,7 +7638,9 @@ DisplayServer *DisplayServerWindows::create_func(const String &p_rendering_drive
 					vformat(
 							"Your video card drivers seem not to support the required %s version.\n\n"
 							"If possible, consider updating your video card drivers.\n\n"
-							"If you have recently updated your video card drivers, try rebooting.",
+							"If you have recently updated your video card drivers, try rebooting."
+							"Or try installing an older version of the game:\n\n"
+							"https://www.hardwoodgames.com/download/",
 							String(" or ").join(drivers)),
 					"Unable to initialize video driver");
 		}
