@@ -6475,7 +6475,7 @@ Error DisplayServerWindows::_create_window(WindowID p_window_id, WindowMode p_mo
 		String class_name = ProjectSettings::get_singleton()->get("application/config/windows_class_name", &valid);
 		Char16String class_name_16 = class_name.utf16();
 		LPCWSTR class_name_w = (LPCWSTR)(class_name_16.get_data());
-		if(!valid) {
+		if (!valid) {
 			class_name_w = L"Engine";
 		}
 
@@ -7167,8 +7167,9 @@ DisplayServerWindows::DisplayServerWindows(const String &p_rendering_driver, Win
 	String class_name = ProjectSettings::get_singleton()->get("application/config/windows_class_name", &valid);
 	Char16String class_name_16 = class_name.utf16();
 	LPCWSTR class_name_w = (LPCWSTR)(class_name_16.get_data());
-	if(!valid)
+	if (!valid) {
 		class_name_w = L"Engine";
+	}
 
 #ifndef DEBUG_ENABLED
 #define COPYDATA_COMMAND_LINE 828934 // be sure this matches RogueWndProc.cpp
