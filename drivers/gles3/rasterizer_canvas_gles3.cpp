@@ -672,8 +672,12 @@ void RasterizerCanvasGLES3::_render_items(RID p_to_render_target, int p_item_cou
 #else
 	// On Desktop and mobile we map the memory without synchronizing for maximum speed.
 	void *buffer = glMapBufferRange(GL_ARRAY_BUFFER, state.last_item_index * sizeof(InstanceData), index * sizeof(InstanceData), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-	memcpy(buffer, state.instance_data_array, index * sizeof(InstanceData));
-	glUnmapBuffer(GL_ARRAY_BUFFER);
+	if (buffer) {
+		memcpy(buffer, state.instance_data_array, index * sizeof(InstanceData));
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+	} else {
+		glBufferSubData(GL_ARRAY_BUFFER, state.last_item_index * sizeof(InstanceData), index * sizeof(InstanceData), state.instance_data_array);
+	}
 #endif
 
 	glDisable(GL_SCISSOR_TEST);
@@ -1559,8 +1563,12 @@ void RasterizerCanvasGLES3::_add_to_batch(uint32_t &r_index, bool &r_batch_broke
 #else
 		// On Desktop and mobile we map the memory without synchronizing for maximum speed.
 		void *buffer = glMapBufferRange(GL_ARRAY_BUFFER, state.last_item_index * sizeof(InstanceData), r_index * sizeof(InstanceData), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-		memcpy(buffer, state.instance_data_array, r_index * sizeof(InstanceData));
-		glUnmapBuffer(GL_ARRAY_BUFFER);
+		if (buffer) {
+			memcpy(buffer, state.instance_data_array, r_index * sizeof(InstanceData));
+			glUnmapBuffer(GL_ARRAY_BUFFER);
+		} else {
+			glBufferSubData(GL_ARRAY_BUFFER, state.last_item_index * sizeof(InstanceData), r_index * sizeof(InstanceData), state.instance_data_array);
+		}
 #endif
 		_allocate_instance_buffer();
 		r_index = 0;
