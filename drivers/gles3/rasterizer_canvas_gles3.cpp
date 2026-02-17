@@ -1314,8 +1314,15 @@ void RasterizerCanvasGLES3::_render_batch(Light *p_lights, uint32_t p_index, Ren
 	switch (state.canvas_instance_batches[p_index].command_type) {
 		case Item::Command::TYPE_RECT:
 		case Item::Command::TYPE_NINEPATCH: {
+			int buf_idx = state.canvas_instance_batches[p_index].instance_buffer_index;
+			ERR_FAIL_INDEX(buf_idx, (int)state.canvas_instance_data_buffers[state.current_data_buffer_index].instance_buffers.size());
+			GLuint buf = state.canvas_instance_data_buffers[state.current_data_buffer_index].instance_buffers[buf_idx];
+			if (buf == 0) {
+				break;
+			}
+
 			glBindVertexArray(data.indexed_quad_array);
-			glBindBuffer(GL_ARRAY_BUFFER, state.canvas_instance_data_buffers[state.current_data_buffer_index].instance_buffers[state.canvas_instance_batches[p_index].instance_buffer_index]);
+			glBindBuffer(GL_ARRAY_BUFFER, buf);
 			uint32_t range_start = state.canvas_instance_batches[p_index].start * sizeof(InstanceData);
 			_enable_attributes(range_start, false);
 
@@ -1336,8 +1343,15 @@ void RasterizerCanvasGLES3::_render_batch(Light *p_lights, uint32_t p_index, Ren
 			PolygonBuffers *pb = polygon_buffers.polygons.getptr(polygon->polygon.polygon_id);
 			ERR_FAIL_NULL(pb);
 
+			int buf_idx = state.canvas_instance_batches[p_index].instance_buffer_index;
+			ERR_FAIL_INDEX(buf_idx, (int)state.canvas_instance_data_buffers[state.current_data_buffer_index].instance_buffers.size());
+			GLuint buf = state.canvas_instance_data_buffers[state.current_data_buffer_index].instance_buffers[buf_idx];
+			if (buf == 0) {
+				break;
+			}
+
 			glBindVertexArray(pb->vertex_array);
-			glBindBuffer(GL_ARRAY_BUFFER, state.canvas_instance_data_buffers[state.current_data_buffer_index].instance_buffers[state.canvas_instance_batches[p_index].instance_buffer_index]);
+			glBindBuffer(GL_ARRAY_BUFFER, buf);
 
 			uint32_t range_start = state.canvas_instance_batches[p_index].start * sizeof(InstanceData);
 			_enable_attributes(range_start, false);
@@ -1366,8 +1380,15 @@ void RasterizerCanvasGLES3::_render_batch(Light *p_lights, uint32_t p_index, Ren
 		} break;
 
 		case Item::Command::TYPE_PRIMITIVE: {
+			int buf_idx = state.canvas_instance_batches[p_index].instance_buffer_index;
+			ERR_FAIL_INDEX(buf_idx, (int)state.canvas_instance_data_buffers[state.current_data_buffer_index].instance_buffers.size());
+			GLuint buf = state.canvas_instance_data_buffers[state.current_data_buffer_index].instance_buffers[buf_idx];
+			if (buf == 0) {
+				break;
+			}
+
 			glBindVertexArray(data.canvas_quad_array);
-			glBindBuffer(GL_ARRAY_BUFFER, state.canvas_instance_data_buffers[state.current_data_buffer_index].instance_buffers[state.canvas_instance_batches[p_index].instance_buffer_index]);
+			glBindBuffer(GL_ARRAY_BUFFER, buf);
 			uint32_t range_start = state.canvas_instance_batches[p_index].start * sizeof(InstanceData);
 			_enable_attributes(range_start, true);
 
@@ -1479,8 +1500,16 @@ void RasterizerCanvasGLES3::_render_batch(Light *p_lights, uint32_t p_index, Ren
 
 				index_array_gl = mesh_storage->mesh_surface_get_index_buffer(surface, 0);
 				bool use_index_buffer = false;
+
+				int buf_idx = state.canvas_instance_batches[p_index].instance_buffer_index;
+				ERR_CONTINUE_MSG(buf_idx < 0 || buf_idx >= (int)state.canvas_instance_data_buffers[state.current_data_buffer_index].instance_buffers.size(), "Instance buffer index out of bounds.");
+				GLuint buf = state.canvas_instance_data_buffers[state.current_data_buffer_index].instance_buffers[buf_idx];
+				if (buf == 0) {
+					continue;
+				}
+
 				glBindVertexArray(vertex_array_gl);
-				glBindBuffer(GL_ARRAY_BUFFER, state.canvas_instance_data_buffers[state.current_data_buffer_index].instance_buffers[state.canvas_instance_batches[p_index].instance_buffer_index]);
+				glBindBuffer(GL_ARRAY_BUFFER, buf);
 
 				uint32_t range_start = state.canvas_instance_batches[p_index].start * sizeof(InstanceData);
 				_enable_attributes(range_start, false, instance_count);
