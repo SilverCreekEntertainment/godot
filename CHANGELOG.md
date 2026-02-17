@@ -7,6 +7,96 @@ previous feature release. It is equivalent to the listings on our
 Changelogs for earlier feature releases are available in their respective Git
 branches, and linked at the [end of this file](#Past-releases).
 
+## 4.6.1 - 2026-02-16
+
+- [Release announcement](https://godotengine.org/article/maintenance-release-godot-4-6-1)
+- [Interactive changelog](https://godotengine.github.io/godot-interactive-changelog/#4.6.1)
+
+#### 3D
+
+- Change orbit snap shortcut with navigation scheme ([GH-115298](https://github.com/godotengine/godot/pull/115298)).
+- Fix `Skeleton3D` Edit Mode bone buttons have priority over transform gizmo ([GH-115608](https://github.com/godotengine/godot/pull/115608)).
+- Fix viewport orbit snap defaulting to always snapping when shortcut(s) are set to none ([GH-115002](https://github.com/godotengine/godot/pull/115002)).
+- Increase float precision in the editor inspector for Quaternions ([GH-106352](https://github.com/godotengine/godot/pull/106352)).
+- Register zoom shortcuts to match preset `Godot` navigation scheme ([GH-115290](https://github.com/godotengine/godot/pull/115290)).
+
+#### Animation
+
+- Fix double memdelete of `dummy_player` ([GH-115968](https://github.com/godotengine/godot/pull/115968)).
+- Fix LookAtModifier3D / AimModifier3D forward vector ([GH-115689](https://github.com/godotengine/godot/pull/115689)).
+- Fix use-after-free in Animation Blend Tree ([GH-115919](https://github.com/godotengine/godot/pull/115919)).
+- Fix use-after-free in AnimationTree (AHashMap realloc) ([GH-115931](https://github.com/godotengine/godot/pull/115931)).
+
+#### Buildsystem
+
+- Fix missing lib with `builtin_glslang=false` ([GH-93478](https://github.com/godotengine/godot/pull/93478)).
+
+#### C#
+
+- Revert "Improve performance of `CSharpLanguage::reload_assemblies`" ([GH-115759](https://github.com/godotengine/godot/pull/115759)).
+
+#### Core
+
+- Fix ClassDB class list sorting regression ([GH-115923](https://github.com/godotengine/godot/pull/115923)).
+- Fix the `NodePath` hash function to not yield the same value for similar paths ([GH-115473](https://github.com/godotengine/godot/pull/115473)).
+
+#### Editor
+
+- Fix `NodePath` `EditorProperty` using the wrong scene root ([GH-115422](https://github.com/godotengine/godot/pull/115422)).
+- Fix create dialog recents ([GH-115314](https://github.com/godotengine/godot/pull/115314)).
+- Fix Rename option for instance roots ([GH-115575](https://github.com/godotengine/godot/pull/115575)).
+- Fix Unique Resources from Inherited Scenes ([GH-115862](https://github.com/godotengine/godot/pull/115862)).
+- Fix wrong base type when creating script ([GH-115778](https://github.com/godotengine/godot/pull/115778)).
+
+#### Export
+
+- Load translation files to check locale for ICU data export ([GH-115827](https://github.com/godotengine/godot/pull/115827)).
+
+#### GDScript
+
+- LSP: Add `godot` to known language ids ([GH-115671](https://github.com/godotengine/godot/pull/115671)).
+- LSP: Handle clients that do not support `CompletionContext` ([GH-115672](https://github.com/godotengine/godot/pull/115672)).
+
+#### GUI
+
+- Fix current line highlight not extending into gutter ([GH-115729](https://github.com/godotengine/godot/pull/115729)).
+
+#### Input
+
+- Update editor shortcuts when changing 3D navigation scheme ([GH-115289](https://github.com/godotengine/godot/pull/115289)).
+
+#### Particles
+
+- Revert "Change curve range for particle multipliers" ([GH-116140](https://github.com/godotengine/godot/pull/116140)).
+
+#### Physics
+
+- Fix transform updates sometimes being discarded when using Jolt ([GH-115364](https://github.com/godotengine/godot/pull/115364)).
+
+#### Platforms
+
+- Android: Fix `Bad file descriptor` in SAF/MediaStore in long term access ([GH-115751](https://github.com/godotengine/godot/pull/115751)).
+- Fix crash in `StorageScope.kt` on Android ([GH-115515](https://github.com/godotengine/godot/pull/115515)).
+- Wayland Embedder: Fix FD leak with inert objects ([GH-115823](https://github.com/godotengine/godot/pull/115823)).
+- Windows: Disable MSVC control flow check on IAT hooks ([GH-115430](https://github.com/godotengine/godot/pull/115430)).
+
+#### Plugin
+
+- Android: Fix plugin type mismatch regression ([GH-115685](https://github.com/godotengine/godot/pull/115685)).
+
+#### Rendering
+
+- Avoid reading from sky pointer when rendering background without sky ([GH-115874](https://github.com/godotengine/godot/pull/115874)).
+- Ensure that uv border size is passed in to sky rendering functions ([GH-115606](https://github.com/godotengine/godot/pull/115606)).
+- Pick the sample closer to the camera when resolving 2x MSAA ([GH-115124](https://github.com/godotengine/godot/pull/115124)).
+- Update re-spirv with more derivative operations ([GH-115921](https://github.com/godotengine/godot/pull/115921)).
+- Use sky's corrected camera projection for `combined_reprojection` ([GH-115292](https://github.com/godotengine/godot/pull/115292)).
+- Use transmittance instead of opacity in the early-out branch when calculating volumetric fog ([GH-116107](https://github.com/godotengine/godot/pull/116107)).
+
+#### Thirdparty
+
+- libpng: Update to 1.6.54 ([GH-115714](https://github.com/godotengine/godot/pull/115714)).
+
 ## 4.6 - 2026-01-26
 
 - [Release announcement](https://godotengine.org/releases/4.6/)
