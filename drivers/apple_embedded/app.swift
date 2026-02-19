@@ -54,6 +54,27 @@ struct SwiftUIApp: App {
 		WindowGroup {
 			GodotSwiftUIViewController()
 				.ignoresSafeArea()
+				// Forward deep links (URL schemes) to registered app delegate services,
+				// since scene-based lifecycle no longer delivers these to the app delegate.
+				.onOpenURL { url in
+					let application = UIApplication.shared
+					for service in GDTApplicationDelegate.services {
+						if service.responds(to: #selector(UIApplicationDelegate.application(_:open:options:))) {
+							if service.application!(application, open: url, options: [:]) {
+								break
+							}
+						}
+					}
+				}
+				// Forward universal links to registered app delegate services.
+				.onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { userActivity in
+					let application = UIApplication.shared
+					for service in GDTApplicationDelegate.services {
+						if service.responds(to: #selector(UIApplicationDelegate.application(_:continue:restorationHandler:))) {
+							_ = service.application!(application, continue: userActivity, restorationHandler: { _ in })
+						}
+					}
+				}
 				// UIViewControllerRepresentable does not call viewWillDisappear() nor viewDidDisappear() when
 				// backgrounding the app, or closing the app's main window, update the renderer here.
 				.onChange(of: scenePhase) { phase in
