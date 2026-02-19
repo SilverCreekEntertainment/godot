@@ -664,6 +664,16 @@ void DisplayServerAppleEmbedded::screen_set_orientation(DisplayServer::ScreenOri
 	screen_orientation = p_orientation;
 	if (@available(iOS 16.0, *)) {
 		[GDTAppDelegateService.viewController setNeedsUpdateOfSupportedInterfaceOrientations];
+#if !defined(VISIONOS_ENABLED)
+		UIWindowScene *windowScene = GDTAppDelegateService.viewController.view.window.windowScene;
+		if (windowScene) {
+			UIInterfaceOrientationMask mask = [GDTAppDelegateService.viewController supportedInterfaceOrientations];
+			UIWindowSceneGeometryPreferencesIOS *prefs = [[UIWindowSceneGeometryPreferencesIOS alloc] initWithInterfaceOrientations:mask];
+			[windowScene requestGeometryUpdateWithPreferences:prefs
+												 errorHandler:^(NSError *error){
+												 }];
+		}
+#endif
 	}
 #if !defined(VISIONOS_ENABLED)
 	else {

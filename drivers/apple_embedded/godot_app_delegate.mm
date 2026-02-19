@@ -32,6 +32,7 @@
 
 #import "app_delegate_service.h"
 #include "core/typedefs.h"
+#import "godot_view_controller.h"
 
 @implementation GDTApplicationDelegate
 
@@ -456,13 +457,15 @@ GODOT_CLANG_WARNING_PUSH_AND_IGNORE("-Wdeprecated-declarations")
 	}
 }
 
-/* Handled By Info.plist file for now
-
 // MARK: Interface Geometry
 
-- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {}
-
-*/
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+	GDTViewController *vc = GDTAppDelegateService.viewController;
+	if (vc) {
+		return [vc supportedInterfaceOrientations];
+	}
+	return UIInterfaceOrientationMaskAll;
+}
 
 @end
 
