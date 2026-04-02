@@ -48,12 +48,10 @@ struct GodotSwiftUIViewController: UIViewControllerRepresentable {
 @main
 struct SwiftUIApp: App {
 	@UIApplicationDelegateAdaptor(GDTApplicationDelegate.self) var appDelegate
-	@Environment(\.scenePhase) private var scenePhase
 
 	var body: some Scene {
 		WindowGroup {
 			GodotSwiftUIViewController()
-				.ignoresSafeArea()
 				// Forward deep links (URL schemes) to registered app delegate services,
 				// since scene-based lifecycle no longer delivers these to the app delegate.
 				.onOpenURL { url in
@@ -73,26 +71,6 @@ struct SwiftUIApp: App {
 						if service.responds(to: #selector(UIApplicationDelegate.application(_:continue:restorationHandler:))) {
 							_ = service.application!(application, continue: userActivity, restorationHandler: { _ in })
 						}
-					}
-				}
-				// UIViewControllerRepresentable does not call viewWillDisappear() nor viewDidDisappear() when
-				// backgrounding the app, or closing the app's main window, update the renderer here.
-				.onChange(of: scenePhase) { phase in
-					// For some reason UIViewControllerRepresentable is not calling viewWillDisappear()
-					// nor viewDidDisappear when closing the app's main window, call it here so we
-					// stop the renderer.
-					switch phase {
-					case .active:
-						print("GodotSwiftUIViewController scene active")
-						GDTAppDelegateService.viewController?.godotView.startRendering()
-					case .inactive:
-						print("GodotSwiftUIViewController scene inactive")
-						GDTAppDelegateService.viewController?.godotView.stopRendering()
-					case .background:
-						print("GodotSwiftUIViewController scene backgrounded")
-						GDTAppDelegateService.viewController?.godotView.stopRendering()
-					@unknown default:
-						print("unknown default")
 					}
 				}
 		}
