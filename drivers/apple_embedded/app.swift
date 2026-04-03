@@ -52,6 +52,7 @@ struct SwiftUIApp: App {
 	var body: some Scene {
 		WindowGroup {
 			GodotSwiftUIViewController()
+				.ignoresSafeArea()
 				// Forward deep links (URL schemes) to registered app delegate services,
 				// since scene-based lifecycle no longer delivers these to the app delegate.
 				.onOpenURL { url in
