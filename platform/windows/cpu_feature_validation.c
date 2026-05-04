@@ -29,8 +29,12 @@
 /**************************************************************************/
 
 #include <windows.h>
+#include <commctrl.h>
+#include <shellapi.h>
 #ifdef _MSC_VER
 #include <intrin.h> // For builtin __cpuid.
+#pragma comment(lib, "comctl32.lib")
+#pragma comment(lib, "shell32.lib")
 #else
 void __cpuid(int *r_cpuinfo, int p_info) {
 	// Note: Some compilers have a buggy `__cpuid` intrinsic, using inline assembly (based on LLVM-20 implementation) instead.
@@ -74,7 +78,34 @@ extern int WINAPI ShimMainCRTStartup() {
 		return WinMainCRTStartup();
 #endif
 	} else {
-		MessageBoxW(NULL, L"A CPU with SSE4.2 instruction set support is required.", L"Godot Engine", MB_OK | MB_ICONEXCLAMATION | MB_TASKMODAL);
+		TASKDIALOG_BUTTON td_buttons[2];
+		TASKDIALOGCONFIG td_config;
+		int nButtonPressed = 0;
+
+		td_buttons[0].nButtonID = 100;
+		td_buttons[0].pszButtonText = L"Download Older Version";
+		td_buttons[1].nButtonID = 101;
+		td_buttons[1].pszButtonText = L"Cancel";
+
+		ZeroMemory(&td_config, sizeof(td_config));
+		td_config.cbSize = sizeof(TASKDIALOGCONFIG);
+		td_config.pszWindowTitle = L"Hardwood Games";
+		td_config.pszMainIcon = TD_WARNING_ICON;
+		td_config.pszMainInstruction = L"This version of the game can't run on your computer";
+		td_config.pszContent = L"It requires SSE 4.2. An older compatible version is available at hardwoodgames.com/download";
+		td_config.pButtons = td_buttons;
+		td_config.cButtons = 2;
+		td_config.nDefaultButton = 100;
+		td_config.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION;
+
+		TaskDialogIndirect(&td_config, &nButtonPressed, NULL, NULL);
+		if (nButtonPressed == 100) {
+			ShellExecuteW(NULL, L"open", L"https://www.hardwoodgames.com/download/", NULL, NULL, SW_SHOWNORMAL);
+			Sleep(1000);
+
+			// for some reason return -1; doesn't exit the process, but ExitProcess does.
+			ExitProcess(1);
+		}
 		return -1;
 	}
 }
