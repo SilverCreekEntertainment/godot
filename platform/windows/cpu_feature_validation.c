@@ -28,9 +28,9 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#include <windows.h>
 #include <commctrl.h>
 #include <shellapi.h>
+#include <windows.h>
 #ifdef _MSC_VER
 #include <intrin.h> // For builtin __cpuid.
 #pragma comment(lib, "comctl32.lib")
