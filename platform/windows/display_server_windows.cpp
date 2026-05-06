@@ -30,6 +30,7 @@
 
 #include "display_server_windows.h"
 
+#include "download_dialog.h"
 #include "drop_target_windows.h"
 #include "os_windows.h"
 #include "scene/main/window.h"
@@ -7682,18 +7683,16 @@ DisplayServer *DisplayServerWindows::create_func(const String &p_rendering_drive
 			if (tested_drivers.has_flag(DRIVER_ID_RD_D3D12)) {
 				drivers.push_back("Direct3D 12");
 			}
-			String executable_name = OS::get_singleton()->get_executable_path().get_file();
-			OS::get_singleton()->alert(
-					vformat("Your video card drivers seem not to support the required %s version.\n\n"
-							"If possible, consider updating your video card drivers or using the OpenGL 3 driver.\n\n"
-							//"You can enable the OpenGL 3 driver by starting the engine from the\n"
-							//"command line with the command:\n\n    \"%s\" --rendering-driver opengl3\n\n"
-							"If you have recently updated your video card drivers, try rebooting."
-							"Or try installing an older version of the game:\n\n"
-							"https://www.hardwoodgames.com/download/",
-							String(" or ").join(drivers),
-							executable_name),
-					"Unable to initialize video driver");
+			String params = "tried_drivers=" + String(",").join(drivers).uri_encode();
+			String content = vformat(
+					"Your video drivers don't support %s, which this version requires.\n\n"
+					"Quick fix - Download an older version built for more systems.\n"
+					"Tech fix - Update your video card drivers, then reboot.",
+					String(" or ").join(drivers));
+			show_download_older_version_dialog(
+					L"The game couldn't start",
+					(const wchar_t *)content.utf16().get_data(),
+					(const wchar_t *)params.utf16().get_data());
 		} else {
 			Vector<String> drivers;
 			if (tested_drivers.has_flag(DRIVER_ID_COMPAT_OPENGL3)) {
@@ -7702,15 +7701,16 @@ DisplayServer *DisplayServerWindows::create_func(const String &p_rendering_drive
 			if (tested_drivers.has_flag(DRIVER_ID_COMPAT_ANGLE_D3D11)) {
 				drivers.push_back("Direct3D 11");
 			}
-			OS::get_singleton()->alert(
-					vformat(
-							"Your video card drivers seem not to support the required %s version.\n\n"
-							"If possible, consider updating your video card drivers.\n\n"
-							"If you have recently updated your video card drivers, try rebooting."
-							"Or try installing an older version of the game:\n\n"
-							"https://www.hardwoodgames.com/download/",
-							String(" or ").join(drivers)),
-					"Unable to initialize video driver");
+			String params = "tried_drivers=" + String(",").join(drivers).uri_encode();
+			String content = vformat(
+					"Your video drivers don't support %s, which this version requires.\n\n"
+					"Quick fix - Download an older version built for more systems.\n"
+					"Tech fix - Update your video card drivers, then reboot.",
+					String(" or ").join(drivers));
+			show_download_older_version_dialog(
+					L"The game couldn't start",
+					(const wchar_t *)content.utf16().get_data(),
+					(const wchar_t *)params.utf16().get_data());
 		}
 	}
 	return ds;

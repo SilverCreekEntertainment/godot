@@ -10,6 +10,10 @@ import platform_windows_builders
 
 from methods import redirect_emitter
 
+# Add roguec to CPPPATH so download_dialog.c can include build.h.
+_rogue_path = Path(Dir(".").abspath).parent.parent.parent / "rogue"
+env.Append(CPPPATH=[str(_rogue_path / "roguec")])
+
 sources = []
 
 common_win = [
@@ -25,6 +29,7 @@ common_win = [
     "wgl_detect_version.cpp",
     "rendering_context_driver_vulkan_windows.cpp",
     "drop_target_windows.cpp",
+    "download_dialog.c",
 ]
 
 if env["library_type"] == "executable":
