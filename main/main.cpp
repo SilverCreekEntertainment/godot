@@ -2476,6 +2476,17 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 		FORCE_ANGLE("Intel", "Intel(R) Iris Pro Graphics 580");
 		FORCE_ANGLE("Intel", "Intel(R) Iris Pro Graphics P580");
 
+		// Radeon 3000 got opengl shader compiler error then exits, forcing to angle shows users message to
+		// update drivers or download older version of game.
+		// Added other similar cards to blocklist.
+		FORCE_ANGLE("ATI", "Radeon 2100");
+		FORCE_ANGLE("ATI", "Radeon 3000");
+		FORCE_ANGLE("ATI", "Radeon 3100");
+		FORCE_ANGLE("ATI", "Radeon 7000");
+		FORCE_ANGLE("ATI", "Radeon 9000");
+		FORCE_ANGLE("ATI", "Radeon 9100");
+		FORCE_ANGLE("ATI", "Radeon IGP");
+
 #undef FORCE_ANGLE
 
 		GLOBAL_DEF_RST_NOVAL(PropertyInfo(Variant::ARRAY, "rendering/gl_compatibility/force_angle_on_devices", PROPERTY_HINT_ARRAY_TYPE, vformat("%s/%s:%s", Variant::DICTIONARY, PROPERTY_HINT_NONE, String())), force_angle_list);
