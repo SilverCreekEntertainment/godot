@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  cpu_feature_validation.c                                              */
+/*  download_dialog.c                                                     */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -30,59 +30,74 @@
 
 #include "download_dialog.h"
 
+#include "build.h"
+
 #include <windows.h>
 
+#include <commctrl.h>
 #include <shellapi.h>
+
 #ifdef _MSC_VER
-#include <intrin.h> // For builtin __cpuid.
+#pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "shell32.lib")
-#else
-void __cpuid(int *r_cpuinfo, int p_info) {
-	// Note: Some compilers have a buggy `__cpuid` intrinsic, using inline assembly (based on LLVM-20 implementation) instead.
-	__asm__ __volatile__(
-			"xchgq %%rbx, %q1;"
-			"cpuid;"
-			"xchgq %%rbx, %q1;"
-			: "=a"(r_cpuinfo[0]), "=r"(r_cpuinfo[1]), "=c"(r_cpuinfo[2]), "=d"(r_cpuinfo[3])
-			: "0"(p_info));
-}
 #endif
 
-#ifndef PF_SSE4_2_INSTRUCTIONS_AVAILABLE
-#define PF_SSE4_2_INSTRUCTIONS_AVAILABLE 38
-#endif
+#define BASE_URL L"https://www.hardwoodgames.com/downloads/"
 
-#ifdef WINDOWS_SUBSYSTEM_CONSOLE
-extern int WINAPI mainCRTStartup();
-#else
-extern int WINAPI WinMainCRTStartup();
-#endif
+void show_download_older_version_dialog(
+		const wchar_t *p_main_instruction,
+		const wchar_t *p_content,
+		const wchar_t *p_query_params) {
+	TASKDIALOG_BUTTON td_buttons[2];
+	TASKDIALOGCONFIG td_config;
+	int nButtonPressed = 0;
 
-#if defined(__GNUC__) || defined(__clang__)
-extern int WINAPI ShimMainCRTStartup() __attribute__((used));
-#endif
+	td_buttons[0].nButtonID = 100;
+	td_buttons[0].pszButtonText = L"Download Older Version";
+	td_buttons[1].nButtonID = 101;
+	td_buttons[1].pszButtonText = L"Exit";
 
-extern int WINAPI ShimMainCRTStartup() {
-	BOOL win_sse42_supported = FALSE;
-	BOOL cpuid_sse42_supported = FALSE;
+	ZeroMemory(&td_config, sizeof(td_config));
+	td_config.cbSize = sizeof(TASKDIALOGCONFIG);
+	td_config.pszWindowTitle = L"Hardwood Games";
+	td_config.pszMainIcon = TD_WARNING_ICON;
+	td_config.pszMainInstruction = p_main_instruction;
+	td_config.pszContent = p_content;
+	td_config.pButtons = td_buttons;
+	td_config.cButtons = 2;
+	td_config.nDefaultButton = 100;
+	td_config.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION;
 
-	int cpuinfo[4];
-	__cpuid(cpuinfo, 0x01);
+	TaskDialogIndirect(&td_config, &nButtonPressed, NULL, NULL);
+	if (nButtonPressed == 100) {
+		// Get Windows version via RtlGetVersion (works regardless of manifest).
+		DWORD major = 0, minor = 0, build_num = 0;
+		HMODULE hNtdll = GetModuleHandleW(L"ntdll.dll");
+		if (hNtdll) {
+			typedef LONG(WINAPI * RtlGetVersionFn)(OSVERSIONINFOW *);
+			RtlGetVersionFn pRtlGetVersion = (RtlGetVersionFn)GetProcAddress(hNtdll, "RtlGetVersion");
+			if (pRtlGetVersion) {
+				OSVERSIONINFOW osvi;
+				ZeroMemory(&osvi, sizeof(osvi));
+				osvi.dwOSVersionInfoSize = sizeof(osvi);
+				if (pRtlGetVersion(&osvi) == 0) {
+					major = osvi.dwMajorVersion;
+					minor = osvi.dwMinorVersion;
+					build_num = osvi.dwBuildNumber;
+				}
+			}
+		}
 
-	win_sse42_supported = IsProcessorFeaturePresent(PF_SSE4_2_INSTRUCTIONS_AVAILABLE);
-	cpuid_sse42_supported = cpuinfo[2] & (1 << 20);
-
-	if (win_sse42_supported || cpuid_sse42_supported) {
-#ifdef WINDOWS_SUBSYSTEM_CONSOLE
-		return mainCRTStartup();
-#else
-		return WinMainCRTStartup();
-#endif
-	} else {
-		show_download_older_version_dialog(
-				L"This version of the game can't run on your computer",
-				L"It requires SSE 4.2. An older compatible version is available at hardwoodgames.com/download",
-				L"sse42_support=0");
-		return -1;
+		wchar_t url[1024];
+		_snwprintf_s(url, 1024, _TRUNCATE,
+				BASE_URL L"?win_version=%lu.%lu.%lu&build=%d",
+				major, minor, build_num, ROGUE_ENGINE_BUILD);
+		if (p_query_params && p_query_params[0] != L'\0') {
+			wcsncat_s(url, 1024, L"&", _TRUNCATE);
+			wcsncat_s(url, 1024, p_query_params, _TRUNCATE);
+		}
+		ShellExecuteW(NULL, L"open", url, NULL, NULL, SW_SHOWNORMAL);
+		Sleep(1000);
+		ExitProcess(1);
 	}
 }

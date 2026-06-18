@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  cpu_feature_validation.c                                              */
+/*  download_dialog.h                                                     */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,61 +28,27 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#include "download_dialog.h"
+#pragma once
 
-#include <windows.h>
+#include <wchar.h>
 
-#include <shellapi.h>
-#ifdef _MSC_VER
-#include <intrin.h> // For builtin __cpuid.
-#pragma comment(lib, "shell32.lib")
-#else
-void __cpuid(int *r_cpuinfo, int p_info) {
-	// Note: Some compilers have a buggy `__cpuid` intrinsic, using inline assembly (based on LLVM-20 implementation) instead.
-	__asm__ __volatile__(
-			"xchgq %%rbx, %q1;"
-			"cpuid;"
-			"xchgq %%rbx, %q1;"
-			: "=a"(r_cpuinfo[0]), "=r"(r_cpuinfo[1]), "=c"(r_cpuinfo[2]), "=d"(r_cpuinfo[3])
-			: "0"(p_info));
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// Shows a TaskDialog with a "Download Older Version" button and a "Cancel"
+// button. If the user picks the download button, ShellExecuteW opens
+// https://www.hardwoodgames.com/downloads/ with optional query params appended,
+// then the process is terminated via ExitProcess(1).
+//
+// `p_main_instruction` is shown as the bold heading, `p_content` as the
+// description text. `p_query_params` is an optional query string appended after
+// '?' (e.g. L"tried_drivers=Vulkan"), or NULL for no params.
+void show_download_older_version_dialog(
+		const wchar_t *p_main_instruction,
+		const wchar_t *p_content,
+		const wchar_t *p_query_params);
+
+#ifdef __cplusplus
 }
 #endif
-
-#ifndef PF_SSE4_2_INSTRUCTIONS_AVAILABLE
-#define PF_SSE4_2_INSTRUCTIONS_AVAILABLE 38
-#endif
-
-#ifdef WINDOWS_SUBSYSTEM_CONSOLE
-extern int WINAPI mainCRTStartup();
-#else
-extern int WINAPI WinMainCRTStartup();
-#endif
-
-#if defined(__GNUC__) || defined(__clang__)
-extern int WINAPI ShimMainCRTStartup() __attribute__((used));
-#endif
-
-extern int WINAPI ShimMainCRTStartup() {
-	BOOL win_sse42_supported = FALSE;
-	BOOL cpuid_sse42_supported = FALSE;
-
-	int cpuinfo[4];
-	__cpuid(cpuinfo, 0x01);
-
-	win_sse42_supported = IsProcessorFeaturePresent(PF_SSE4_2_INSTRUCTIONS_AVAILABLE);
-	cpuid_sse42_supported = cpuinfo[2] & (1 << 20);
-
-	if (win_sse42_supported || cpuid_sse42_supported) {
-#ifdef WINDOWS_SUBSYSTEM_CONSOLE
-		return mainCRTStartup();
-#else
-		return WinMainCRTStartup();
-#endif
-	} else {
-		show_download_older_version_dialog(
-				L"This version of the game can't run on your computer",
-				L"It requires SSE 4.2. An older compatible version is available at hardwoodgames.com/download",
-				L"sse42_support=0");
-		return -1;
-	}
-}
