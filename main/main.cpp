@@ -2476,6 +2476,16 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 		FORCE_ANGLE("Intel", "Intel(R) Iris Pro Graphics 580");
 		FORCE_ANGLE("Intel", "Intel(R) Iris Pro Graphics P580");
 
+		// Added by SCE (was in godot-sce-4.6, lost in the 4.7 port, which made Sentry
+		// GOROGUE-WINDOWS-301 spike in build 639): Intel iGPUs whose native OpenGL ICD
+		// (ig9icd64.dll / igxelpicd64.dll) crashes in exit-time TLS/FLS teardown. Upstream's
+		// "Intel(R) HD Graphics" entries do NOT substring-match these newer names (the "U" in
+		// "UHD" breaks the match). GL_RENDERER strings below verified from crash-report
+		// godot.log attachments on GOROGUE-WINDOWS-301.
+		FORCE_ANGLE("Intel", "Intel(R) UHD Graphics"); // "Intel(R) UHD Graphics 6xx/7xx" and bare "Intel(R) UHD Graphics" (Gen9.5-Gen12, N-series)
+		FORCE_ANGLE("Intel", "Intel(R) Iris"); // "Intel(R) Iris(R) Xe Graphics", "Intel(R) Iris(R) Plus Graphics" (Gen11+)
+		FORCE_ANGLE("Intel", "Intel(R) Graphics"); // new naming on N150 / Core (Ultra) 1xxU-series
+
 		// Radeon 3000 got opengl shader compiler error then exits, forcing to angle shows users message to
 		// update drivers or download older version of game.
 		// Added other similar cards to blocklist.
