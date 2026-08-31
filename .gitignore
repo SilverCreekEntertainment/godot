@@ -396,3 +396,7 @@ $RECYCLE.BIN/
 *.msp
 *.lnk
 *.generated.props
+
+# SCE
+*.scons_stamp
+*.ninja.sources
