@@ -63,6 +63,13 @@ DisplayServerWeb *DisplayServerWeb::get_singleton() {
 	return static_cast<DisplayServerWeb *>(DisplayServer::get_singleton());
 }
 
+// SCE: game-provided "is the wheel event for us?" hook.
+DisplayServerWeb::MouseWheelWantedCallback DisplayServerWeb::mouse_wheel_wanted_callback = nullptr;
+
+void DisplayServerWeb::set_mouse_wheel_wanted_callback(MouseWheelWantedCallback p_callback) {
+	mouse_wheel_wanted_callback = p_callback;
+}
+
 // Window (canvas)
 bool DisplayServerWeb::check_size_force_redraw() {
 	bool size_changed = godot_js_display_size_update() != 0;
@@ -654,6 +661,13 @@ int DisplayServerWeb::mouse_wheel_callback(int p_delta_mode, double p_delta_x, d
 }
 
 int DisplayServerWeb::_mouse_wheel_callback(int p_delta_mode, double p_delta_x, double p_delta_y) {
+	// SCE: let the game decline the event so the browser scrolls the page. This must be decided
+	// here, synchronously, because the input event itself is buffered until the next frame.
+	// Checked before the focus logic so an unfocused canvas doesn't grab focus for a page scroll.
+	if (mouse_wheel_wanted_callback && !mouse_wheel_wanted_callback(p_delta_x, p_delta_y)) {
+		return false;
+	}
+
 	if (!godot_js_display_canvas_is_focused() && !godot_js_is_ime_focused()) {
 		if (get_singleton()->cursor_inside_canvas) {
 			godot_js_display_canvas_focus();

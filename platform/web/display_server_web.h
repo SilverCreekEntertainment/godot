@@ -130,6 +130,11 @@ private:
 	static void _mouse_move_callback(double p_x, double p_y, double p_rel_x, double p_rel_y, int p_modifiers, double p_pressure);
 	WASM_EXPORT static int mouse_wheel_callback(int p_delta_mode, double p_delta_x, double p_delta_y);
 	static int _mouse_wheel_callback(int p_delta_mode, double p_delta_x, double p_delta_y);
+	// SCE: consulted synchronously inside the browser "wheel" event. If it returns false the
+	// event is not consumed (no preventDefault), so the browser scrolls the page instead.
+	// Gets the raw DOM deltas so the game can tell a horizontal wheel from a vertical one.
+	typedef bool (*MouseWheelWantedCallback)(double p_delta_x, double p_delta_y);
+	static MouseWheelWantedCallback mouse_wheel_wanted_callback;
 	WASM_EXPORT static void touch_callback(int p_type, int p_count);
 	static void _touch_callback(int p_type, int p_count);
 	WASM_EXPORT static void key_callback(int p_pressed, int p_repeat, int p_modifiers);
@@ -169,6 +174,9 @@ protected:
 public:
 	// Override return type to make writing static callbacks less tedious.
 	static DisplayServerWeb *get_singleton();
+
+	// SCE: game hook deciding whether a wheel event is for the canvas or the page.
+	static void set_mouse_wheel_wanted_callback(MouseWheelWantedCallback p_callback);
 
 	// utilities
 	bool check_size_force_redraw();
