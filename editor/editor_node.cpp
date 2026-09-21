@@ -1407,6 +1407,11 @@ void EditorNode::_fs_changed() {
 				}
 				if (err != OK) {
 					export_error = vformat("Project export for preset \"%s\" failed.", preset_name);
+				} else if (platform->get_worst_message_type() >= EditorExportPlatform::EXPORT_MESSAGE_ERROR) {
+					// SCE: an export plugin that reports an error (ExportMainGobPlugin when main.gob did not build)
+					// fails the export, so a command line export never exits 0 with a broken package.
+					err = FAILED;
+					export_error = vformat("Project export for preset \"%s\" completed with errors.", preset_name);
 				} else if (platform->get_worst_message_type() >= EditorExportPlatform::EXPORT_MESSAGE_WARNING) {
 					export_error = vformat("Project export for preset \"%s\" completed with warnings.", preset_name);
 				}
