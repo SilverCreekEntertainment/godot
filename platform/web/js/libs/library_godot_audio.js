@@ -717,6 +717,10 @@ class SampleNode {
 	 * @returns {void}
 	 */
 	_restart() {
+		// See `_pause`: nothing can be (re)started on a closed context.
+		if (GodotAudio.ctx == null) {
+			return;
+		}
 		if (this._source != null) {
 			this._source.disconnect();
 		}
@@ -746,6 +750,13 @@ class SampleNode {
 	 */
 	_pause() {
 		if (!this.isStarted) {
+			return;
+		}
+		// Once `close_async` has run (engine exit) the context is gone and the sources went with it.
+		// Reading `currentTime` off the null context would throw back into the engine, where a C++
+		// destructor may be on the stack (nodes leaving the tree during cleanup): the foreign
+		// exception turns into std::terminate and the wasm aborts before the exit callback runs.
+		if (GodotAudio.ctx == null) {
 			return;
 		}
 		this.isPaused = true;
