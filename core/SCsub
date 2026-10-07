@@ -181,9 +181,14 @@ env.CommandNoCache(
 )
 
 # Generate version hash
-gen_hash = env.CommandNoCache(
-    "version_hash.gen.cpp", env.Value(methods.get_git_info()), env.Run(core_builders.version_hash_builder)
-)
+# SCE: dev builds don't bake the commit hash. This Value changes with every commit, which regenerates
+# the file, recompiles it and relinks the editor on the next build with no code change (~12 s each
+# time). A dev editor reports an empty hash, like any build without a .git; everything else keeps it.
+if env.dev_build:
+    git_info = {"git_hash": "", "git_timestamp": 0}
+else:
+    git_info = methods.get_git_info()
+gen_hash = env.CommandNoCache("version_hash.gen.cpp", env.Value(git_info), env.Run(core_builders.version_hash_builder))
 env.add_source_files(env.core_sources, gen_hash)
 
 # Generate AES256 script encryption key
