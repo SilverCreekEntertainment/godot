@@ -3600,6 +3600,19 @@ bool EditorExportPlatformAndroid::_is_clean_build_required(const Ref<EditorExpor
 	last_gradle_build_dir = gradle_build_dir;
 	last_plugin_names = plugin_names;
 
+	// SCE: a command-line export is always a fresh process, so "first build" (and the build dir
+	// "changing" from the initial empty string) would clean on every export and gradle rebuilds
+	// everything (~5 s instead of ~1 s). The build scripts set GODOT_GRADLE_CLEAN=0 when nothing
+	// the gradle project depends on changed, or =1 to force a clean (template or plugins
+	// rebuilt). Unset keeps the stock editor behavior.
+	String gradle_clean_env = OS::get_singleton()->get_environment("GODOT_GRADLE_CLEAN");
+	if (gradle_clean_env == "1") {
+		return true;
+	}
+	if (gradle_clean_env == "0") {
+		return !first_build && (have_plugins_changed || has_build_dir_changed);
+	}
+
 	return have_plugins_changed || has_build_dir_changed || first_build;
 }
 
