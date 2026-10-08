@@ -1202,6 +1202,14 @@ if env["ninja"]:
     SetOption("experimental", "ninja")
     env["NINJA_FILE_NAME"] = env["ninja_file"]
     env["NINJA_DISABLE_AUTO_RUN"] = not env["ninja_auto_run"]
+    # SCE: ninja hands generated-file steps to a resident scons daemon keyed by NINJA_DIR, and that
+    # daemon runs the scons arguments it was started with. One shared .ninja dir would have an
+    # android build asking the windows editor's daemon for its targets, so every non-windows ninja
+    # file gets its own dir (build_android_template_debug_arm64.ninja -> .ninja_android_template_debug_arm64).
+    # Windows keeps the default .ninja it has always used. tasks/utils/godot_ninja.py mirrors this.
+    if env["platform"] != "windows":
+        ninja_stem = os.path.splitext(os.path.basename(env["ninja_file"]))[0]
+        env["NINJA_DIR"] = "#/.ninja_" + ninja_stem.removeprefix("build_")
     env.Tool("ninja", env["ninja_file"])
 
 # Threads
