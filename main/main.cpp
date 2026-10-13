@@ -250,6 +250,7 @@ static bool init_fullscreen = false;
 static bool init_maximized = false;
 static bool init_windowed = false;
 static bool init_always_on_top = false;
+static bool init_no_focus = false;
 static bool init_use_custom_pos = false;
 static bool init_use_custom_screen = false;
 static Vector2 init_custom_pos;
@@ -636,6 +637,7 @@ void Main::print_help(const char *p_binary) {
 	print_help_option("-m, --maximized", "Request a maximized window.\n");
 	print_help_option("-w, --windowed", "Request windowed mode.\n");
 	print_help_option("-t, --always-on-top", "Request an always-on-top window.\n");
+	print_help_option("--no-focus", "Request a window that never takes keyboard focus (same as display/window/size/no_focus).\n");
 	print_help_option("--resolution <W>x<H>", "Request window resolution.\n");
 	print_help_option("--position <X>,<Y>", "Request window position.\n");
 	print_help_option("--screen <N>", "Request window screen.\n");
@@ -1435,6 +1437,9 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 		} else if (arg == "-t" || arg == "--always-on-top") { // force always-on-top window
 
 			init_always_on_top = true;
+		} else if (arg == "--no-focus") { // a window that never takes focus (layout shots run in the background)
+
+			init_no_focus = true;
 		} else if (arg == "--resolution") { // force resolution
 
 			if (N) {
@@ -2741,7 +2746,7 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 		if (bool(GLOBAL_GET("display/window/size/extend_to_title"))) {
 			window_flags |= DisplayServerEnums::WINDOW_FLAG_EXTEND_TO_TITLE_BIT;
 		}
-		if (bool(GLOBAL_GET("display/window/size/no_focus"))) {
+		if (bool(GLOBAL_GET("display/window/size/no_focus")) || init_no_focus) {
 			window_flags |= DisplayServerEnums::WINDOW_FLAG_NO_FOCUS_BIT;
 		}
 		if (bool(GLOBAL_GET("display/window/size/sharp_corners"))) {

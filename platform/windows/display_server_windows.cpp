@@ -7211,7 +7211,9 @@ Error DisplayServerWindows::_create_window(DisplayServerEnums::WindowID p_window
 		} else {
 			Rect2i srect = screen_get_usable_rect(rq_screen);
 			Point2i wpos = p_rect.position;
-			if (srect != Rect2i()) {
+			// SCE: a no focus window is placed deliberately (rogue's layout shots park the game off screen with
+			// --no-focus --position, so it never shows up over other work), so it keeps the position it asked for
+			if (srect != Rect2i() && !(p_flags & DisplayServerEnums::WINDOW_FLAG_NO_FOCUS_BIT)) {
 				wpos = wpos.clamp(srect.position, srect.position + srect.size - p_rect.size / 3);
 			}
 
@@ -7308,7 +7310,9 @@ Error DisplayServerWindows::_create_window(DisplayServerEnums::WindowID p_window
 			// Save initial non-fullscreen rect.
 			Rect2i srect = screen_get_usable_rect(rq_screen);
 			Point2i wpos = p_rect.position;
-			if (srect != Rect2i()) {
+			// SCE: a no focus window is placed deliberately (rogue's layout shots park the game off screen with
+			// --no-focus --position, so it never shows up over other work), so it keeps the position it asked for
+			if (srect != Rect2i() && !(p_flags & DisplayServerEnums::WINDOW_FLAG_NO_FOCUS_BIT)) {
 				wpos = wpos.clamp(srect.position, srect.position + srect.size - p_rect.size / 3);
 			}
 
