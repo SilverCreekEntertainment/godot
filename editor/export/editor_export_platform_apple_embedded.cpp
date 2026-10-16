@@ -1291,7 +1291,7 @@ Error EditorExportPlatformAppleEmbedded::_copy_asset(const Ref<EditorExportPrese
 					return make_dir_err;
 				}
 			}
-			Error err = dir_exists ? da->copy_dir(p_asset, destination) : da->copy(p_asset, destination);
+			Error err = dir_exists ? da->copy_dir(p_asset, destination, -1, true) : da->copy(p_asset, destination);
 			if (err) {
 				return err;
 			}
@@ -1319,7 +1319,7 @@ Error EditorExportPlatformAppleEmbedded::_copy_asset(const Ref<EditorExportPrese
 				return make_dir_err;
 			}
 		}
-		Error err = dir_exists ? da->copy_dir(p_asset, destination) : da->copy(p_asset, destination);
+		Error err = dir_exists ? da->copy_dir(p_asset, destination, -1, true) : da->copy(p_asset, destination);
 		if (err) {
 			return err;
 		}
@@ -1346,7 +1346,7 @@ Error EditorExportPlatformAppleEmbedded::_copy_asset(const Ref<EditorExportPrese
 				return make_dir_err;
 			}
 		}
-		Error err = dir_exists ? da->copy_dir(p_asset, destination) : da->copy(p_asset, destination);
+		Error err = dir_exists ? da->copy_dir(p_asset, destination, -1, true) : da->copy(p_asset, destination);
 		if (err) {
 			return err;
 		}
