@@ -40,6 +40,9 @@
 @property(nonatomic, readonly, strong) GDTView *godotView;
 @property(nonatomic, readonly, strong) GDTKeyboardInputView *keyboardView;
 
+// [SCE] Point keyboardView at the password or the general-purpose input view.
+- (void)selectKeyboardView:(bool)password;
+
 #ifdef IOS_ENABLED
 - (void)propagateUIPreferencesToRootViewController;
 #endif

@@ -48,6 +48,12 @@
 @property(strong, nonatomic) GDTViewRenderer *renderer;
 @property(strong, nonatomic) GDTKeyboardInputView *keyboardView;
 
+// [SCE] iOS keeps a UITextView in password mode (no autocorrect, no predictive bar) once it has
+// been shown with UITextContentTypePassword, even after the input traits are reset. So password
+// input gets its own view and keyboardView is switched between the two in selectKeyboardView:.
+@property(strong, nonatomic) GDTKeyboardInputView *mainKeyboardView;
+@property(strong, nonatomic) GDTKeyboardInputView *passwordKeyboardView;
+
 @property(strong, nonatomic) UIView *godotLoadingOverlay;
 
 @end
@@ -184,8 +190,14 @@
 
 - (void)observeKeyboard {
 	print_verbose("Setting up keyboard input view.");
-	self.keyboardView = [GDTKeyboardInputView new];
-	[self.view addSubview:self.keyboardView];
+
+	self.mainKeyboardView = [GDTKeyboardInputView new];
+	[self.view addSubview:self.mainKeyboardView];
+
+	self.passwordKeyboardView = [GDTKeyboardInputView new];
+	[self.view addSubview:self.passwordKeyboardView];
+
+	self.keyboardView = self.mainKeyboardView;
 
 	print_verbose("Adding observer for keyboard show/hide.");
 	[[NSNotificationCenter defaultCenter]
@@ -198,6 +210,14 @@
 			   selector:@selector(keyboardHidden:)
 				   name:UIKeyboardDidHideNotification
 				 object:nil];
+}
+
+- (void)selectKeyboardView:(bool)password {
+	if (password) {
+		self.keyboardView = self.passwordKeyboardView;
+	} else {
+		self.keyboardView = self.mainKeyboardView;
+	}
 }
 
 - (void)displayLoadingOverlay {
@@ -229,6 +249,8 @@
 
 - (void)dealloc {
 	self.keyboardView = nil;
+	self.mainKeyboardView = nil;
+	self.passwordKeyboardView = nil;
 
 	self.renderer = nil;
 

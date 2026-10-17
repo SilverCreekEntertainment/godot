@@ -722,6 +722,12 @@ _FORCE_INLINE_ int _convert_utf32_offset_to_utf16(const String &p_existing_text,
 void DisplayServerAppleEmbedded::virtual_keyboard_show(const String &p_existing_text, const Rect2 &p_screen_rect, DisplayServerEnums::VirtualKeyboardType p_type, int p_max_length, int p_cursor_start, int p_cursor_end) {
 	NSString *existingString = [[NSString alloc] initWithUTF8String:p_existing_text.utf8().get_data()];
 
+	// [SCE] Once a UITextView has been shown with UITextContentTypePassword, iOS keeps it in password
+	// mode (no autocorrect, no predictive bar) for every later keyboard, even with the traits reset
+	// below (that reset alone, upstream PR godotengine/godot#118146, was not enough on device).
+	// So passwords use a separate input view; see GDTViewController selectKeyboardView:.
+	[GDTAppDelegateService.viewController selectKeyboardView:(p_type == DisplayServerEnums::KEYBOARD_TYPE_PASSWORD)];
+
 	GDTAppDelegateService.viewController.keyboardView.keyboardType = UIKeyboardTypeDefault;
 	GDTAppDelegateService.viewController.keyboardView.textContentType = nil;
 	GDTAppDelegateService.viewController.keyboardView.autocapitalizationType = UITextAutocapitalizationTypeSentences;
