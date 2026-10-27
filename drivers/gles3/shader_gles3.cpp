@@ -789,25 +789,32 @@ void ShaderGLES3::initialize(const String &p_general_defines, int p_base_texture
 
 		base_sha256 = hash_build.as_string().sha256_text();
 
+		// SCE: a cache folder that can't be created is not worth an error. In the wild it is always
+		// environmental (full disk, antivirus / sync tool holding the just-made folder) and it fired a
+		// Godot error per shader per launch into Sentry (GOROGUE-WINDOWS-4MA). Just compile the shader
+		// every run instead, and keep quiet about it: WARN_PRINT reaches the error handler as well.
 		Ref<DirAccess> d = DirAccess::open(shader_cache_dir);
-		ERR_FAIL_COND(d.is_null());
-		if (d->change_dir(name) != OK) {
-			Error err = d->make_dir(name);
-			ERR_FAIL_COND(err != OK);
-			d->change_dir(name);
+		bool cache_ok = d.is_valid();
+		if (cache_ok && d->change_dir(name) != OK) {
+			d->make_dir(name);
+			cache_ok = d->change_dir(name) == OK;
 		}
 
 		//erase other versions?
 		if (shader_cache_cleanup_on_start) {
 		}
 		//
-		if (d->change_dir(base_sha256) != OK) {
-			Error err = d->make_dir(base_sha256);
-			ERR_FAIL_COND(err != OK);
+		if (cache_ok && d->change_dir(base_sha256) != OK) {
+			d->make_dir(base_sha256);
+			cache_ok = d->change_dir(base_sha256) == OK;
 		}
-		shader_cache_dir_valid = true;
 
-		print_verbose("Shader '" + name + "' SHA256: " + base_sha256);
+		if (cache_ok) {
+			shader_cache_dir_valid = true;
+			print_verbose("Shader '" + name + "' SHA256: " + base_sha256);
+		} else {
+			print_verbose("Shader '" + name + "': can't create cache folder " + shader_cache_dir.path_join(name).path_join(base_sha256) + ", shader cache disabled for it.");
+		}
 	}
 }
 
